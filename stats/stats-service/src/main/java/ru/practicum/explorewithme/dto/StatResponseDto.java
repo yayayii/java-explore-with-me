@@ -4,14 +4,11 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
-
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class StatsRequestDto {
+public class StatResponseDto {
     private String app;
     private String uri;
-    private String ip;
-    private LocalDateTime timestamp;
+    private Long hits;
 }

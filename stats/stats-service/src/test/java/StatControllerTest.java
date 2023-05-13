@@ -10,10 +10,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import ru.practicum.explorewithme.controller.StatsController;
-import ru.practicum.explorewithme.dto.StatsRequestDto;
-import ru.practicum.explorewithme.dto.StatsResponseDto;
-import ru.practicum.explorewithme.service.StatsService;
+import ru.practicum.explorewithme.controller.StatController;
+import ru.practicum.explorewithme.dto.StatFullResponseDto;
+import ru.practicum.explorewithme.dto.StatRequestDto;
+import ru.practicum.explorewithme.dto.StatResponseDto;
+import ru.practicum.explorewithme.service.StatService;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -26,17 +27,18 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ExtendWith(MockitoExtension.class)
-public class StatsControllerTest {
+public class StatControllerTest {
     @Mock
-    private StatsService mockStatsService;
+    private StatService mockStatService;
     @InjectMocks
-    private StatsController statsController;
+    private StatController statController;
     private static ObjectMapper objectMapper;
     private MockMvc mockMvc;
 
 
-    private static StatsRequestDto testStatsRequestDto;
-    private static StatsResponseDto testStatsResponseDto;
+    private static StatRequestDto testStatRequestDto;
+    private static StatResponseDto testStatResponseDto;
+    private static StatFullResponseDto testStatFullResponseDto;
 
 
     @BeforeAll
@@ -44,29 +46,30 @@ public class StatsControllerTest {
         objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
 
-        testStatsRequestDto = new StatsRequestDto("app1", "uri1", "ip1", LocalDateTime.now());
-        testStatsResponseDto = new StatsResponseDto("app1", "uri1", 1L);
+        testStatRequestDto = new StatRequestDto("app1", "uri1", "ip1", LocalDateTime.now());
+        testStatResponseDto = new StatResponseDto("app1", "uri1", 1L);
+        testStatFullResponseDto = new StatFullResponseDto(1L, "app1", "uri1", "ip1", LocalDateTime.now());
     }
 
     @BeforeEach
     public void beforeEach() {
-        mockMvc = MockMvcBuilders.standaloneSetup(statsController).build();
+        mockMvc = MockMvcBuilders.standaloneSetup(statController).build();
     }
 
 
     @Test
     public void testSaveEndpointRequest() throws Exception {
-        doNothing().when(mockStatsService).saveEndpointRequest(any());
+        doNothing().when(mockStatService).saveEndpointRequest(any());
         mockMvc.perform(post("/hit")
-                .content(objectMapper.writeValueAsString(testStatsRequestDto))
+                .content(objectMapper.writeValueAsString(testStatRequestDto))
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isCreated());
     }
 
     @Test
     public void testGetStatsById() throws Exception {
-        when(mockStatsService.getStatsById(anyLong()))
-                .thenReturn(testStatsResponseDto);
+        when(mockStatService.getStatById(anyLong()))
+                .thenReturn(testStatFullResponseDto);
         mockMvc.perform(get("/stats/1"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON));
@@ -74,9 +77,9 @@ public class StatsControllerTest {
 
     @Test
     public void testGetStats() throws Exception {
-        when(mockStatsService.getStats(anyString(), anyString(), any(), anyBoolean()))
-                .thenReturn(List.of(testStatsResponseDto, testStatsResponseDto));
-        mockMvc.perform(get("/stats?start=start&end=end"))
+        when(mockStatService.getStats(any(), any(), any(), anyBoolean()))
+                .thenReturn(List.of(testStatResponseDto, testStatResponseDto));
+        mockMvc.perform(get("/stats?start=2022-09-06 10:00:23&end=2022-09-06 10:00:23"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$", hasSize(2)));
