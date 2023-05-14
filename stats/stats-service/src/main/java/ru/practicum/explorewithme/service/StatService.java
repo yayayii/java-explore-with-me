@@ -40,6 +40,9 @@ public class StatService {
 
     public List<StatResponseDto> getStats(LocalDateTime start, LocalDateTime end, String[] uris, boolean unique) {
         log.info("stats - stats-service - StatService - getStats");
+        if (!start.isBefore(end)) {
+            throw new IllegalArgumentException("Start date must be before end date");
+        }
         if (unique) {
             if (uris != null) {
                 return statDao.getStatModelInUrisWithUniqueIp(start, end, uris)

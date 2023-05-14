@@ -22,18 +22,11 @@ public class StatModel {
     private String uri;
     private String ip;
     private LocalDateTime created;
-    private Long hits;
 
     public StatModel(String app, String uri, String ip, LocalDateTime created) {
         this.app = app;
         this.uri = uri;
         this.ip = ip;
         this.created = created;
-    }
-
-    public StatModel(String app, String uri, Long hits) {
-        this.app = app;
-        this.uri = uri;
-        this.hits = hits;
     }
 }
