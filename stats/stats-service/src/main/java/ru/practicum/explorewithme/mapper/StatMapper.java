@@ -13,7 +13,7 @@ public class StatMapper {
                 statRequestDto.getApp(),
                 statRequestDto.getUri(),
                 statRequestDto.getIp(),
-                statRequestDto.getCreated()
+                statRequestDto.getTimestamp()
         );
     }
 

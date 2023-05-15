@@ -14,5 +14,5 @@ public class StatFullResponseDto {
     private String app;
     private String uri;
     private String ip;
-    private LocalDateTime created;
+    private LocalDateTime timestamp;
 }

@@ -80,7 +80,7 @@ public class StatIntegrationTest {
         assertEquals(testStatRequestDto[0].getApp(), statModel.getApp());
         assertEquals(testStatRequestDto[0].getUri(), statModel.getUri());
         assertEquals(testStatRequestDto[0].getIp(), statModel.getIp());
-        assertEquals(testStatRequestDto[0].getCreated(), statModel.getCreated());
+        assertEquals(testStatRequestDto[0].getTimestamp(), statModel.getCreated());
     }
 
     @Test
