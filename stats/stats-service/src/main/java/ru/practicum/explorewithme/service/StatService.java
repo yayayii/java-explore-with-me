@@ -2,6 +2,7 @@ package ru.practicum.explorewithme.service;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.explorewithme.dao.StatDao;
@@ -45,18 +46,18 @@ public class StatService {
         }
         if (unique) {
             if (uris != null) {
-                return statDao.getStatModelInUrisWithUniqueIp(start, end, uris)
+                return statDao.getStatModelInUrisWithUniqueIp(start, end, uris, Sort.by("hits").descending())
                         .stream().map(StatMapper::toStatDto).collect(Collectors.toList());
             } else {
-                return statDao.getStatModelWithUniqueIp(start, end)
+                return statDao.getStatModelWithUniqueIp(start, end, Sort.by("hits").descending())
                         .stream().map(StatMapper::toStatDto).collect(Collectors.toList());
             }
         } else {
             if (uris != null) {
-                return statDao.getStatModelInUris(start, end, uris)
+                return statDao.getStatModelInUris(start, end, uris, Sort.by("hits").descending())
                         .stream().map(StatMapper::toStatDto).collect(Collectors.toList());
             } else {
-                return statDao.getStatModel(start, end)
+                return statDao.getStatModel(start, end, Sort.by("hits").descending())
                         .stream().map(StatMapper::toStatDto).collect(Collectors.toList());
             }
         }

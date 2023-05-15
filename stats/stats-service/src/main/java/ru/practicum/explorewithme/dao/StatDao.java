@@ -1,5 +1,6 @@
 package ru.practicum.explorewithme.dao;
 
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -16,7 +17,7 @@ public interface StatDao extends JpaRepository<StatModel, Long> {
             "where sm.created between ?1 and ?2 " +
             "group by sm.app, sm.uri "
     )
-    List<Object[]> getStatModel(LocalDateTime start, LocalDateTime end);
+    List<Object[]> getStatModel(LocalDateTime start, LocalDateTime end, Sort sort);
 
     @Query(
             "select sm.app, sm.uri, count(distinct sm.ip) as hits " +
@@ -24,7 +25,7 @@ public interface StatDao extends JpaRepository<StatModel, Long> {
             "where sm.created between ?1 and ?2 " +
             "group by sm.app, sm.uri "
     )
-    List<Object[]> getStatModelWithUniqueIp(LocalDateTime start, LocalDateTime end);
+    List<Object[]> getStatModelWithUniqueIp(LocalDateTime start, LocalDateTime end, Sort sort);
 
     @Query(
             "select sm.app, sm.uri, count(sm.ip) as hits " +
@@ -33,7 +34,7 @@ public interface StatDao extends JpaRepository<StatModel, Long> {
             "and sm.uri in ?3 " +
             "group by sm.app, sm.uri "
     )
-    List<Object[]> getStatModelInUris(LocalDateTime start, LocalDateTime end, String[] uris);
+    List<Object[]> getStatModelInUris(LocalDateTime start, LocalDateTime end, String[] uris, Sort sort);
 
     @Query(
             "select sm.app, sm.uri, count(distinct sm.ip) as hits " +
@@ -42,5 +43,5 @@ public interface StatDao extends JpaRepository<StatModel, Long> {
             "and sm.uri in ?3 " +
             "group by sm.app, sm.uri "
     )
-    List<Object[]> getStatModelInUrisWithUniqueIp(LocalDateTime start, LocalDateTime end, String[] uris);
+    List<Object[]> getStatModelInUrisWithUniqueIp(LocalDateTime start, LocalDateTime end, String[] uris, Sort sort);
 }
