@@ -5,6 +5,7 @@ import ru.practicum.explorewithme.dto.StatFullResponseDto;
 import ru.practicum.explorewithme.dto.StatRequestDto;
 import ru.practicum.explorewithme.dto.StatResponseDto;
 import ru.practicum.explorewithme.model.StatModel;
+import ru.practicum.explorewithme.model.StatProjection;
 
 @UtilityClass
 public class StatMapper {
@@ -17,11 +18,11 @@ public class StatMapper {
         );
     }
 
-    public StatResponseDto toStatDto(Object[] statModel) {
+    public StatResponseDto toStatDto(StatProjection statModel) {
         return new StatResponseDto(
-                (String) statModel[0],
-                (String) statModel[1],
-                (Long) statModel[2]
+                statModel.getApp(),
+                statModel.getUri(),
+                statModel.getHits()
         );
     }
 

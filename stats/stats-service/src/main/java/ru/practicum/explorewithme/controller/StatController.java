@@ -1,10 +1,11 @@
 package ru.practicum.explorewithme.controller;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.explorewithme.dto.StatFullResponseDto;
 import ru.practicum.explorewithme.dto.StatRequestDto;
@@ -14,11 +15,11 @@ import ru.practicum.explorewithme.service.StatService;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@AllArgsConstructor
+@RequiredArgsConstructor
 @Slf4j
-@RestController
+@Controller
 public class StatController {
-    private StatService statService;
+    private final StatService statService;
 
 
     @PostMapping("/hit")
@@ -31,7 +32,7 @@ public class StatController {
     @GetMapping("/stats/{id}")
     public ResponseEntity<StatFullResponseDto> getStatById(@PathVariable Long id) {
         log.info("stats - stats-service - StatController - getStatById");
-        return ResponseEntity.ok().body(statService.getStatById(id));
+        return ResponseEntity.ok(statService.getStatById(id));
     }
 
     @GetMapping("/stats")
@@ -42,6 +43,6 @@ public class StatController {
             @RequestParam(required = false) boolean unique
     ) {
         log.info("stats - stats-service - StatController - getStats");
-        return ResponseEntity.ok().body(statService.getStats(start, end, uris, unique));
+        return ResponseEntity.ok(statService.getStats(start, end, uris, unique));
     }
 }

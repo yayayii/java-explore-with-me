@@ -8,6 +8,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 import ru.practicum.explorewithme.dto.StatRequestDto;
 
+import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.Map;
+
 @Service
 public class StatClient extends BaseClient {
     @Autowired
@@ -20,5 +24,19 @@ public class StatClient extends BaseClient {
 
     public ResponseEntity<Object> saveEndpointRequest(StatRequestDto statsRequestDto) {
         return post("/hit", statsRequestDto);
+    }
+
+    public ResponseEntity<Object> getStatById(Long statId) {
+        return get("/stats/" + statId);
+    }
+
+    public ResponseEntity<Object> getStats(LocalDateTime start, LocalDateTime end, String[] uris, boolean unique) {
+        Map<String, Object> parameters = Map.of(
+                "start", start.toString(),
+                "end", end.toString(),
+                "uris", Arrays.toString(uris),
+                "unique", unique
+        );
+        return get("/stats", parameters);
     }
 }
