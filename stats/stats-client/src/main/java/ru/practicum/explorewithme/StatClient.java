@@ -9,7 +9,6 @@ import org.springframework.web.util.DefaultUriBuilderFactory;
 import ru.practicum.explorewithme.dto.StatRequestDto;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.Map;
 
 @Service
@@ -34,7 +33,7 @@ public class StatClient extends BaseClient {
         Map<String, Object> parameters = Map.of(
                 "start", start.toString(),
                 "end", end.toString(),
-                "uris", Arrays.toString(uris),
+                "uris", String.join(",", uris),
                 "unique", unique
         );
         return get("/stats", parameters);
