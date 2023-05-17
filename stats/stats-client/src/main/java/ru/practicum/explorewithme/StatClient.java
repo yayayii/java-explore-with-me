@@ -1,5 +1,6 @@
 package ru.practicum.explorewithme;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +12,7 @@ import ru.practicum.explorewithme.dto.StatRequestDto;
 import java.time.LocalDateTime;
 import java.util.Map;
 
+@Slf4j
 @Service
 public class StatClient extends BaseClient {
     @Autowired
@@ -21,15 +23,18 @@ public class StatClient extends BaseClient {
         );
     }
 
-    public ResponseEntity<Object> saveEndpointRequest(StatRequestDto statsRequestDto) {
-        return post("/hit", statsRequestDto);
+    public ResponseEntity<Object> saveEndpointRequest(StatRequestDto requestDto) {
+        log.info("stats - stats-client - StatClient - saveEndpointRequest");
+        return post("/hit", requestDto);
     }
 
     public ResponseEntity<Object> getStatById(Long statId) {
+        log.info("stats - stats-client - StatClient - getStatById");
         return get("/stats/" + statId);
     }
 
     public ResponseEntity<Object> getStats(LocalDateTime start, LocalDateTime end, String[] uris, boolean unique) {
+        log.info("stats - stats-client - StatClient - getStats");
         Map<String, Object> parameters = Map.of(
                 "start", start.toString(),
                 "end", end.toString(),

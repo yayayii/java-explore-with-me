@@ -23,16 +23,16 @@ public class StatController {
 
 
     @PostMapping("/hit")
-    public ResponseEntity<Void> saveEndpointRequest(@RequestBody StatRequestDto statsRequestDto) {
+    public ResponseEntity<Void> saveEndpointRequest(@RequestBody StatRequestDto requestDto) {
         log.info("stats - stats-service - StatController - saveEndpointRequest");
-        statService.saveEndpointRequest(statsRequestDto);
+        statService.saveEndpointRequest(requestDto);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    @GetMapping("/stats/{id}")
-    public ResponseEntity<StatFullResponseDto> getStatById(@PathVariable Long id) {
+    @GetMapping("/stats/{statId}")
+    public ResponseEntity<StatFullResponseDto> getStatById(@PathVariable Long statId) {
         log.info("stats - stats-service - StatController - getStatById");
-        return ResponseEntity.ok(statService.getStatById(id));
+        return ResponseEntity.ok(statService.getStatById(statId));
     }
 
     @GetMapping("/stats")

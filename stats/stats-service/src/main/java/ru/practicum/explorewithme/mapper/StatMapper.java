@@ -9,30 +9,30 @@ import ru.practicum.explorewithme.model.StatProjection;
 
 @UtilityClass
 public class StatMapper {
-    public StatModel toStatModel(StatRequestDto statRequestDto) {
+    public StatModel toModel(StatRequestDto requestDto) {
         return new StatModel(
-                statRequestDto.getApp(),
-                statRequestDto.getUri(),
-                statRequestDto.getIp(),
-                statRequestDto.getTimestamp()
+                requestDto.getApp(),
+                requestDto.getUri(),
+                requestDto.getIp(),
+                requestDto.getTimestamp()
         );
     }
 
-    public StatResponseDto toStatDto(StatProjection statModel) {
+    public StatResponseDto toResponseDto(StatProjection model) {
         return new StatResponseDto(
-                statModel.getApp(),
-                statModel.getUri(),
-                statModel.getHits()
+                model.getApp(),
+                model.getUri(),
+                model.getHits()
         );
     }
 
-    public StatFullResponseDto toFullStatDto(StatModel statModel) {
+    public StatFullResponseDto toFullResponseDto(StatModel model) {
         return new StatFullResponseDto(
-                statModel.getId(),
-                statModel.getApp(),
-                statModel.getUri(),
-                statModel.getIp(),
-                statModel.getCreated()
+                model.getId(),
+                model.getApp(),
+                model.getUri(),
+                model.getIp(),
+                model.getCreated()
         );
     }
 }

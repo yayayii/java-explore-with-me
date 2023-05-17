@@ -26,17 +26,17 @@ public class StatService {
 
 
     @Transactional
-    public void saveEndpointRequest(StatRequestDto statRequestDto) {
+    public void saveEndpointRequest(StatRequestDto requestDto) {
         log.info("stats - stats-service - StatService - saveEndpointRequest");
-        StatModel statsModel = StatMapper.toStatModel(statRequestDto);
+        StatModel statsModel = StatMapper.toModel(requestDto);
         statDao.save(statsModel);
     }
 
-    public StatFullResponseDto getStatById(Long id) {
+    public StatFullResponseDto getStatById(Long statId) {
         log.info("stats - stats-service - StatService - getStatById");
-        StatModel statModel = statDao.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("Stat id = " + id + " doesn't exist"));
-        return StatMapper.toFullStatDto(statModel);
+        StatModel statModel = statDao.findById(statId)
+                .orElseThrow(() -> new NoSuchElementException("Stat id = " + statId + " doesn't exist"));
+        return StatMapper.toFullResponseDto(statModel);
     }
 
     public List<StatResponseDto> getStats(LocalDateTime start, LocalDateTime end, String[] uris, boolean unique) {
@@ -47,18 +47,18 @@ public class StatService {
         if (unique) {
             if (uris != null) {
                 return statDao.getStatModelInUrisWithUniqueIp(start, end, uris, Sort.by("hits").descending())
-                        .stream().map(StatMapper::toStatDto).collect(Collectors.toList());
+                        .stream().map(StatMapper::toResponseDto).collect(Collectors.toList());
             } else {
                 return statDao.getStatModelWithUniqueIp(start, end, Sort.by("hits").descending())
-                        .stream().map(StatMapper::toStatDto).collect(Collectors.toList());
+                        .stream().map(StatMapper::toResponseDto).collect(Collectors.toList());
             }
         } else {
             if (uris != null) {
                 return statDao.getStatModelInUris(start, end, uris, Sort.by("hits").descending())
-                        .stream().map(StatMapper::toStatDto).collect(Collectors.toList());
+                        .stream().map(StatMapper::toResponseDto).collect(Collectors.toList());
             } else {
                 return statDao.getStatModel(start, end, Sort.by("hits").descending())
-                        .stream().map(StatMapper::toStatDto).collect(Collectors.toList());
+                        .stream().map(StatMapper::toResponseDto).collect(Collectors.toList());
             }
         }
     }
