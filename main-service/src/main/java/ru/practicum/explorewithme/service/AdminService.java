@@ -29,21 +29,22 @@ public class AdminService {
     }
 
     @Transactional
-    public CategoryResponseDto updateCategory(Long catId, CategoryRequestDto requestDto) {
-        log.info("main-service - AdminService - updateCategory - catId: {} / requestDto: {}", catId, requestDto);
-        Category category = categoryDao.findById(catId)
-                .orElseThrow(() -> new NoSuchElementException("Category id = " + catId + " doesn't exist"));
+    public CategoryResponseDto updateCategory(Long categoryId, CategoryRequestDto requestDto) {
+        log.info("main-service - AdminService - updateCategory - categoryId: {} / requestDto: {}",
+                categoryId, requestDto);
+        Category category = categoryDao.findById(categoryId)
+                .orElseThrow(() -> new NoSuchElementException("Category id = " + categoryId + " doesn't exist"));
         Category updatedCategory = CategoryMapper.toModel(requestDto);
         category.setName(updatedCategory.getName());
         return CategoryMapper.toResponseDto(category);
     }
 
     @Transactional
-    public void deleteCategory(Long catId) {
-        log.info("main-service - AdminService - deleteCategory - catId: {}", catId);
-        if (!categoryDao.existsById(catId)) {
-            throw new NoSuchElementException("Category id = " + catId + " doesn't exist");
+    public void deleteCategory(Long categoryId) {
+        log.info("main-service - AdminService - deleteCategory - categoryId: {}", categoryId);
+        if (!categoryDao.existsById(categoryId)) {
+            throw new NoSuchElementException("Category id = " + categoryId + " doesn't exist");
         }
-        categoryDao.deleteById(catId);
+        categoryDao.deleteById(categoryId);
     }
 }

@@ -29,19 +29,20 @@ public class AdminController {
         return new ResponseEntity<>(adminService.addCategory(requestDto), HttpStatus.CREATED);
     }
 
-    @PatchMapping("/categories/{catId}")
+    @PatchMapping("/categories/{categoryId}")
     public ResponseEntity<CategoryResponseDto> updateCategory(
-            @PathVariable Long catId,
+            @PathVariable Long categoryId,
             @RequestBody @Valid CategoryRequestDto requestDto
     ) {
-        log.info("main-service - AdminController - updateCategory - catId: {} / requestDto:{}", catId, requestDto);
-        return ResponseEntity.ok(adminService.updateCategory(catId, requestDto));
+        log.info("main-service - AdminController - updateCategory - categoryId: {} / requestDto:{}",
+                categoryId, requestDto);
+        return ResponseEntity.ok(adminService.updateCategory(categoryId, requestDto));
     }
 
-    @DeleteMapping("/categories/{catId}")
-    public ResponseEntity<Void> deleteCategory(@PathVariable Long catId) {
-        log.info("main-service - AdminController - deleteCategory - catId: {}", catId);
-        adminService.deleteCategory(catId);
+    @DeleteMapping("/categories/{categoryId}")
+    public ResponseEntity<Void> deleteCategory(@PathVariable Long categoryId) {
+        log.info("main-service - AdminController - deleteCategory - categoryId: {}", categoryId);
+        adminService.deleteCategory(categoryId);
         return ResponseEntity.noContent().build();
     }
 }

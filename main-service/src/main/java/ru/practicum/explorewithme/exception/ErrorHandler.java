@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.time.LocalDateTime;
 import java.util.NoSuchElementException;
@@ -20,7 +21,7 @@ public class ErrorHandler {
     public ResponseEntity<ErrorResponse> handleNoSuchElementException(final NoSuchElementException e) {
         ErrorResponse errorResponse = new ErrorResponse(
                 HttpStatus.NOT_FOUND.getReasonPhrase(),
-                "Wrong id",
+                "The required object was not found",
                 e.getMessage(),
                 LocalDateTime.now());
         log.warn(errorResponse.toString());
@@ -36,6 +37,17 @@ public class ErrorHandler {
                 LocalDateTime.now());
         log.warn(errorResponse.toString());
         return new ResponseEntity<>(errorResponse, HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<ErrorResponse> handleMethodArgumentTypeMismatchException(final MethodArgumentTypeMismatchException e) {
+        ErrorResponse errorResponse = new ErrorResponse(
+                HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                "Incorrectly made request",
+                e.getMessage(),
+                LocalDateTime.now());
+        log.warn(errorResponse.toString());
+        return ResponseEntity.badRequest().body(errorResponse);
     }
 
     @ExceptionHandler
