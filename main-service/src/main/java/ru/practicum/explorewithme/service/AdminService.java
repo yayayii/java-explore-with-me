@@ -23,14 +23,14 @@ public class AdminService {
     //categories
     @Transactional
     public CategoryResponseDto addCategory(CategoryRequestDto requestDto) {
-        log.info("main-service - AdminService - addCategory");
+        log.info("main-service - AdminService - addCategory - requestDto: {}", requestDto);
         Category category = CategoryMapper.toModel(requestDto);
         return CategoryMapper.toResponseDto(categoryDao.save(category));
     }
 
     @Transactional
     public CategoryResponseDto updateCategory(Long catId, CategoryRequestDto requestDto) {
-        log.info("main-service - AdminService - updateCategory");
+        log.info("main-service - AdminService - updateCategory - catId: {} / requestDto: {}", catId, requestDto);
         Category category = categoryDao.findById(catId)
                 .orElseThrow(() -> new NoSuchElementException("Category id = " + catId + " doesn't exist"));
         Category updatedCategory = CategoryMapper.toModel(requestDto);
@@ -40,7 +40,7 @@ public class AdminService {
 
     @Transactional
     public void deleteCategory(Long catId) {
-        log.info("main-service - AdminService - deleteCategory");
+        log.info("main-service - AdminService - deleteCategory - catId: {}", catId);
         if (!categoryDao.existsById(catId)) {
             throw new NoSuchElementException("Category id = " + catId + " doesn't exist");
         }

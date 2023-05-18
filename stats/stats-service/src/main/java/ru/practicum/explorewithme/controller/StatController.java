@@ -13,6 +13,7 @@ import ru.practicum.explorewithme.dto.StatResponseDto;
 import ru.practicum.explorewithme.service.StatService;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -24,14 +25,14 @@ public class StatController {
 
     @PostMapping("/hit")
     public ResponseEntity<Void> saveEndpointRequest(@RequestBody StatRequestDto requestDto) {
-        log.info("stats - stats-service - StatController - saveEndpointRequest");
+        log.info("stats - stats-service - StatController - saveEndpointRequest - requestDto: {}", requestDto);
         statService.saveEndpointRequest(requestDto);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @GetMapping("/stats/{statId}")
     public ResponseEntity<StatFullResponseDto> getStatById(@PathVariable Long statId) {
-        log.info("stats - stats-service - StatController - getStatById");
+        log.info("stats - stats-service - StatController - getStatById - statId: {}", statId);
         return ResponseEntity.ok(statService.getStatById(statId));
     }
 
@@ -42,7 +43,8 @@ public class StatController {
             @RequestParam(required = false) String[] uris,
             @RequestParam(required = false) boolean unique
     ) {
-        log.info("stats - stats-service - StatController - getStats");
+        log.info("stats - stats-service - StatController - getStats - " +
+                "start: {} / end: {} / uris: {} / unique: {}", start, end, Arrays.toString(uris), unique);
         return ResponseEntity.ok(statService.getStats(start, end, uris, unique));
     }
 }

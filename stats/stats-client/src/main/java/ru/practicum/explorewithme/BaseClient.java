@@ -1,5 +1,6 @@
 package ru.practicum.explorewithme;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.*;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
@@ -7,6 +8,7 @@ import org.springframework.web.client.RestTemplate;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 public class BaseClient {
     protected final RestTemplate rest;
 
@@ -32,8 +34,10 @@ public class BaseClient {
     private <T> ResponseEntity<Object> makeAndSendRequest(
             HttpMethod method, String path, T body, Map<String, Object> parameters
     ) {
-        HttpEntity<T> requestEntity = new HttpEntity<>(body, defaultHeaders());
+        log.info("stats - stats-client - BaseClient - makeAndSendRequest - " +
+                "method: {} / path: {} / body: {} / parameters: {}", method, path, body, parameters);
 
+        HttpEntity<T> requestEntity = new HttpEntity<>(body, defaultHeaders());
         ResponseEntity<Object> explorewithmeServerResponse;
         try {
             if (parameters != null) {
@@ -60,11 +64,9 @@ public class BaseClient {
         }
 
         ResponseEntity.BodyBuilder responseBuilder = ResponseEntity.status(response.getStatusCode());
-
         if (response.hasBody()) {
             return responseBuilder.body(response.getBody());
         }
-
         return responseBuilder.build();
     }
 }
