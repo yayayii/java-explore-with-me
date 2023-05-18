@@ -32,24 +32,24 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
         "spring.datasource.password=test",
         "server.port=9091"
 })
-public class StatIntegrationTest {
+public class StatServiceTest {
     private final EntityManager entityManager;
     private final StatService statService;
 
     private static LocalDateTime testLocalDateTime;
-    private static StatRequestDto[] testStatRequestDto;
-    private static StatResponseDto[] testStatResponseDto;
+    private static StatRequestDto[] testStatRequestDtos;
+    private static StatResponseDto[] testStatResponseDtos;
     private static StatFullResponseDto testStatFullResponseDto;
 
 
     @BeforeAll
     public static void beforeAll() {
         testLocalDateTime = LocalDateTime.of(2001, 1, 1, 1, 1);
-        testStatRequestDto = new StatRequestDto[]{
+        testStatRequestDtos = new StatRequestDto[]{
                 new StatRequestDto("app1", "uri1", "ip1", testLocalDateTime),
                 new StatRequestDto("app2", "uri2", "ip2", testLocalDateTime)
         };
-        testStatResponseDto = new StatResponseDto[]{
+        testStatResponseDtos = new StatResponseDto[]{
                 new StatResponseDto("app1", "uri1", 1L),
                 new StatResponseDto("app1", "uri1", 2L),
                 new StatResponseDto("app2", "uri2", 1L),
@@ -71,16 +71,16 @@ public class StatIntegrationTest {
 
     @Test
     public void testSaveEndpointRequest() {
-        statService.saveEndpointRequest(testStatRequestDto[0]);
+        statService.saveEndpointRequest(testStatRequestDtos[0]);
         StatModel statModel = entityManager.createQuery(
                 "select sm from StatModel sm where sm.id = ?1", StatModel.class
         ).setParameter(1, 1L).getSingleResult();
 
         assertEquals(1, statModel.getId());
-        assertEquals(testStatRequestDto[0].getApp(), statModel.getApp());
-        assertEquals(testStatRequestDto[0].getUri(), statModel.getUri());
-        assertEquals(testStatRequestDto[0].getIp(), statModel.getIp());
-        assertEquals(testStatRequestDto[0].getTimestamp(), statModel.getCreated());
+        assertEquals(testStatRequestDtos[0].getApp(), statModel.getApp());
+        assertEquals(testStatRequestDtos[0].getUri(), statModel.getUri());
+        assertEquals(testStatRequestDtos[0].getIp(), statModel.getIp());
+        assertEquals(testStatRequestDtos[0].getTimestamp(), statModel.getCreated());
     }
 
     @Test
@@ -88,7 +88,7 @@ public class StatIntegrationTest {
         Exception exception = assertThrows(NoSuchElementException.class, () -> statService.getStatById(1L));
         assertEquals("Stat id = 1 doesn't exist", exception.getMessage());
 
-        statService.saveEndpointRequest(testStatRequestDto[0]);
+        statService.saveEndpointRequest(testStatRequestDtos[0]);
         assertEquals(testStatFullResponseDto, statService.getStatById(1L));
     }
 
@@ -100,10 +100,10 @@ public class StatIntegrationTest {
         );
         assertEquals("Start date must be before end date", exception.getMessage());
 
-        statService.saveEndpointRequest(testStatRequestDto[0]);
-        statService.saveEndpointRequest(testStatRequestDto[0]);
-        statService.saveEndpointRequest(testStatRequestDto[1]);
-        statService.saveEndpointRequest(testStatRequestDto[1]);
+        statService.saveEndpointRequest(testStatRequestDtos[0]);
+        statService.saveEndpointRequest(testStatRequestDtos[0]);
+        statService.saveEndpointRequest(testStatRequestDtos[1]);
+        statService.saveEndpointRequest(testStatRequestDtos[1]);
 
         List<StatResponseDto> statResponseDtos = statService.getStats(
                 testLocalDateTime.plusDays(1), testLocalDateTime.plusDays(2), null, false
@@ -113,26 +113,26 @@ public class StatIntegrationTest {
         statResponseDtos = statService.getStats(
                 testLocalDateTime.minusDays(1),
                 testLocalDateTime.plusDays(1),
-                new String[]{testStatRequestDto[0].getUri()},
+                new String[]{testStatRequestDtos[0].getUri()},
                 true
         );
-        assertEquals(List.of(testStatResponseDto[0]), statResponseDtos);
+        assertEquals(List.of(testStatResponseDtos[0]), statResponseDtos);
 
         statResponseDtos = statService.getStats(
                 testLocalDateTime.minusDays(1), testLocalDateTime.plusDays(1), null, true
         );
-        assertEquals(List.of(testStatResponseDto[0], testStatResponseDto[2]), statResponseDtos);
+        assertEquals(List.of(testStatResponseDtos[0], testStatResponseDtos[2]), statResponseDtos);
 
         statResponseDtos = statService.getStats(
                 testLocalDateTime.minusDays(1), testLocalDateTime.plusDays(1),
-                new String[]{testStatRequestDto[0].getUri()},
+                new String[]{testStatRequestDtos[0].getUri()},
                 false
         );
-        assertEquals(List.of(testStatResponseDto[1]), statResponseDtos);
+        assertEquals(List.of(testStatResponseDtos[1]), statResponseDtos);
 
         statResponseDtos = statService.getStats(
                 testLocalDateTime.minusDays(1), testLocalDateTime.plusDays(1), null, false
         );
-        assertEquals(List.of(testStatResponseDto[1], testStatResponseDto[3]), statResponseDtos);
+        assertEquals(List.of(testStatResponseDtos[1], testStatResponseDtos[3]), statResponseDtos);
     }
 }

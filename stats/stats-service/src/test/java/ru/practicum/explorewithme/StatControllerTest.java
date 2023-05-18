@@ -37,7 +37,6 @@ public class StatControllerTest {
     private static ObjectMapper objectMapper;
     private MockMvc mockMvc;
 
-
     private static StatRequestDto testStatRequestDto;
     private static StatResponseDto testStatResponseDto;
     private static StatFullResponseDto testStatFullResponseDto;
