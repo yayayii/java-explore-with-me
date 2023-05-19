@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
+import javax.validation.ConstraintViolationException;
 import java.time.LocalDateTime;
 import java.util.NoSuchElementException;
 
@@ -37,6 +38,17 @@ public class ErrorHandler {
                 LocalDateTime.now());
         log.warn(errorResponse.toString());
         return new ResponseEntity<>(errorResponse, HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<ErrorResponse> handleConstraintViolationException(final ConstraintViolationException e) {
+        ErrorResponse errorResponse = new ErrorResponse(
+                HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                "Incorrectly made request",
+                e.getMessage(),
+                LocalDateTime.now());
+        log.warn(errorResponse.toString());
+        return ResponseEntity.badRequest().body(errorResponse);
     }
 
     @ExceptionHandler

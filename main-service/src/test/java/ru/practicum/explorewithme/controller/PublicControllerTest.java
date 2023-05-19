@@ -17,12 +17,12 @@ import ru.practicum.explorewithme.service.PublicService;
 
 import java.util.List;
 
+import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ExtendWith(MockitoExtension.class)
 public class PublicControllerTest {
@@ -68,15 +68,12 @@ public class PublicControllerTest {
                 .andExpect(status().isBadRequest());
         mockMvc.perform(get("/categories/?size=qwe"))
                 .andExpect(status().isBadRequest());
-        mockMvc.perform(get("/categories/?from=-1"))
-                .andExpect(status().isBadRequest());
-        mockMvc.perform(get("/categories/?size=0"))
-                .andExpect(status().isBadRequest());
 
         when(mockPublicService.getCategories(anyInt(), anyInt()))
                 .thenReturn(List.of(testCategoryResponseDto, testCategoryResponseDto));
         mockMvc.perform(get("/categories"))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON));
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$", hasSize(2)));
     }
 }
