@@ -1,15 +1,14 @@
-package ru.practicum.explorewithme.dto.categories;
+package ru.practicum.explorewithme.dto.user;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.NotBlank;
-
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class CategoryRequestDto {
-    @NotBlank
+public class UserResponseDto {
+    private Long id;
+    private String email;
     private String name;
 }

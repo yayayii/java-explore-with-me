@@ -12,8 +12,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import ru.practicum.explorewithme.dto.categories.CategoryRequestDto;
-import ru.practicum.explorewithme.dto.categories.CategoryResponseDto;
+import ru.practicum.explorewithme.dto.category.CategoryRequestDto;
+import ru.practicum.explorewithme.dto.category.CategoryResponseDto;
 import ru.practicum.explorewithme.service.AdminService;
 
 import static org.mockito.ArgumentMatchers.any;

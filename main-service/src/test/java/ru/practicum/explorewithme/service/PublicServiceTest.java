@@ -7,8 +7,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
-import ru.practicum.explorewithme.dto.categories.CategoryRequestDto;
-import ru.practicum.explorewithme.dto.categories.CategoryResponseDto;
+import ru.practicum.explorewithme.dto.category.CategoryRequestDto;
+import ru.practicum.explorewithme.dto.category.CategoryResponseDto;
 
 import javax.persistence.EntityManager;
 import java.util.List;

@@ -12,7 +12,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import ru.practicum.explorewithme.dto.categories.CategoryResponseDto;
+import ru.practicum.explorewithme.dto.category.CategoryResponseDto;
 import ru.practicum.explorewithme.service.PublicService;
 
 import java.util.List;
@@ -67,6 +67,10 @@ public class PublicControllerTest {
         mockMvc.perform(get("/categories/?from=qwe"))
                 .andExpect(status().isBadRequest());
         mockMvc.perform(get("/categories/?size=qwe"))
+                .andExpect(status().isBadRequest());
+        mockMvc.perform(get("/categories/?from=-1"))
+                .andExpect(status().isBadRequest());
+        mockMvc.perform(get("/categories/?size=0"))
                 .andExpect(status().isBadRequest());
 
         when(mockPublicService.getCategories(anyInt(), anyInt()))
