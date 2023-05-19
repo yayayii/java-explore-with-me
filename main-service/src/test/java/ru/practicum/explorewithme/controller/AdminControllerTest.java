@@ -12,6 +12,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import ru.practicum.explorewithme.StatClient;
 import ru.practicum.explorewithme.dto.category.CategoryRequestDto;
 import ru.practicum.explorewithme.dto.category.CategoryResponseDto;
 import ru.practicum.explorewithme.dto.user.UserRequestDto;
@@ -31,6 +32,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class AdminControllerTest {
     @Mock
     private AdminService mockAdminService;
+    @Mock
+    private StatClient mockStatClient;
     @InjectMocks
     private AdminController adminController;
     private static ObjectMapper objectMapper;

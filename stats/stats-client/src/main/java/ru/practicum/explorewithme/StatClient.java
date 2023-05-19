@@ -1,6 +1,7 @@
 package ru.practicum.explorewithme;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
@@ -14,7 +15,7 @@ import java.util.Map;
 @Service
 public class StatClient extends BaseClient {
     @Autowired
-    public StatClient(String serverUrl, RestTemplateBuilder builder) {
+    public StatClient(@Value("http://stats-server:9090") String serverUrl, RestTemplateBuilder builder) {
         super(
                 builder.uriTemplateHandler(new DefaultUriBuilderFactory(serverUrl))
                         .requestFactory(HttpComponentsClientHttpRequestFactory::new).build()
