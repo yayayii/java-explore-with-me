@@ -3,6 +3,7 @@ package ru.practicum.explorewithme.mapper;
 import lombok.experimental.UtilityClass;
 import ru.practicum.explorewithme.dto.event.EventRequestDto;
 import ru.practicum.explorewithme.dto.event.EventResponseDto;
+import ru.practicum.explorewithme.dto.event.EventShortResponseDto;
 import ru.practicum.explorewithme.dto.event.LocationDto;
 import ru.practicum.explorewithme.model.event.Event;
 
@@ -40,6 +41,20 @@ public class EventMapper {
                 model.getViews(),
                 UserMapper.toResponseDto(model.getInitiator()),
                 model.getState()
+        );
+    }
+
+    public EventShortResponseDto toShortResponseDto(Event model) {
+        return new EventShortResponseDto(
+                model.getId(),
+                model.getTitle(),
+                model.getAnnotation(),
+                model.isPaid(),
+                CategoryMapper.toResponseDto(model.getCategory()),
+                model.getConfirmedRequests(),
+                model.getEventDate(),
+                model.getViews(),
+                UserMapper.toResponseDto(model.getInitiator())
         );
     }
 }
