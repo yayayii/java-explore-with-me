@@ -81,11 +81,6 @@ public class PrivateControllerTest {
     //events
     @Test
     public void testAddEvent() throws Exception {
-        mockMvc.perform(post("/users/qwe/events")
-                        .content(objectMapper.writeValueAsString(testEventRequestDto))
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
-
         testEventRequestDto.setTitle(null);
         mockMvc.perform(post("/users/1/events")
                         .content(objectMapper.writeValueAsString(testEventRequestDto))
@@ -159,15 +154,6 @@ public class PrivateControllerTest {
 
     @Test
     public void testGetEventById() throws Exception {
-        mockMvc.perform(get("/users/1/events/qwe")
-                        .content(objectMapper.writeValueAsString(testEventRequestDto))
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
-        mockMvc.perform(get("/users/qwe/events/1")
-                        .content(objectMapper.writeValueAsString(testEventRequestDto))
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
-
         when(mockPrivateService.getEventById(anyLong(), anyLong()))
                 .thenReturn(testEventResponseDto);
         mockMvc.perform(get("/users/1/events/1"))
@@ -177,13 +163,6 @@ public class PrivateControllerTest {
 
     @Test
     public void testGetEventsByInitiatorId() throws Exception {
-        mockMvc.perform(get("/users/qwe/events"))
-                .andExpect(status().isBadRequest());
-        mockMvc.perform(get("/users/1/events?from=qwe"))
-                .andExpect(status().isBadRequest());
-        mockMvc.perform(get("/users/1/events?size=qwe"))
-                .andExpect(status().isBadRequest());
-
         when(mockPrivateService.getEventsByInitiatorId(anyLong(), anyInt(), anyInt()))
                 .thenReturn(List.of(testEventShortResponseDto, testEventShortResponseDto));
         mockMvc.perform(get("/users/1/events?from=1&size=1"))

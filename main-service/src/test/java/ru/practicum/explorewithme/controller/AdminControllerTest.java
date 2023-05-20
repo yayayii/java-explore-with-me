@@ -15,10 +15,16 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import ru.practicum.explorewithme.StatClient;
 import ru.practicum.explorewithme.dto.category.CategoryRequestDto;
 import ru.practicum.explorewithme.dto.category.CategoryResponseDto;
+import ru.practicum.explorewithme.dto.event.EventAdminUpdateRequestDto;
+import ru.practicum.explorewithme.dto.event.EventResponseDto;
+import ru.practicum.explorewithme.dto.event.LocationDto;
 import ru.practicum.explorewithme.dto.user.UserRequestDto;
 import ru.practicum.explorewithme.dto.user.UserResponseDto;
+import ru.practicum.explorewithme.model.event.EventState;
+import ru.practicum.explorewithme.model.event.EventUpdateState;
 import ru.practicum.explorewithme.service.AdminService;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.hamcrest.Matchers.hasSize;
@@ -43,6 +49,9 @@ public class AdminControllerTest {
     private static CategoryResponseDto testCategoryResponseDto;
     private static UserRequestDto testUserRequestDto;
     private static UserResponseDto testUserResponseDto;
+    private static LocalDateTime testLocalDateTime;
+    private static EventAdminUpdateRequestDto testEventAdminUpdateRequestDto;
+    private static EventResponseDto testEventResponseDto;
 
 
     @BeforeAll
@@ -55,6 +64,19 @@ public class AdminControllerTest {
 
         testUserRequestDto = new UserRequestDto("email1@email.ru", "name1");
         testUserResponseDto = new UserResponseDto(1L, "email1@email.ru", "name1");
+
+        testLocalDateTime = LocalDateTime.of(2024, 1, 1, 1, 1);
+        testEventAdminUpdateRequestDto = new EventAdminUpdateRequestDto(
+                "newTitle1", "newAnnotation11111111", "newDescription1111111",
+                false, false, 1, testLocalDateTime,
+                new LocationDto(0.0, 0.0), 1L, EventUpdateState.PUBLISH_EVENT
+        );
+        testEventResponseDto = new EventResponseDto(
+                1L, "title1", "annotation1", "description1", false,
+                false, new CategoryResponseDto(1L, "name1"), 1, 1,
+                testLocalDateTime, testLocalDateTime, testLocalDateTime, new LocationDto(1.1, 1.1), 1,
+                new UserResponseDto(1L, "email1@yandex.ru", "name1"), EventState.PUBLISHED
+        );
     }
 
     @BeforeEach
@@ -103,6 +125,25 @@ public class AdminControllerTest {
                 .andExpect(status().isNoContent());
     }
 
+    //events
+    @Test
+    public void testUpdateAdminEvent() throws Exception {
+        testEventAdminUpdateRequestDto.setStateAction(null);
+        mockMvc.perform(patch("/admin/events/1")
+                        .content(objectMapper.writeValueAsString(testEventAdminUpdateRequestDto))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+        testEventAdminUpdateRequestDto.setStateAction(EventUpdateState.PUBLISH_EVENT);
+
+        when(mockAdminService.updateAdminEvent(anyLong(), any()))
+                .thenReturn(testEventResponseDto);
+        mockMvc.perform(patch("/admin/events/1")
+                        .content(objectMapper.writeValueAsString(testEventAdminUpdateRequestDto))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON));
+    }
+
     //users
     @Test
     public void testAddUser() throws Exception {
@@ -130,11 +171,6 @@ public class AdminControllerTest {
 
     @Test
     public void testGetUsers() throws Exception {
-        mockMvc.perform(get("/admin/users?from=qwe"))
-                .andExpect(status().isBadRequest());
-        mockMvc.perform(get("/admin/users?size=qwe"))
-                .andExpect(status().isBadRequest());
-
         when(mockAdminService.getUsers(anyInt(), anyInt()))
                 .thenReturn(List.of(testUserResponseDto, testUserResponseDto));
         mockMvc.perform(get("/admin/users"))

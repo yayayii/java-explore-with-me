@@ -10,11 +10,18 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.explorewithme.dto.category.CategoryRequestDto;
 import ru.practicum.explorewithme.dto.category.CategoryResponseDto;
+import ru.practicum.explorewithme.dto.event.EventAdminUpdateRequestDto;
+import ru.practicum.explorewithme.dto.event.EventRequestDto;
+import ru.practicum.explorewithme.dto.event.EventResponseDto;
+import ru.practicum.explorewithme.dto.event.LocationDto;
 import ru.practicum.explorewithme.dto.user.UserRequestDto;
 import ru.practicum.explorewithme.dto.user.UserResponseDto;
+import ru.practicum.explorewithme.model.event.EventState;
+import ru.practicum.explorewithme.model.event.EventUpdateState;
 
 import javax.persistence.EntityManager;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -33,12 +40,17 @@ import static org.junit.jupiter.api.Assertions.*;
 public class AdminServiceTest {
     private final EntityManager entityManager;
     private final AdminService adminService;
+    private final PrivateService privateService;
 
 
     private static CategoryRequestDto[] testCategoryRequestDtos;
     private static CategoryResponseDto[] testCategoryResponseDtos;
     private static UserRequestDto[] testUserRequestDtos;
     private static UserResponseDto[] testUserResponseDtos;
+    private static LocalDateTime testLocalDateTime;
+    private static EventRequestDto testEventRequestDto;
+    private static EventAdminUpdateRequestDto testEventAdminUpdateRequestDto;
+    private static EventResponseDto testEventResponseDto;
 
 
     @BeforeAll
@@ -59,6 +71,22 @@ public class AdminServiceTest {
                 new UserResponseDto(1L, "email1@yandex.ru", "name1"),
                 new UserResponseDto(2L, "email2@yandex.ru", "name2")
         };
+        testLocalDateTime = LocalDateTime.of(2024, 1, 1, 1, 1);
+        testEventRequestDto = new EventRequestDto(
+                "title1", "annotation1", "description1", false, false,
+                1, testLocalDateTime, new LocationDto(1.1, 1.1), 1L
+        );
+        testEventAdminUpdateRequestDto = new EventAdminUpdateRequestDto(
+                "newTitle1", "newAnnotation1", "newDescription1",
+                true, true, 2, testLocalDateTime,
+                new LocationDto(0.0, 0.0), 1L, EventUpdateState.PUBLISH_EVENT
+        );
+        testEventResponseDto = new EventResponseDto(
+                1L, "newTitle1", "newAnnotation1", "newDescription1", true,
+                true, new CategoryResponseDto(1L, "name1"), 2, 0,
+                testLocalDateTime, testLocalDateTime, null, new LocationDto(0.0, 0.0), 0,
+                new UserResponseDto(1L, "email1@yandex.ru", "name1"), EventState.PUBLISHED
+        );
     }
 
     @BeforeEach
@@ -105,6 +133,34 @@ public class AdminServiceTest {
         adminService.addCategory(testCategoryRequestDtos[0]);
         assertDoesNotThrow(() -> adminService.deleteCategory(1L));
         assertThrows(NoSuchElementException.class, () -> adminService.deleteCategory(1L));
+    }
+
+    //events
+    @Test
+    public void testUpdateAdminEvent() {
+        assertThrows(
+                NoSuchElementException.class,
+                () -> adminService.updateAdminEvent(1L, testEventAdminUpdateRequestDto)
+        );
+        adminService.addUser(testUserRequestDtos[0]);
+        adminService.addCategory(testCategoryRequestDtos[0]);
+        privateService.addEvent(1L, testEventRequestDto);
+
+        testEventAdminUpdateRequestDto.setEventDate(LocalDateTime.now());
+        assertThrows(
+                DataIntegrityViolationException.class,
+                () -> adminService.updateAdminEvent(1L, testEventAdminUpdateRequestDto)
+        );
+        testEventAdminUpdateRequestDto.setEventDate(testLocalDateTime);
+
+        testEventAdminUpdateRequestDto.setCategory(2L);
+        assertThrows(
+                NoSuchElementException.class,
+                () -> adminService.updateAdminEvent(1L, testEventAdminUpdateRequestDto)
+        );
+        testEventAdminUpdateRequestDto.setCategory(1L);
+
+        assertEquals(testEventResponseDto, adminService.updateAdminEvent(1L, testEventAdminUpdateRequestDto));
     }
 
     //users

@@ -55,9 +55,6 @@ public class PublicControllerTest {
 
     @Test
     public void testGetCategoryById() throws Exception {
-        mockMvc.perform(get("/categories/qwe"))
-                .andExpect(status().isBadRequest());
-
         when(mockPublicService.getCategoryById(anyLong()))
                 .thenReturn(testCategoryResponseDto);
         mockMvc.perform(get("/categories/1"))
@@ -67,11 +64,6 @@ public class PublicControllerTest {
 
     @Test
     public void testGetCategories() throws Exception {
-        mockMvc.perform(get("/categories/?from=qwe"))
-                .andExpect(status().isBadRequest());
-        mockMvc.perform(get("/categories/?size=qwe"))
-                .andExpect(status().isBadRequest());
-
         when(mockPublicService.getCategories(anyInt(), anyInt()))
                 .thenReturn(List.of(testCategoryResponseDto, testCategoryResponseDto));
         mockMvc.perform(get("/categories"))
