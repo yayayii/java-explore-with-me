@@ -39,10 +39,7 @@ public class AdminController {
     ) {
         log.info("main-service - AdminController - addCategory - requestDto: {}", requestDto);
         statClient.saveEndpointRequest(new StatRequestDto(
-                        "main-service",
-                        request.getRequestURI(),
-                        request.getRemoteAddr(),
-                        LocalDateTime.now()
+                        "main-service", request.getRequestURI(), request.getRemoteAddr(), LocalDateTime.now()
         ));
         return new ResponseEntity<>(adminService.addCategory(requestDto), HttpStatus.CREATED);
     }
@@ -56,10 +53,7 @@ public class AdminController {
         log.info("main-service - AdminController - updateCategory - categoryId: {} / requestDto:{}",
                 categoryId, requestDto);
         statClient.saveEndpointRequest(new StatRequestDto(
-                "main-service",
-                request.getRequestURI(),
-                request.getRemoteAddr(),
-                LocalDateTime.now()
+                "main-service", request.getRequestURI(), request.getRemoteAddr(), LocalDateTime.now()
         ));
         return ResponseEntity.ok(adminService.updateCategory(categoryId, requestDto));
     }
@@ -68,10 +62,7 @@ public class AdminController {
     public ResponseEntity<Void> deleteCategory(@PathVariable Long categoryId, HttpServletRequest request) {
         log.info("main-service - AdminController - deleteCategory - categoryId: {}", categoryId);
         statClient.saveEndpointRequest(new StatRequestDto(
-                "main-service",
-                request.getRequestURI(),
-                request.getRemoteAddr(),
-                LocalDateTime.now()
+                "main-service", request.getRequestURI(), request.getRemoteAddr(), LocalDateTime.now()
         ));
         adminService.deleteCategory(categoryId);
         return ResponseEntity.noContent().build();
@@ -84,10 +75,7 @@ public class AdminController {
     ) {
         log.info("main-service - AdminController - addUser - requestDto: {}", requestDto);
         statClient.saveEndpointRequest(new StatRequestDto(
-                "main-service",
-                request.getRequestURI(),
-                request.getRemoteAddr(),
-                LocalDateTime.now()
+                "main-service", request.getRequestURI(), request.getRemoteAddr(), LocalDateTime.now()
         ));
         return new ResponseEntity<>(adminService.addUser(requestDto), HttpStatus.CREATED);
     }
@@ -100,10 +88,7 @@ public class AdminController {
     ) {
         log.info("main-service - AdminController - getUsers - from: {} / size: {}", from, size);
         statClient.saveEndpointRequest(new StatRequestDto(
-                "main-service",
-                request.getRequestURI(),
-                request.getRemoteAddr(),
-                LocalDateTime.now()
+                "main-service", request.getRequestURI(), request.getRemoteAddr(), LocalDateTime.now()
         ));
         return ResponseEntity.ok(adminService.getUsers(from, size));
     }
@@ -112,10 +97,7 @@ public class AdminController {
     public ResponseEntity<Void> deleteUser(@PathVariable Long userId, HttpServletRequest request) {
         log.info("main-service - AdminController - deleteUser - userId: {}", userId);
         statClient.saveEndpointRequest(new StatRequestDto(
-                "main-service",
-                request.getRequestURI(),
-                request.getRemoteAddr(),
-                LocalDateTime.now()
+                "main-service", request.getRequestURI(), request.getRemoteAddr(), LocalDateTime.now()
         ));
         adminService.deleteUser(userId);
         return ResponseEntity.noContent().build();

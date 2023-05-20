@@ -33,10 +33,7 @@ public class PublicController {
     ) {
         log.info("main-service - PublicController - getCategoryById - categoryId: {}", categoryId);
         statClient.saveEndpointRequest(new StatRequestDto(
-                "main-service",
-                request.getRequestURI(),
-                request.getRemoteAddr(),
-                LocalDateTime.now()
+                "main-service", request.getRequestURI(), request.getRemoteAddr(), LocalDateTime.now()
         ));
         return ResponseEntity.ok(publicService.getCategoryById(categoryId));
     }
@@ -49,10 +46,7 @@ public class PublicController {
     ) {
         log.info("main-service - PublicController - getCategories - from: {} / size: {}", from, size);
         statClient.saveEndpointRequest(new StatRequestDto(
-                "main-service",
-                request.getRequestURI(),
-                request.getRemoteAddr(),
-                LocalDateTime.now()
+                "main-service", request.getRequestURI(), request.getRemoteAddr(), LocalDateTime.now()
         ));
         return ResponseEntity.ok(publicService.getCategories(from, size));
     }
