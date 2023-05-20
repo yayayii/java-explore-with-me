@@ -2,20 +2,30 @@ package ru.practicum.explorewithme.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.explorewithme.dao.CategoryDao;
+import ru.practicum.explorewithme.dao.EventDao;
 import ru.practicum.explorewithme.dao.UserDao;
 import ru.practicum.explorewithme.dto.category.CategoryRequestDto;
 import ru.practicum.explorewithme.dto.category.CategoryResponseDto;
+import ru.practicum.explorewithme.dto.event.EventAdminUpdateRequestDto;
+import ru.practicum.explorewithme.dto.event.EventResponseDto;
 import ru.practicum.explorewithme.dto.user.UserRequestDto;
 import ru.practicum.explorewithme.dto.user.UserResponseDto;
 import ru.practicum.explorewithme.mapper.CategoryMapper;
+import ru.practicum.explorewithme.mapper.EventMapper;
 import ru.practicum.explorewithme.mapper.UserMapper;
 import ru.practicum.explorewithme.model.Category;
 import ru.practicum.explorewithme.model.User;
+import ru.practicum.explorewithme.model.event.Event;
+import ru.practicum.explorewithme.model.event.EventState;
+import ru.practicum.explorewithme.model.event.EventUpdateState;
 
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
@@ -26,6 +36,7 @@ import java.util.stream.Collectors;
 @Service
 public class AdminService {
     private final CategoryDao categoryDao;
+    private final EventDao eventDao;
     private final UserDao userDao;
 
 
@@ -55,6 +66,71 @@ public class AdminService {
             throw new NoSuchElementException("Category id = " + categoryId + " doesn't exist");
         }
         categoryDao.deleteById(categoryId);
+    }
+
+    //events
+    @Transactional
+    public EventResponseDto updateAdminEvent(Long eventId, EventAdminUpdateRequestDto requestDto) {
+        log.info("main-service - AdminService - updateAdminEvent - eventId: {} / requestDto: {}", eventId, requestDto);
+
+        Event event = eventDao.findById(eventId)
+                .orElseThrow(() -> new NoSuchElementException("Event id = " + eventId + " doesn't exist"));
+        if (event.getState() != EventState.PENDING) {
+            throw new DataIntegrityViolationException("Event state is already changed");
+        }
+
+        if (requestDto.getTitle() != null) {
+            event.setTitle(requestDto.getTitle());
+        }
+        if (requestDto.getAnnotation() != null) {
+            event.setAnnotation(requestDto.getAnnotation());
+        }
+        if (requestDto.getDescription() != null) {
+            event.setDescription(requestDto.getDescription());
+        }
+        if (requestDto.getPaid() != null) {
+            event.setPaid(requestDto.getPaid());
+        }
+        if (requestDto.getRequestModeration() != null) {
+            event.setRequestModeration(requestDto.getRequestModeration());
+        }
+        if (requestDto.getParticipantLimit() != null) {
+            event.setParticipantLimit(requestDto.getParticipantLimit());
+        }
+        if (requestDto.getEventDate() != null) {
+            if (ChronoUnit.MINUTES.between(requestDto.getEventDate(), LocalDateTime.now()) > -60) {
+                throw new DataIntegrityViolationException("The event date must be at least 1 hour later");
+            }
+            event.setEventDate(requestDto.getEventDate());
+        } else {
+            if (ChronoUnit.MINUTES.between(event.getEventDate(), LocalDateTime.now()) > -60) {
+                throw new DataIntegrityViolationException("The event date must be at least 1 hour later");
+            }
+        }
+        if (requestDto.getLocation() != null) {
+            if (requestDto.getLocation().getLat() != null) {
+                event.setLocationLat(requestDto.getLocation().getLat());
+            }
+            if (requestDto.getLocation().getLon() != null) {
+                event.setLocationLon(requestDto.getLocation().getLon());
+            }
+        }
+        if (requestDto.getCategory() != null) {
+            Category category = categoryDao.findById(requestDto.getCategory())
+                    .orElseThrow(() -> new NoSuchElementException(
+                            "Category id = " + requestDto.getCategory() + " doesn't exist"
+                    ));
+            event.setCategory(category);
+        }
+        if (requestDto.getStateAction() == EventUpdateState.PUBLISH_EVENT) {
+            event.setState(EventState.PUBLISHED);
+            event.setPublishedOn(LocalDateTime.now());
+        }
+        if (requestDto.getStateAction() == EventUpdateState.REJECT_EVENT) {
+            event.setState(EventState.CANCELED);
+        }
+
+        return EventMapper.toResponseDto(event);
     }
 
     //users

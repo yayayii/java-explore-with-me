@@ -2,6 +2,7 @@ package ru.practicum.explorewithme.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -45,13 +46,13 @@ public class PrivateService {
                         "Category id = " + requestDto.getCategory() + " doesn't exist"
                 ));
         if (ChronoUnit.MINUTES.between(requestDto.getEventDate(), LocalDateTime.now()) > -120) {
-            throw new IllegalArgumentException("The event date must be at least 2 hours later");
+            throw new DataIntegrityViolationException("The event date must be at least 2 hours later");
         }
 
         Event event = EventMapper.toModel(requestDto);
         event.setInitiator(user);
         event.setCategory(category);
-        event.setState(EventState.PUBLISHED);
+        event.setState(EventState.PENDING);
         event.setCreatedOn(LocalDateTime.now());
         return EventMapper.toResponseDto(eventDao.save(event));
     }

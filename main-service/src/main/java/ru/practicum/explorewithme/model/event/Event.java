@@ -35,5 +35,6 @@ public class Event {
     private long views;
     @ManyToOne
     private User initiator;
+    @Enumerated(value = EnumType.STRING)
     private EventState state;
 }

@@ -11,6 +11,8 @@ import ru.practicum.explorewithme.StatClient;
 import ru.practicum.explorewithme.dto.StatRequestDto;
 import ru.practicum.explorewithme.dto.category.CategoryRequestDto;
 import ru.practicum.explorewithme.dto.category.CategoryResponseDto;
+import ru.practicum.explorewithme.dto.event.EventAdminUpdateRequestDto;
+import ru.practicum.explorewithme.dto.event.EventResponseDto;
 import ru.practicum.explorewithme.dto.user.UserRequestDto;
 import ru.practicum.explorewithme.dto.user.UserResponseDto;
 import ru.practicum.explorewithme.service.AdminService;
@@ -66,6 +68,21 @@ public class AdminController {
         ));
         adminService.deleteCategory(categoryId);
         return ResponseEntity.noContent().build();
+    }
+
+    //events
+    @PatchMapping("/events/{eventId}")
+    public ResponseEntity<EventResponseDto> updateAdminEvent(
+            @PathVariable Long eventId,
+            @RequestBody @Valid EventAdminUpdateRequestDto requestDto,
+            HttpServletRequest request
+    ) {
+        log.info("main-service - AdminController - updateAdminEvent - eventId: {} / requestDto: {}",
+                eventId, requestDto);
+        statClient.saveEndpointRequest(new StatRequestDto(
+                "main-service", request.getRequestURI(), request.getRemoteAddr(), LocalDateTime.now()
+        ));
+        return ResponseEntity.ok(adminService.updateAdminEvent(eventId, requestDto));
     }
 
     //users
