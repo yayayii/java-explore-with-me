@@ -16,30 +16,6 @@ import java.util.NoSuchElementException;
 @Slf4j
 @RestControllerAdvice
 public class ErrorHandler {
-    //добавить обработку ошибки при удалении внешнего ключа
-
-    @ExceptionHandler
-    public ResponseEntity<ErrorResponse> handleNoSuchElementException(final NoSuchElementException e) {
-        ErrorResponse errorResponse = new ErrorResponse(
-                HttpStatus.NOT_FOUND.getReasonPhrase(),
-                "The required object was not found",
-                e.getMessage(),
-                LocalDateTime.now());
-        log.warn(errorResponse.toString());
-        return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
-    }
-
-    @ExceptionHandler
-    public ResponseEntity<ErrorResponse> handleDataIntegrityViolationException(final DataIntegrityViolationException e) {
-        ErrorResponse errorResponse = new ErrorResponse(
-                HttpStatus.CONFLICT.getReasonPhrase(),
-                "Integrity constraint has been violated",
-                e.getMessage(),
-                LocalDateTime.now());
-        log.warn(errorResponse.toString());
-        return new ResponseEntity<>(errorResponse, HttpStatus.CONFLICT);
-    }
-
     @ExceptionHandler
     public ResponseEntity<ErrorResponse> handleConstraintViolationException(final ConstraintViolationException e) {
         ErrorResponse errorResponse = new ErrorResponse(
@@ -82,6 +58,28 @@ public class ErrorHandler {
                 LocalDateTime.now());
         log.warn(errorResponse.toString());
         return new ResponseEntity<>(errorResponse, HttpStatus.FORBIDDEN);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<ErrorResponse> handleNoSuchElementException(final NoSuchElementException e) {
+        ErrorResponse errorResponse = new ErrorResponse(
+                HttpStatus.NOT_FOUND.getReasonPhrase(),
+                "The required object was not found",
+                e.getMessage(),
+                LocalDateTime.now());
+        log.warn(errorResponse.toString());
+        return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<ErrorResponse> handleDataIntegrityViolationException(final DataIntegrityViolationException e) {
+        ErrorResponse errorResponse = new ErrorResponse(
+                HttpStatus.CONFLICT.getReasonPhrase(),
+                "Integrity constraint has been violated",
+                e.getMessage(),
+                LocalDateTime.now());
+        log.warn(errorResponse.toString());
+        return new ResponseEntity<>(errorResponse, HttpStatus.CONFLICT);
     }
 
     @ExceptionHandler
