@@ -74,6 +74,17 @@ public class ErrorHandler {
     }
 
     @ExceptionHandler
+    public ResponseEntity<ErrorResponse> handleIllegalArgumentException(final IllegalArgumentException e) {
+        ErrorResponse errorResponse = new ErrorResponse(
+                HttpStatus.FORBIDDEN.getReasonPhrase(),
+                "For the requested operation the conditions are not met",
+                e.getMessage(),
+                LocalDateTime.now());
+        log.warn(errorResponse.toString());
+        return new ResponseEntity<>(errorResponse, HttpStatus.FORBIDDEN);
+    }
+
+    @ExceptionHandler
     public ResponseEntity<ErrorResponse> handleException(final Exception e) {
         ErrorResponse errorResponse = new ErrorResponse(
                 HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
