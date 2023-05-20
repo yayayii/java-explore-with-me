@@ -16,19 +16,21 @@ import ru.practicum.explorewithme.StatClient;
 import ru.practicum.explorewithme.dto.category.CategoryResponseDto;
 import ru.practicum.explorewithme.dto.event.EventRequestDto;
 import ru.practicum.explorewithme.dto.event.EventResponseDto;
+import ru.practicum.explorewithme.dto.event.EventShortResponseDto;
 import ru.practicum.explorewithme.dto.event.LocationDto;
 import ru.practicum.explorewithme.dto.user.UserResponseDto;
 import ru.practicum.explorewithme.model.event.EventState;
 import ru.practicum.explorewithme.service.PrivateService;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
+import static org.hamcrest.Matchers.hasSize;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ExtendWith(MockitoExtension.class)
 public class PrivateControllerTest {
@@ -43,6 +45,7 @@ public class PrivateControllerTest {
 
     private static LocalDateTime testLocalDateTime;
     private static EventRequestDto testEventRequestDto;
+    private static EventShortResponseDto testEventShortResponseDto;
     private static EventResponseDto testEventResponseDto;
 
 
@@ -55,6 +58,11 @@ public class PrivateControllerTest {
         testEventRequestDto = new EventRequestDto(
                 "title1", "annotation11111111111", "description1111111111", false,
                 false, 1, testLocalDateTime, new LocationDto(1.1, 1.1), 1L
+        );
+        testEventShortResponseDto = new EventShortResponseDto(
+                1L, "title1", "annotation1", false,
+                new CategoryResponseDto(1L, "name1"), 1, testLocalDateTime, 1,
+                new UserResponseDto(1L, "email1@yandex.ru", "name1")
         );
         testEventResponseDto = new EventResponseDto(
                 1L, "title1", "annotation1", "description1", false,
@@ -73,6 +81,11 @@ public class PrivateControllerTest {
     //events
     @Test
     public void testAddEvent() throws Exception {
+        mockMvc.perform(post("/users/qwe/events")
+                        .content(objectMapper.writeValueAsString(testEventRequestDto))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+
         testEventRequestDto.setTitle(null);
         mockMvc.perform(post("/users/1/events")
                         .content(objectMapper.writeValueAsString(testEventRequestDto))
@@ -142,5 +155,40 @@ public class PrivateControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON));
+    }
+
+    @Test
+    public void testGetEventById() throws Exception {
+        mockMvc.perform(get("/users/1/events/qwe")
+                        .content(objectMapper.writeValueAsString(testEventRequestDto))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+        mockMvc.perform(get("/users/qwe/events/1")
+                        .content(objectMapper.writeValueAsString(testEventRequestDto))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+
+        when(mockPrivateService.getEventById(anyLong(), anyLong()))
+                .thenReturn(testEventResponseDto);
+        mockMvc.perform(get("/users/1/events/1"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON));
+    }
+
+    @Test
+    public void testGetEventsByInitiatorId() throws Exception {
+        mockMvc.perform(get("/users/qwe/events"))
+                .andExpect(status().isBadRequest());
+        mockMvc.perform(get("/users/1/events?from=qwe"))
+                .andExpect(status().isBadRequest());
+        mockMvc.perform(get("/users/1/events?size=qwe"))
+                .andExpect(status().isBadRequest());
+
+        when(mockPrivateService.getEventsByInitiatorId(anyLong(), anyInt(), anyInt()))
+                .thenReturn(List.of(testEventShortResponseDto, testEventShortResponseDto));
+        mockMvc.perform(get("/users/1/events?from=1&size=1"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$", hasSize(2)));
     }
 }
