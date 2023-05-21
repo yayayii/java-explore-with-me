@@ -32,22 +32,15 @@ public class PublicController {
             @PathVariable Long categoryId, HttpServletRequest request
     ) {
         log.info("main-service - PublicController - getCategoryById - categoryId: {}", categoryId);
-        statClient.saveEndpointRequest(new StatRequestDto(
-                "main-service", request.getRequestURI(), request.getRemoteAddr(), LocalDateTime.now()
-        ));
         return ResponseEntity.ok(publicService.getCategoryById(categoryId));
     }
 
     @GetMapping("/categories")
     public ResponseEntity<List<CategoryResponseDto>> getCategories(
         @RequestParam(defaultValue = "0") @PositiveOrZero int from,
-        @RequestParam(defaultValue = "10") @Positive int size,
-        HttpServletRequest request
+        @RequestParam(defaultValue = "10") @Positive int size, HttpServletRequest request
     ) {
         log.info("main-service - PublicController - getCategories - from: {} / size: {}", from, size);
-        statClient.saveEndpointRequest(new StatRequestDto(
-                "main-service", request.getRequestURI(), request.getRemoteAddr(), LocalDateTime.now()
-        ));
         return ResponseEntity.ok(publicService.getCategories(from, size));
     }
 }

@@ -127,6 +127,29 @@ public class AdminControllerTest {
 
     //events
     @Test
+    public void testSearchEvents() throws Exception {
+        mockMvc.perform(get("/admin/events"))
+                .andExpect(status().isBadRequest());
+        mockMvc.perform(get("/admin/events?users=1,2"))
+                .andExpect(status().isBadRequest());
+        mockMvc.perform(get("/admin/events?users=1,2&states=qwe,asd"))
+                .andExpect(status().isBadRequest());
+        mockMvc.perform(get("/admin/events?users=1,2&states=PUBLISHED,PENDING"))
+                .andExpect(status().isBadRequest());
+        mockMvc.perform(get("/admin/events?users=1,2&states=PUBLISHED,PENDING&categories=1,2"))
+                .andExpect(status().isBadRequest());
+        mockMvc.perform(get("/admin/events?users=1,2&states=PUBLISHED,PENDING&categories=1,2&rangeStart=2023-01-01 12:12:12"))
+                .andExpect(status().isBadRequest());
+
+        when(mockAdminService.searchEvents(any(), any(), any(), any(), any(), anyInt(), anyInt()))
+                .thenReturn(List.of(testEventResponseDto, testEventResponseDto));
+        mockMvc.perform(get("/admin/events?users=1,2&states=PUBLISHED,PENDING&categories=1,2&rangeStart=2023-01-01 12:12:12&rangeEnd=2023-01-01 12:12:12"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$", hasSize(2)));
+    }
+
+    @Test
     public void testUpdateAdminEvent() throws Exception {
         testEventAdminUpdateRequestDto.setStateAction(null);
         mockMvc.perform(patch("/admin/events/1")

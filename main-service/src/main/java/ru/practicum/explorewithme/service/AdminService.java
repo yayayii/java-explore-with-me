@@ -69,6 +69,18 @@ public class AdminService {
     }
 
     //events
+    public List<EventResponseDto> searchEvents(
+            long[] users, EventState[] states, long[] categories,
+            LocalDateTime rangeStart, LocalDateTime rangeEnd,
+            int from, int size
+    ) {
+        log.info("main-service - AdminService - searchEvents - " +
+                "users: {} / states: {} / categories: {} / rangeStart: {} / rangeEnd: {} / from: {} / size: {}",
+                users, states, categories, rangeStart, rangeEnd, from, size);
+        return eventDao.searchAllByAdmin(users, states, categories, rangeStart, rangeEnd, PageRequest.of(from, size))
+                .stream().map(EventMapper::toResponseDto).collect(Collectors.toList());
+    }
+
     @Transactional
     public EventResponseDto updateAdminEvent(Long eventId, EventAdminUpdateRequestDto requestDto) {
         log.info("main-service - AdminService - updateAdminEvent - eventId: {} / requestDto: {}", eventId, requestDto);

@@ -22,6 +22,7 @@ import ru.practicum.explorewithme.model.event.EventUpdateState;
 import javax.persistence.EntityManager;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -50,7 +51,7 @@ public class AdminServiceTest {
     private static LocalDateTime testLocalDateTime;
     private static EventRequestDto testEventRequestDto;
     private static EventAdminUpdateRequestDto testEventAdminUpdateRequestDto;
-    private static EventResponseDto testEventResponseDto;
+    private static EventResponseDto[] testEventResponseDtos;
 
 
     @BeforeAll
@@ -81,12 +82,21 @@ public class AdminServiceTest {
                 true, true, 2, testLocalDateTime,
                 new LocationDto(0.0, 0.0), 1L, EventUpdateState.PUBLISH_EVENT
         );
-        testEventResponseDto = new EventResponseDto(
-                1L, "newTitle1", "newAnnotation1", "newDescription1", true,
-                true, new CategoryResponseDto(1L, "name1"), 2, 0,
-                testLocalDateTime, testLocalDateTime, null, new LocationDto(0.0, 0.0), 0,
-                new UserResponseDto(1L, "email1@yandex.ru", "name1"), EventState.PUBLISHED
-        );
+        testEventResponseDtos = new EventResponseDto[] {
+                new EventResponseDto(
+                        1L, "title1", "annotation1", "description1", false,
+                        false, new CategoryResponseDto(1L, "name1"), 1,
+                        0, testLocalDateTime, testLocalDateTime, null,
+                        new LocationDto(1.1, 1.1), 0,
+                        new UserResponseDto(1L, "email1@yandex.ru", "name1"), EventState.PENDING
+                ),
+                new EventResponseDto(
+                    1L, "newTitle1", "newAnnotation1", "newDescription1", true,
+                    true, new CategoryResponseDto(1L, "name1"), 2, 0,
+                    testLocalDateTime, testLocalDateTime, null, new LocationDto(0.0, 0.0), 0,
+                    new UserResponseDto(1L, "email1@yandex.ru", "name1"), EventState.PUBLISHED
+                )
+        };
     }
 
     @BeforeEach
@@ -98,6 +108,10 @@ public class AdminServiceTest {
             "       restart with 1; " +
             "delete from user_account; " +
             "alter table user_account " +
+            "   alter column id " +
+            "       restart with 1; " +
+            "delete from event; " +
+            "alter table event " +
             "   alter column id " +
             "       restart with 1; "
         ).executeUpdate();
@@ -137,6 +151,33 @@ public class AdminServiceTest {
 
     //events
     @Test
+    public void testSearchEvents() {
+        adminService.addUser(testUserRequestDtos[0]);
+        adminService.addCategory(testCategoryRequestDtos[0]);
+        privateService.addEvent(1L, testEventRequestDto);
+
+        assertEquals(Collections.emptyList(), adminService.searchEvents(
+                new long[]{2}, new EventState[]{EventState.PENDING}, new long[]{1},
+                testLocalDateTime.minusDays(1), testLocalDateTime.plusDays(1), 0, 10));
+        assertEquals(Collections.emptyList(), adminService.searchEvents(
+                new long[]{1}, new EventState[]{EventState.PUBLISHED}, new long[]{1},
+                testLocalDateTime.minusDays(1), testLocalDateTime.plusDays(1), 0, 10));
+        assertEquals(Collections.emptyList(), adminService.searchEvents(
+                new long[]{1}, new EventState[]{EventState.PENDING}, new long[]{2},
+                testLocalDateTime.minusDays(1), testLocalDateTime.plusDays(1), 0, 10));
+        assertEquals(Collections.emptyList(), adminService.searchEvents(
+                new long[]{1}, new EventState[]{EventState.PENDING}, new long[]{2},
+                testLocalDateTime.plusDays(1), testLocalDateTime.plusDays(2), 0, 10));
+        assertEquals(Collections.emptyList(), adminService.searchEvents(
+                new long[]{1}, new EventState[]{EventState.PENDING}, new long[]{1},
+                testLocalDateTime.minusDays(2), testLocalDateTime.minusDays(1), 0, 10));
+
+        assertEquals(List.of(testEventResponseDtos[0]), adminService.searchEvents(
+                new long[]{1}, new EventState[]{EventState.PENDING}, new long[]{1},
+                testLocalDateTime.minusDays(1), testLocalDateTime.plusDays(1), 0, 10));
+    }
+
+    @Test
     public void testUpdateAdminEvent() {
         assertThrows(
                 NoSuchElementException.class,
@@ -160,7 +201,7 @@ public class AdminServiceTest {
         );
         testEventAdminUpdateRequestDto.setCategory(1L);
 
-        assertEquals(testEventResponseDto, adminService.updateAdminEvent(1L, testEventAdminUpdateRequestDto));
+        assertEquals(testEventResponseDtos[1], adminService.updateAdminEvent(1L, testEventAdminUpdateRequestDto));
     }
 
     //users

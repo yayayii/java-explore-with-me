@@ -37,9 +37,6 @@ public class PrivateController {
             @PathVariable Long userId, @RequestBody @Valid EventRequestDto requestDto, HttpServletRequest request
     ) {
         log.info("main-service - PrivateController - addEvent - userId: {} / requestDto: {}", userId, requestDto);
-        statClient.saveEndpointRequest(new StatRequestDto(
-                "main-service", request.getRequestURI(), request.getRemoteAddr(), LocalDateTime.now()
-        ));
         return new ResponseEntity<>(privateService.addEvent(userId, requestDto), HttpStatus.CREATED);
     }
 
@@ -49,9 +46,6 @@ public class PrivateController {
     ) {
         log.info("main-service - PrivateController - getEventsByInitiatorId - userId: {} / eventId: {}",
                 userId, eventId);
-        statClient.saveEndpointRequest(new StatRequestDto(
-                "main-service", request.getRequestURI(), request.getRemoteAddr(), LocalDateTime.now()
-        ));
         return ResponseEntity.ok(privateService.getEventById(userId, eventId));
     }
 
@@ -59,14 +53,10 @@ public class PrivateController {
     public ResponseEntity<List<EventShortResponseDto>> getEventsByInitiatorId(
             @PathVariable Long userId,
             @RequestParam(defaultValue = "0") @PositiveOrZero int from,
-            @RequestParam(defaultValue = "10") @Positive int size,
-            HttpServletRequest request
+            @RequestParam(defaultValue = "10") @Positive int size, HttpServletRequest request
     ) {
         log.info("main-service - PrivateController - getEventsByInitiatorId - userId: {} / from: {} / size: {}",
                 userId, from, size);
-        statClient.saveEndpointRequest(new StatRequestDto(
-                "main-service", request.getRequestURI(), request.getRemoteAddr(), LocalDateTime.now()
-        ));
         return ResponseEntity.ok(privateService.getEventsByInitiatorId(userId, from, size));
     }
 }
