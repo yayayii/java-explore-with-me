@@ -52,7 +52,7 @@ public class PublicController {
 
     @GetMapping("/compilations")
     public ResponseEntity<List<CompilationResponseDto>> getCompilations(
-            @RequestParam(defaultValue = "false") boolean pinned,
+            @RequestParam(required = false) Boolean pinned,
             @RequestParam(defaultValue = "0") @PositiveOrZero int from,
             @RequestParam(defaultValue = "10") @Positive int size
     ) {

@@ -130,14 +130,13 @@ public class AdminService {
 
     //events
     public List<EventResponseDto> searchEvents(
-            long[] users, EventState[] states, long[] categories,
-            LocalDateTime rangeStart, LocalDateTime rangeEnd,
-            int from, int size
+            long[] userIds, EventState[] states, long[] categoryIds,
+            LocalDateTime rangeStart, LocalDateTime rangeEnd, int from, int size
     ) {
         log.info("main-service - AdminService - searchEvents - " +
-                "users: {} / states: {} / categories: {} / rangeStart: {} / rangeEnd: {} / from: {} / size: {}",
-                users, states, categories, rangeStart, rangeEnd, from, size);
-        return eventDao.searchAllByAdmin(users, states, categories, rangeStart, rangeEnd, PageRequest.of(from, size))
+                "userIds: {} / states: {} / categoryIds: {} / rangeStart: {} / rangeEnd: {} / from: {} / size: {}",
+                userIds, states, categoryIds, rangeStart, rangeEnd, from, size);
+        return eventDao.searchAllByAdmin(userIds, states, categoryIds, rangeStart, rangeEnd, PageRequest.of(from, size))
                 .stream().map(EventMapper::toResponseDto).collect(Collectors.toList());
     }
 

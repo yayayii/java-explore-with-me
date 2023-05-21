@@ -47,10 +47,10 @@ public class PublicService {
         return CompilationMapper.toResponseDto(compilation);
     }
 
-    public List<CompilationResponseDto> getCompilations(boolean pinned, int from, int size) {
+    public List<CompilationResponseDto> getCompilations(Boolean isPinned, int from, int size) {
         log.info("main-service - PublicService - getCompilations - " +
-                "pinned: {} / from: {} / size: {}", pinned, from, size);
-        return compilationDao.findAllByPinned(pinned, PageRequest.of(from, size))
+                "isPinned: {} / from: {} / size: {}", isPinned, from, size);
+        return compilationDao.findAllByPinned(isPinned, PageRequest.of(from, size))
                 .stream().map(CompilationMapper::toResponseDto).collect(Collectors.toList());
     }
 }
