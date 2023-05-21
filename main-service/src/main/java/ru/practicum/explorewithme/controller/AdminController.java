@@ -59,7 +59,9 @@ public class AdminController {
 
     //compilations
     @PostMapping("/compilations")
-    public ResponseEntity<CompilationResponseDto> addCompilation(@RequestBody @Valid CompilationRequestDto requestDto) {
+    public ResponseEntity<CompilationResponseDto> addCompilation(
+            @RequestBody @Valid CompilationRequestDto requestDto
+    ) {
         log.info("main-service - AdminController - addCompilation - requestDto: {}", requestDto);
         return new ResponseEntity<>(adminService.addCompilation(requestDto), HttpStatus.CREATED);
     }

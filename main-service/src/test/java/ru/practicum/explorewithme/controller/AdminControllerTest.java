@@ -15,8 +15,11 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import ru.practicum.explorewithme.StatClient;
 import ru.practicum.explorewithme.dto.category.CategoryRequestDto;
 import ru.practicum.explorewithme.dto.category.CategoryResponseDto;
+import ru.practicum.explorewithme.dto.compilation.CompilationRequestDto;
+import ru.practicum.explorewithme.dto.compilation.CompilationResponseDto;
 import ru.practicum.explorewithme.dto.event.EventAdminUpdateRequestDto;
 import ru.practicum.explorewithme.dto.event.EventResponseDto;
+import ru.practicum.explorewithme.dto.event.EventShortResponseDto;
 import ru.practicum.explorewithme.dto.event.LocationDto;
 import ru.practicum.explorewithme.dto.user.UserRequestDto;
 import ru.practicum.explorewithme.dto.user.UserResponseDto;
@@ -47,11 +50,14 @@ public class AdminControllerTest {
 
     private static CategoryRequestDto testCategoryRequestDto;
     private static CategoryResponseDto testCategoryResponseDto;
-    private static UserRequestDto testUserRequestDto;
-    private static UserResponseDto testUserResponseDto;
+    private static CompilationRequestDto testCompilationRequestDto;
+    private static CompilationResponseDto testCompilationResponseDto;
     private static LocalDateTime testLocalDateTime;
     private static EventAdminUpdateRequestDto testEventAdminUpdateRequestDto;
+    private static EventShortResponseDto testEventShortResponseDto;
     private static EventResponseDto testEventResponseDto;
+    private static UserRequestDto testUserRequestDto;
+    private static UserResponseDto testUserResponseDto;
 
 
     @BeforeAll
@@ -71,11 +77,20 @@ public class AdminControllerTest {
                 false, false, 1, testLocalDateTime,
                 new LocationDto(0.0, 0.0), 1L, EventUpdateState.PUBLISH_EVENT
         );
+        testEventShortResponseDto = new EventShortResponseDto(
+                1L, "title1", "annotation1", false, testCategoryResponseDto, 1,
+                testLocalDateTime, 1, testUserResponseDto
+        );
         testEventResponseDto = new EventResponseDto(
                 1L, "title1", "annotation1", "description1", false,
-                false, new CategoryResponseDto(1L, "name1"), 1, 1,
+                false, testCategoryResponseDto, 1, 1,
                 testLocalDateTime, testLocalDateTime, testLocalDateTime, new LocationDto(1.1, 1.1), 1,
-                new UserResponseDto(1L, "email1@yandex.ru", "name1"), EventState.PUBLISHED
+                testUserResponseDto, EventState.PUBLISHED
+        );
+
+        testCompilationRequestDto = new CompilationRequestDto("title1", false, new Long[]{1L, 2L});
+        testCompilationResponseDto = new CompilationResponseDto(
+                1L, "title1", false, List.of(testEventShortResponseDto, testEventShortResponseDto)
         );
     }
 
@@ -122,6 +137,43 @@ public class AdminControllerTest {
     public void testDeleteCategory() throws Exception {
         doNothing().when(mockAdminService).deleteCategory(anyLong());
         mockMvc.perform(delete("/admin/categories/1"))
+                .andExpect(status().isNoContent());
+    }
+
+    //compilations
+    @Test
+    public void testAddCompilation() throws Exception {
+        testCompilationRequestDto.setTitle(null);
+        mockMvc.perform(post("/admin/compilations")
+                    .content(objectMapper.writeValueAsString(testCompilationRequestDto))
+                    .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+        testCompilationRequestDto.setTitle("title1");
+
+        when(mockAdminService.addCompilation(any()))
+                .thenReturn(testCompilationResponseDto);
+        mockMvc.perform(post("/admin/compilations")
+                        .content(objectMapper.writeValueAsString(testCompilationRequestDto))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON));
+    }
+
+    @Test
+    public void testUpdateCompilation() throws Exception {
+        when(mockAdminService.updateCompilation(anyLong(), any()))
+                .thenReturn(testCompilationResponseDto);
+        mockMvc.perform(patch("/admin/compilations/1")
+                        .content(objectMapper.writeValueAsString(testCompilationRequestDto))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON));
+    }
+
+    @Test
+    public void testDeleteCompilation() throws Exception {
+        doNothing().when(mockAdminService).deleteCompilation(anyLong());
+        mockMvc.perform(delete("/admin/compilations/1"))
                 .andExpect(status().isNoContent());
     }
 

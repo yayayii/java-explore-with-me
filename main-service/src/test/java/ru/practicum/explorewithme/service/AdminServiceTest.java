@@ -10,10 +10,9 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.explorewithme.dto.category.CategoryRequestDto;
 import ru.practicum.explorewithme.dto.category.CategoryResponseDto;
-import ru.practicum.explorewithme.dto.event.EventAdminUpdateRequestDto;
-import ru.practicum.explorewithme.dto.event.EventRequestDto;
-import ru.practicum.explorewithme.dto.event.EventResponseDto;
-import ru.practicum.explorewithme.dto.event.LocationDto;
+import ru.practicum.explorewithme.dto.compilation.CompilationRequestDto;
+import ru.practicum.explorewithme.dto.compilation.CompilationResponseDto;
+import ru.practicum.explorewithme.dto.event.*;
 import ru.practicum.explorewithme.dto.user.UserRequestDto;
 import ru.practicum.explorewithme.dto.user.UserResponseDto;
 import ru.practicum.explorewithme.model.event.EventState;
@@ -46,11 +45,14 @@ public class AdminServiceTest {
 
     private static CategoryRequestDto[] testCategoryRequestDtos;
     private static CategoryResponseDto[] testCategoryResponseDtos;
+    private static CompilationRequestDto[] testCompilationRequestDtos;
+    private static CompilationResponseDto[] testCompilationResponseDtos;
     private static UserRequestDto[] testUserRequestDtos;
     private static UserResponseDto[] testUserResponseDtos;
     private static LocalDateTime testLocalDateTime;
-    private static EventRequestDto testEventRequestDto;
+    private static EventRequestDto[] testEventRequestDtos;
     private static EventAdminUpdateRequestDto testEventAdminUpdateRequestDto;
+    private static EventShortResponseDto[] testEventShortResponseDtos;
     private static EventResponseDto[] testEventResponseDtos;
 
 
@@ -64,6 +66,7 @@ public class AdminServiceTest {
                 new CategoryResponseDto(1L, "name1"),
                 new CategoryResponseDto(2L, "name2")
         };
+
         testUserRequestDtos = new UserRequestDto[]{
                 new UserRequestDto("email1@yandex.ru", "name1"),
                 new UserRequestDto("email2@yandex.ru", "name2")
@@ -72,16 +75,35 @@ public class AdminServiceTest {
                 new UserResponseDto(1L, "email1@yandex.ru", "name1"),
                 new UserResponseDto(2L, "email2@yandex.ru", "name2")
         };
+
         testLocalDateTime = LocalDateTime.of(2024, 1, 1, 1, 1);
-        testEventRequestDto = new EventRequestDto(
-                "title1", "annotation1", "description1", false, false,
-                1, testLocalDateTime, new LocationDto(1.1, 1.1), 1L
-        );
+        testEventRequestDtos = new EventRequestDto[]{
+                new EventRequestDto(
+                        "title1", "annotation1", "description1", false,
+                        false, 1, testLocalDateTime,
+                        new LocationDto(1.1, 1.1), 1L
+                ),
+                new EventRequestDto(
+                        "title2", "annotation2", "description2", false,
+                        false, 1, testLocalDateTime,
+                        new LocationDto(1.1, 1.1), 1L
+                ),
+        };
         testEventAdminUpdateRequestDto = new EventAdminUpdateRequestDto(
                 "newTitle1", "newAnnotation1", "newDescription1",
                 true, true, 2, testLocalDateTime,
                 new LocationDto(0.0, 0.0), 1L, EventUpdateState.PUBLISH_EVENT
         );
+        testEventShortResponseDtos = new EventShortResponseDto[]{
+                new EventShortResponseDto(
+                        1L, "title1", "annotation1", false, testCategoryResponseDtos[0],
+                        0, testLocalDateTime, 0, testUserResponseDtos[0]
+                ),
+                new EventShortResponseDto(
+                        2L, "title2", "annotation2", false, testCategoryResponseDtos[0],
+                        0, testLocalDateTime, 0, testUserResponseDtos[0]
+                ),
+        };
         testEventResponseDtos = new EventResponseDto[] {
                 new EventResponseDto(
                         1L, "title1", "annotation1", "description1", false,
@@ -97,21 +119,41 @@ public class AdminServiceTest {
                     new UserResponseDto(1L, "email1@yandex.ru", "name1"), EventState.PUBLISHED
                 )
         };
+
+        testCompilationRequestDtos = new CompilationRequestDto[]{
+                new CompilationRequestDto("title1", false, new Long[]{1L, 2L}),
+                new CompilationRequestDto("newTitle1", true, new Long[]{2L})
+        };
+        testCompilationResponseDtos = new CompilationResponseDto[]{
+                new CompilationResponseDto(
+                        1L, "title1", false,
+                        List.of(testEventShortResponseDtos[0], testEventShortResponseDtos[1])
+                ),
+                new CompilationResponseDto(
+                        1L, "newTitle1", true,
+                        List.of(testEventShortResponseDtos[1])
+                ),
+        };
     }
 
     @BeforeEach
     public void beforeEach() {
         entityManager.createNativeQuery(
+            "delete from event_compilation; " +
+            "delete from compilation; " +
+            "alter table compilation " +
+            "   alter column id " +
+            "       restart with 1; " +
+            "delete from event; " +
+            "alter table event " +
+            "   alter column id " +
+            "       restart with 1; " +
             "delete from category; " +
             "alter table category " +
             "   alter column id " +
             "       restart with 1; " +
             "delete from user_account; " +
             "alter table user_account " +
-            "   alter column id " +
-            "       restart with 1; " +
-            "delete from event; " +
-            "alter table event " +
             "   alter column id " +
             "       restart with 1; "
         ).executeUpdate();
@@ -149,12 +191,62 @@ public class AdminServiceTest {
         assertThrows(NoSuchElementException.class, () -> adminService.deleteCategory(1L));
     }
 
+    //compilations
+    @Test
+    public void testAddCompilation() {
+        assertThrows(NoSuchElementException.class, () -> adminService.addCompilation(testCompilationRequestDtos[0]));
+
+        adminService.addCategory(testCategoryRequestDtos[0]);
+        adminService.addUser(testUserRequestDtos[0]);
+        privateService.addEvent(1L, testEventRequestDtos[0]);
+        privateService.addEvent(1L, testEventRequestDtos[1]);
+        assertEquals(testCompilationResponseDtos[0], adminService.addCompilation(testCompilationRequestDtos[0]));
+    }
+
+    @Test
+    public void testUpdateCompilation() {
+        assertThrows(
+                NoSuchElementException.class,
+                () -> adminService.updateCompilation(1L, testCompilationRequestDtos[0])
+        );
+
+        adminService.addCategory(testCategoryRequestDtos[0]);
+        adminService.addUser(testUserRequestDtos[0]);
+        privateService.addEvent(1L, testEventRequestDtos[0]);
+        privateService.addEvent(1L, testEventRequestDtos[1]);
+        adminService.addCompilation(testCompilationRequestDtos[0]);
+        testCompilationRequestDtos[1].setEvents(new Long[]{3L});
+        assertThrows(
+                NoSuchElementException.class,
+                () -> adminService.updateCompilation(1L, testCompilationRequestDtos[1])
+        );
+        testCompilationRequestDtos[1].setEvents(new Long[]{2L});
+
+        assertEquals(
+                testCompilationResponseDtos[1],
+                adminService.updateCompilation(1L, testCompilationRequestDtos[1])
+        );
+    }
+
+    @Test
+    public void testDeleteCompilation() {
+        assertThrows(NoSuchElementException.class, () -> adminService.deleteCompilation(1L));
+
+        adminService.addCategory(testCategoryRequestDtos[0]);
+        adminService.addUser(testUserRequestDtos[0]);
+        privateService.addEvent(1L, testEventRequestDtos[0]);
+        privateService.addEvent(1L, testEventRequestDtos[1]);
+        adminService.addCompilation(testCompilationRequestDtos[0]);
+        assertDoesNotThrow(() -> adminService.deleteCompilation(1L));
+        assertThrows(NoSuchElementException.class, () -> adminService.deleteCompilation(1L));
+    }
+
     //events
     @Test
     public void testSearchEvents() {
         adminService.addUser(testUserRequestDtos[0]);
         adminService.addCategory(testCategoryRequestDtos[0]);
-        privateService.addEvent(1L, testEventRequestDto);
+        privateService.addEvent(1L, testEventRequestDtos[0]);
 
         assertEquals(Collections.emptyList(), adminService.searchEvents(
                 new long[]{2}, new EventState[]{EventState.PENDING}, new long[]{1},
@@ -185,7 +277,7 @@ public class AdminServiceTest {
         );
         adminService.addUser(testUserRequestDtos[0]);
         adminService.addCategory(testCategoryRequestDtos[0]);
-        privateService.addEvent(1L, testEventRequestDto);
+        privateService.addEvent(1L, testEventRequestDtos[0]);
 
         testEventAdminUpdateRequestDto.setEventDate(LocalDateTime.now());
         assertThrows(

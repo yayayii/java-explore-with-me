@@ -6,6 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.explorewithme.dto.category.CategoryRequestDto;
 import ru.practicum.explorewithme.dto.category.CategoryResponseDto;
@@ -69,7 +70,7 @@ public class PrivateServiceTest {
                 1L, "title1", "annotation1", "description1", false,
                 false, new CategoryResponseDto(1L, "name1"), 1, 0,
                 testLocalDateTime, testLocalDateTime, null, new LocationDto(1.1, 1.1), 0,
-                new UserResponseDto(1L, "email1@yandex.ru", "name1"), EventState.PUBLISHED
+                new UserResponseDto(1L, "email1@yandex.ru", "name1"), EventState.PENDING
         );
     }
 
@@ -95,21 +96,15 @@ public class PrivateServiceTest {
     //events
     @Test
     public void testAddEvent() {
-        assertThrows(
-                NoSuchElementException.class,
-                () -> privateService.addEvent(1L, testEventRequestDto)
-        );
+        assertThrows(NoSuchElementException.class, () -> privateService.addEvent(1L, testEventRequestDto));
         adminService.addUser(testUserRequestDtos[0]);
 
-        assertThrows(
-                NoSuchElementException.class,
-                () -> privateService.addEvent(1L, testEventRequestDto)
-        );
+        assertThrows(NoSuchElementException.class, () -> privateService.addEvent(1L, testEventRequestDto));
         adminService.addCategory(testCategoryRequestDto);
 
         testEventRequestDto.setEventDate(LocalDateTime.now());
         assertThrows(
-                IllegalArgumentException.class,
+                DataIntegrityViolationException.class,
                 () -> privateService.addEvent(1L, testEventRequestDto)
         );
         testEventRequestDto.setEventDate(testLocalDateTime);
@@ -119,24 +114,15 @@ public class PrivateServiceTest {
 
     @Test
     public void testGetEventById() {
-        assertThrows(
-                NoSuchElementException.class,
-                () -> privateService.getEventById(1L, 1L)
-        );
+        assertThrows(NoSuchElementException.class, () -> privateService.getEventById(1L, 1L));
         adminService.addUser(testUserRequestDtos[0]);
         adminService.addUser(testUserRequestDtos[1]);
 
-        assertThrows(
-                NoSuchElementException.class,
-                () -> privateService.getEventById(1L, 1L)
-        );
+        assertThrows(NoSuchElementException.class, () -> privateService.getEventById(1L, 1L));
         adminService.addCategory(testCategoryRequestDto);
         privateService.addEvent(1L, testEventRequestDto);
 
-        assertThrows(
-                IllegalArgumentException.class,
-                () -> privateService.getEventById(2L, 1L)
-        );
+        assertThrows(IllegalArgumentException.class, () -> privateService.getEventById(2L, 1L));
 
         assertEquals(testEventResponseDto, privateService.getEventById(1L, 1L));
     }
