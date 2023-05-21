@@ -8,9 +8,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.explorewithme.StatClient;
 import ru.practicum.explorewithme.dto.category.CategoryRequestDto;
 import ru.practicum.explorewithme.dto.category.CategoryResponseDto;
+import ru.practicum.explorewithme.dto.compilation.CompilationRequestDto;
+import ru.practicum.explorewithme.dto.compilation.CompilationResponseDto;
 import ru.practicum.explorewithme.dto.event.EventAdminUpdateRequestDto;
 import ru.practicum.explorewithme.dto.event.EventResponseDto;
 import ru.practicum.explorewithme.dto.user.UserRequestDto;
@@ -18,7 +19,6 @@ import ru.practicum.explorewithme.dto.user.UserResponseDto;
 import ru.practicum.explorewithme.model.event.EventState;
 import ru.practicum.explorewithme.service.AdminService;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
@@ -31,23 +31,19 @@ import java.util.List;
 @Validated
 @RequestMapping(path = "/admin")
 public class AdminController {
-    private final StatClient statClient;
     private final AdminService adminService;
 
 
     //categories
     @PostMapping("/categories")
-    public ResponseEntity<CategoryResponseDto> addCategory(
-            @RequestBody @Valid CategoryRequestDto requestDto, HttpServletRequest request
-    ) {
+    public ResponseEntity<CategoryResponseDto> addCategory(@RequestBody @Valid CategoryRequestDto requestDto) {
         log.info("main-service - AdminController - addCategory - requestDto: {}", requestDto);
         return new ResponseEntity<>(adminService.addCategory(requestDto), HttpStatus.CREATED);
     }
 
     @PatchMapping("/categories/{categoryId}")
     public ResponseEntity<CategoryResponseDto> updateCategory(
-            @PathVariable Long categoryId, @RequestBody @Valid CategoryRequestDto requestDto,
-            HttpServletRequest request
+            @PathVariable Long categoryId, @RequestBody @Valid CategoryRequestDto requestDto
     ) {
         log.info("main-service - AdminController - updateCategory - categoryId: {} / requestDto:{}",
                 categoryId, requestDto);
@@ -55,9 +51,32 @@ public class AdminController {
     }
 
     @DeleteMapping("/categories/{categoryId}")
-    public ResponseEntity<Void> deleteCategory(@PathVariable Long categoryId, HttpServletRequest request) {
+    public ResponseEntity<Void> deleteCategory(@PathVariable Long categoryId) {
         log.info("main-service - AdminController - deleteCategory - categoryId: {}", categoryId);
         adminService.deleteCategory(categoryId);
+        return ResponseEntity.noContent().build();
+    }
+
+    //compilations
+    @PostMapping("/compilations")
+    public ResponseEntity<CompilationResponseDto> addCompilation(@RequestBody @Valid CompilationRequestDto requestDto) {
+        log.info("main-service - AdminController - addCompilation - requestDto: {}", requestDto);
+        return new ResponseEntity<>(adminService.addCompilation(requestDto), HttpStatus.CREATED);
+    }
+
+    @PatchMapping("/compilations/{compilationId}")
+    public ResponseEntity<CompilationResponseDto> updateCompilation(
+            @PathVariable Long compilationId, @RequestBody CompilationRequestDto requestDto
+    ) {
+        log.info("main-service - AdminController - updateCompilation - compilationId: {} / requestDto: {}",
+                compilationId, requestDto);
+        return ResponseEntity.ok(adminService.updateCompilation(compilationId, requestDto));
+    }
+
+    @DeleteMapping("/compilations/{compilationId}")
+    public ResponseEntity<Void> deleteCompilation(@PathVariable Long compilationId) {
+        log.info("main-service - AdminController - deleteCompilation - compilationId: {}", compilationId);
+        adminService.deleteCompilation(compilationId);
         return ResponseEntity.noContent().build();
     }
 
@@ -68,8 +87,7 @@ public class AdminController {
             @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime rangeStart,
             @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime rangeEnd,
             @RequestParam(defaultValue = "0") @PositiveOrZero int from,
-            @RequestParam(defaultValue = "10") @Positive int size,
-            HttpServletRequest request
+            @RequestParam(defaultValue = "10") @Positive int size
     ) {
         log.info("main-service - AdminController - searchEvents - " +
                         "users: {} / states: {} / categories: {} / rangeStart: {} / rangeEnd: {} / from: {} / size: {}",
@@ -79,8 +97,7 @@ public class AdminController {
 
     @PatchMapping("/events/{eventId}")
     public ResponseEntity<EventResponseDto> updateAdminEvent(
-            @PathVariable Long eventId, @RequestBody @Valid EventAdminUpdateRequestDto requestDto,
-            HttpServletRequest request
+            @PathVariable Long eventId, @RequestBody @Valid EventAdminUpdateRequestDto requestDto
     ) {
         log.info("main-service - AdminController - updateAdminEvent - eventId: {} / requestDto: {}",
                 eventId, requestDto);
@@ -89,9 +106,7 @@ public class AdminController {
 
     //users
     @PostMapping("/users")
-    public ResponseEntity<UserResponseDto> addUser(
-            @RequestBody @Valid UserRequestDto requestDto, HttpServletRequest request
-    ) {
+    public ResponseEntity<UserResponseDto> addUser(@RequestBody @Valid UserRequestDto requestDto) {
         log.info("main-service - AdminController - addUser - requestDto: {}", requestDto);
         return new ResponseEntity<>(adminService.addUser(requestDto), HttpStatus.CREATED);
     }
@@ -99,14 +114,14 @@ public class AdminController {
     @GetMapping("/users")
     public ResponseEntity<List<UserResponseDto>> getUsers(
         @RequestParam(defaultValue = "0") @PositiveOrZero int from,
-        @RequestParam(defaultValue = "10") @Positive int size, HttpServletRequest request
+        @RequestParam(defaultValue = "10") @Positive int size
     ) {
         log.info("main-service - AdminController - getUsers - from: {} / size: {}", from, size);
         return ResponseEntity.ok(adminService.getUsers(from, size));
     }
 
     @DeleteMapping("/users/{userId}")
-    public ResponseEntity<Void> deleteUser(@PathVariable Long userId, HttpServletRequest request) {
+    public ResponseEntity<Void> deleteUser(@PathVariable Long userId) {
         log.info("main-service - AdminController - deleteUser - userId: {}", userId);
         adminService.deleteUser(userId);
         return ResponseEntity.noContent().build();

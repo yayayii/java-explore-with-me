@@ -7,18 +7,23 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.explorewithme.dao.CategoryDao;
+import ru.practicum.explorewithme.dao.CompilationDao;
 import ru.practicum.explorewithme.dao.EventDao;
 import ru.practicum.explorewithme.dao.UserDao;
 import ru.practicum.explorewithme.dto.category.CategoryRequestDto;
 import ru.practicum.explorewithme.dto.category.CategoryResponseDto;
+import ru.practicum.explorewithme.dto.compilation.CompilationRequestDto;
+import ru.practicum.explorewithme.dto.compilation.CompilationResponseDto;
 import ru.practicum.explorewithme.dto.event.EventAdminUpdateRequestDto;
 import ru.practicum.explorewithme.dto.event.EventResponseDto;
 import ru.practicum.explorewithme.dto.user.UserRequestDto;
 import ru.practicum.explorewithme.dto.user.UserResponseDto;
 import ru.practicum.explorewithme.mapper.CategoryMapper;
+import ru.practicum.explorewithme.mapper.CompilationMapper;
 import ru.practicum.explorewithme.mapper.EventMapper;
 import ru.practicum.explorewithme.mapper.UserMapper;
 import ru.practicum.explorewithme.model.Category;
+import ru.practicum.explorewithme.model.Compilation;
 import ru.practicum.explorewithme.model.User;
 import ru.practicum.explorewithme.model.event.Event;
 import ru.practicum.explorewithme.model.event.EventState;
@@ -26,6 +31,7 @@ import ru.practicum.explorewithme.model.event.EventUpdateState;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
@@ -38,6 +44,7 @@ public class AdminService {
     private final CategoryDao categoryDao;
     private final EventDao eventDao;
     private final UserDao userDao;
+    private final CompilationDao compilationDao;
 
 
     //categories
@@ -66,6 +73,59 @@ public class AdminService {
             throw new NoSuchElementException("Category id = " + categoryId + " doesn't exist");
         }
         categoryDao.deleteById(categoryId);
+    }
+
+    //compilations
+    @Transactional
+    public CompilationResponseDto addCompilation(CompilationRequestDto requestDto) {
+        log.info("main-service - AdminService - addCompilation - requestDto: {}", requestDto);
+
+        Compilation compilation = CompilationMapper.toModel(requestDto);
+        if (requestDto.getEvents() != null) {
+            List<Event> events = new ArrayList<>();
+            for (Long eventId : requestDto.getEvents()) {
+                Event event = eventDao.findById(eventId)
+                        .orElseThrow(() -> new NoSuchElementException("Event id = " + eventId + " doesn't exist"));
+                events.add(event);
+            }
+            compilation.setEvents(events);
+        }
+
+        return CompilationMapper.toResponseDto(compilationDao.save(compilation));
+    }
+
+    @Transactional
+    public CompilationResponseDto updateCompilation(Long compilationId, CompilationRequestDto requestDto) {
+        log.info("main-service - AdminService - addCompilation - updateCompilation: {}", requestDto);
+
+        Compilation compilation = compilationDao.findById(compilationId)
+                .orElseThrow(() -> new NoSuchElementException("Compilation id = " + compilationId + " doesn't exist"));
+        if (requestDto.getTitle() != null) {
+            compilation.setTitle(requestDto.getTitle());
+        }
+        if (requestDto.getPinned() != null) {
+            compilation.setPinned(requestDto.getPinned());
+        }
+        if (requestDto.getEvents() != null) {
+            List<Event> events = new ArrayList<>();
+            for (Long eventId : requestDto.getEvents()) {
+                Event event = eventDao.findById(eventId)
+                        .orElseThrow(() -> new NoSuchElementException("Event id = " + eventId + " doesn't exist"));
+                events.add(event);
+            }
+            compilation.setEvents(events);
+        }
+
+        return CompilationMapper.toResponseDto(compilation);
+    }
+
+    @Transactional
+    public void deleteCompilation(Long compilationId) {
+        log.info("main-service - AdminService - deleteCompilation - compilationId: {}", compilationId);
+        if (!compilationDao.existsById(compilationId)) {
+            throw new NoSuchElementException("Compilation id = " + compilationId + " doesn't exist");
+        }
+        compilationDao.deleteById(compilationId);
     }
 
     //events

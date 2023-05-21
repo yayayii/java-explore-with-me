@@ -14,14 +14,11 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Data
 public class EventRequestDto {
-    @NotNull
-    @Size(min = 3, max = 120)
+    @NotNull @Size(min = 3, max = 120)
     private String title;
-    @NotNull
-    @Size(min = 20, max = 2000)
+    @NotNull @Size(min = 20, max = 2000)
     private String annotation;
-    @NotNull
-    @Size(min = 20, max = 7000)
+    @NotNull @Size(min = 20, max = 7000)
     private String description;
     private boolean paid;
     private boolean requestModeration = true;
