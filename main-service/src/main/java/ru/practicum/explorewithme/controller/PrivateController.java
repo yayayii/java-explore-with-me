@@ -12,6 +12,8 @@ import ru.practicum.explorewithme.dto.event.EventResponseDto;
 import ru.practicum.explorewithme.dto.event.EventShortResponseDto;
 import ru.practicum.explorewithme.dto.event.EventUpdateRequestDto;
 import ru.practicum.explorewithme.dto.participation.ParticipationResponseDto;
+import ru.practicum.explorewithme.dto.participation.ParticipationUpdateRequestDto;
+import ru.practicum.explorewithme.dto.participation.ParticipationUpdateResponseDto;
 import ru.practicum.explorewithme.service.PrivateService;
 import ru.practicum.explorewithme.util.Private;
 
@@ -67,6 +69,17 @@ public class PrivateController {
         return ResponseEntity.ok(privateService.updateEvent(userId, eventId, requestDto));
     }
 
+    @PatchMapping("/events/{eventId}/requests")
+    public ResponseEntity<ParticipationUpdateResponseDto> updateParticipation(
+            @PathVariable Long userId,
+            @PathVariable Long eventId,
+            @RequestBody @Valid ParticipationUpdateRequestDto requestDto
+    ) {
+        log.info("main-service - PrivateController - updateParticipation - userId: {} / eventId: {} / requestDto: {}",
+                userId, eventId, requestDto);
+        return ResponseEntity.ok(privateService.updateParticipation(userId, eventId, requestDto));
+    }
+
     //participations
     @PostMapping("/requests")
     public ResponseEntity<ParticipationResponseDto> addParticipation(
@@ -76,9 +89,18 @@ public class PrivateController {
         return new ResponseEntity<>(privateService.addParticipation(userId, eventId), HttpStatus.CREATED);
     }
 
-    @GetMapping("requests")
+    @GetMapping("/requests")
     public ResponseEntity<List<ParticipationResponseDto>> getParticipations(@PathVariable Long userId) {
         log.info("main-service - PrivateController - addParticipation - userId: {}", userId);
         return ResponseEntity.ok(privateService.getParticipations(userId));
+    }
+
+    @PatchMapping("/requests/{requestId}/cancel")
+    public ResponseEntity<ParticipationResponseDto> cancelParticipation(
+            @PathVariable Long userId, @PathVariable Long requestId
+    ) {
+        log.info("main-service - PrivateController - cancelParticipation - userId: {} / requestId: {}",
+                userId, requestId);
+        return ResponseEntity.ok(privateService.cancelParticipation(userId, requestId));
     }
 }
