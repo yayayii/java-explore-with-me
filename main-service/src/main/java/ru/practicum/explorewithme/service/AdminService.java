@@ -14,7 +14,7 @@ import ru.practicum.explorewithme.dto.category.CategoryRequestDto;
 import ru.practicum.explorewithme.dto.category.CategoryResponseDto;
 import ru.practicum.explorewithme.dto.compilation.CompilationRequestDto;
 import ru.practicum.explorewithme.dto.compilation.CompilationResponseDto;
-import ru.practicum.explorewithme.dto.event.EventAdminUpdateRequestDto;
+import ru.practicum.explorewithme.dto.event.EventUpdateRequestDto;
 import ru.practicum.explorewithme.dto.event.EventResponseDto;
 import ru.practicum.explorewithme.dto.user.UserRequestDto;
 import ru.practicum.explorewithme.dto.user.UserResponseDto;
@@ -141,8 +141,8 @@ public class AdminService {
     }
 
     @Transactional
-    public EventResponseDto updateAdminEvent(Long eventId, EventAdminUpdateRequestDto requestDto) {
-        log.info("main-service - AdminService - updateAdminEvent - eventId: {} / requestDto: {}", eventId, requestDto);
+    public EventResponseDto updateEvent(Long eventId, EventUpdateRequestDto requestDto) {
+        log.info("main-service - AdminService - updateEvent - eventId: {} / requestDto: {}", eventId, requestDto);
 
         Event event = eventDao.findById(eventId)
                 .orElseThrow(() -> new NoSuchElementException("Event id = " + eventId + " doesn't exist"));

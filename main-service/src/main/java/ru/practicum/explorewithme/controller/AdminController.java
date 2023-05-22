@@ -12,12 +12,13 @@ import ru.practicum.explorewithme.dto.category.CategoryRequestDto;
 import ru.practicum.explorewithme.dto.category.CategoryResponseDto;
 import ru.practicum.explorewithme.dto.compilation.CompilationRequestDto;
 import ru.practicum.explorewithme.dto.compilation.CompilationResponseDto;
-import ru.practicum.explorewithme.dto.event.EventAdminUpdateRequestDto;
+import ru.practicum.explorewithme.dto.event.EventUpdateRequestDto;
 import ru.practicum.explorewithme.dto.event.EventResponseDto;
 import ru.practicum.explorewithme.dto.user.UserRequestDto;
 import ru.practicum.explorewithme.dto.user.UserResponseDto;
 import ru.practicum.explorewithme.model.event.EventState;
 import ru.practicum.explorewithme.service.AdminService;
+import ru.practicum.explorewithme.util.Admin;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
@@ -100,12 +101,12 @@ public class AdminController {
     }
 
     @PatchMapping("/events/{eventId}")
-    public ResponseEntity<EventResponseDto> updateAdminEvent(
-            @PathVariable Long eventId, @RequestBody @Valid EventAdminUpdateRequestDto requestDto
+    public ResponseEntity<EventResponseDto> updateEvent(
+            @PathVariable Long eventId, @RequestBody @Validated(Admin.class) EventUpdateRequestDto requestDto
     ) {
-        log.info("main-service - AdminController - updateAdminEvent - eventId: {} / requestDto: {}",
+        log.info("main-service - AdminController - updateEvent - eventId: {} / requestDto: {}",
                 eventId, requestDto);
-        return ResponseEntity.ok(adminService.updateAdminEvent(eventId, requestDto));
+        return ResponseEntity.ok(adminService.updateEvent(eventId, requestDto));
     }
 
     //users

@@ -5,6 +5,10 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import ru.practicum.explorewithme.model.event.EventUpdateState;
+import ru.practicum.explorewithme.util.Admin;
+import ru.practicum.explorewithme.util.EventAdminUpdateStatePattern;
+import ru.practicum.explorewithme.util.EventPrivateUpdateStatePattern;
+import ru.practicum.explorewithme.util.Private;
 
 import javax.validation.constraints.Future;
 import javax.validation.constraints.NotNull;
@@ -14,7 +18,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class EventAdminUpdateRequestDto {
+public class EventUpdateRequestDto {
     @Size(min = 3, max = 120)
     private String title;
     @Size(min = 20, max = 2000)
@@ -30,5 +34,7 @@ public class EventAdminUpdateRequestDto {
     private LocationDto location;
     private Long category;
     @NotNull
+    @EventAdminUpdateStatePattern(regexp="PUBLISH_EVENT|REJECT_EVENT", groups={Admin.class})
+    @EventPrivateUpdateStatePattern(regexp="SEND_TO_REVIEW|CANCEL_REVIEW", groups={Private.class})
     private EventUpdateState stateAction;
 }

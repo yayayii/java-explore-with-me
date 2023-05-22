@@ -12,6 +12,7 @@ import ru.practicum.explorewithme.dao.UserDao;
 import ru.practicum.explorewithme.dto.event.EventRequestDto;
 import ru.practicum.explorewithme.dto.event.EventResponseDto;
 import ru.practicum.explorewithme.dto.event.EventShortResponseDto;
+import ru.practicum.explorewithme.dto.event.EventUpdateRequestDto;
 import ru.practicum.explorewithme.mapper.EventMapper;
 import ru.practicum.explorewithme.model.Category;
 import ru.practicum.explorewithme.model.User;
@@ -66,7 +67,7 @@ public class PrivateService {
         Event event = eventDao.findById(eventId)
                 .orElseThrow(() -> new NoSuchElementException("Event id = " + eventId + " doesn't exist"));
         if (!userId.equals(event.getInitiator().getId())) {
-            throw new IllegalArgumentException("You must be the initiator of the event");
+            throw new DataIntegrityViolationException("You must be the initiator of the event");
         }
 
         return EventMapper.toResponseDto(event);

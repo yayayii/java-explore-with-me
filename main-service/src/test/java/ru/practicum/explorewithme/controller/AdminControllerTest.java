@@ -17,7 +17,7 @@ import ru.practicum.explorewithme.dto.category.CategoryRequestDto;
 import ru.practicum.explorewithme.dto.category.CategoryResponseDto;
 import ru.practicum.explorewithme.dto.compilation.CompilationRequestDto;
 import ru.practicum.explorewithme.dto.compilation.CompilationResponseDto;
-import ru.practicum.explorewithme.dto.event.EventAdminUpdateRequestDto;
+import ru.practicum.explorewithme.dto.event.EventUpdateRequestDto;
 import ru.practicum.explorewithme.dto.event.EventResponseDto;
 import ru.practicum.explorewithme.dto.event.EventShortResponseDto;
 import ru.practicum.explorewithme.dto.event.LocationDto;
@@ -53,7 +53,7 @@ public class AdminControllerTest {
     private static CompilationRequestDto testCompilationRequestDto;
     private static CompilationResponseDto testCompilationResponseDto;
     private static LocalDateTime testLocalDateTime;
-    private static EventAdminUpdateRequestDto testEventAdminUpdateRequestDto;
+    private static EventUpdateRequestDto testEventUpdateRequestDto;
     private static EventShortResponseDto testEventShortResponseDto;
     private static EventResponseDto testEventResponseDto;
     private static UserRequestDto testUserRequestDto;
@@ -72,7 +72,7 @@ public class AdminControllerTest {
         testUserResponseDto = new UserResponseDto(1L, "email1@email.ru", "name1");
 
         testLocalDateTime = LocalDateTime.of(2024, 1, 1, 1, 1);
-        testEventAdminUpdateRequestDto = new EventAdminUpdateRequestDto(
+        testEventUpdateRequestDto = new EventUpdateRequestDto(
                 "newTitle1", "newAnnotation11111111", "newDescription1111111",
                 false, false, 1, testLocalDateTime,
                 new LocationDto(0.0, 0.0), 1L, EventUpdateState.PUBLISH_EVENT
@@ -194,17 +194,17 @@ public class AdminControllerTest {
 
     @Test
     public void testUpdateAdminEvent() throws Exception {
-        testEventAdminUpdateRequestDto.setStateAction(null);
+        testEventUpdateRequestDto.setStateAction(null);
         mockMvc.perform(patch("/admin/events/1")
-                        .content(objectMapper.writeValueAsString(testEventAdminUpdateRequestDto))
+                        .content(objectMapper.writeValueAsString(testEventUpdateRequestDto))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
-        testEventAdminUpdateRequestDto.setStateAction(EventUpdateState.PUBLISH_EVENT);
+        testEventUpdateRequestDto.setStateAction(EventUpdateState.PUBLISH_EVENT);
 
-        when(mockAdminService.updateAdminEvent(anyLong(), any()))
+        when(mockAdminService.updateEvent(anyLong(), any()))
                 .thenReturn(testEventResponseDto);
         mockMvc.perform(patch("/admin/events/1")
-                        .content(objectMapper.writeValueAsString(testEventAdminUpdateRequestDto))
+                        .content(objectMapper.writeValueAsString(testEventUpdateRequestDto))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON));

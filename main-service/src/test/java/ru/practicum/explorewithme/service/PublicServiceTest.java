@@ -49,7 +49,7 @@ public class PublicServiceTest {
     private static UserRequestDto testUserRequestDto;
     private static LocalDateTime testLocalDateTime;
     private static EventRequestDto[] testEventRequestDtos;
-    private static EventAdminUpdateRequestDto[] testEventAdminUpdateRequestDtos;
+    private static EventUpdateRequestDto[] testEventUpdateRequestDtos;
     private static EventShortResponseDto[] testEventShortResponseDtos;
     private static EventResponseDto testEventResponseDto;
     private static CompilationRequestDto[] testCompilationRequestDtos;
@@ -83,13 +83,13 @@ public class PublicServiceTest {
                         new LocationDto(1.1, 1.1), 2L
                 ),
         };
-        testEventAdminUpdateRequestDtos = new EventAdminUpdateRequestDto[]{
-                new EventAdminUpdateRequestDto(
+        testEventUpdateRequestDtos = new EventUpdateRequestDto[]{
+                new EventUpdateRequestDto(
                         "title1", "annotation1", "description1",
                         false, false, 1, testLocalDateTime,
                         new LocationDto(1.1, 1.1), 1L, EventUpdateState.PUBLISH_EVENT
                 ),
-                new EventAdminUpdateRequestDto(
+                new EventUpdateRequestDto(
                         "title2", "annotation2", "description2",
                         false, false, 1, testLocalDateTime,
                         new LocationDto(1.1, 1.1), 2L, EventUpdateState.PUBLISH_EVENT
@@ -207,7 +207,7 @@ public class PublicServiceTest {
         privateService.addEvent(1L, testEventRequestDtos[0]);
         assertThrows(NoSuchElementException.class, () -> publicService.getEventById(1L));
 
-        adminService.updateAdminEvent(1L, testEventAdminUpdateRequestDtos[0]);
+        adminService.updateEvent(1L, testEventUpdateRequestDtos[0]);
         assertEquals(testEventResponseDto, publicService.getEventById(1L));
     }
 
@@ -226,8 +226,8 @@ public class PublicServiceTest {
                 )
         );
 
-        adminService.updateAdminEvent(1L, testEventAdminUpdateRequestDtos[0]);
-        adminService.updateAdminEvent(2L, testEventAdminUpdateRequestDtos[1]);
+        adminService.updateEvent(1L, testEventUpdateRequestDtos[0]);
+        adminService.updateEvent(2L, testEventUpdateRequestDtos[1]);
         assertEquals(List.of(testEventShortResponseDtos[0]), publicService.getEvents(
                 "description", List.of(1L, 2L), false, testLocalDateTime.minusDays(1),
                 testLocalDateTime.plusDays(1), false, SortValue.VIEWS, 1, 1)

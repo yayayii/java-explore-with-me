@@ -51,7 +51,7 @@ public class AdminServiceTest {
     private static UserResponseDto[] testUserResponseDtos;
     private static LocalDateTime testLocalDateTime;
     private static EventRequestDto[] testEventRequestDtos;
-    private static EventAdminUpdateRequestDto testEventAdminUpdateRequestDto;
+    private static EventUpdateRequestDto testEventUpdateRequestDto;
     private static EventShortResponseDto[] testEventShortResponseDtos;
     private static EventResponseDto[] testEventResponseDtos;
 
@@ -89,7 +89,7 @@ public class AdminServiceTest {
                         new LocationDto(1.1, 1.1), 1L
                 ),
         };
-        testEventAdminUpdateRequestDto = new EventAdminUpdateRequestDto(
+        testEventUpdateRequestDto = new EventUpdateRequestDto(
                 "newTitle1", "newAnnotation1", "newDescription1",
                 true, true, 2, testLocalDateTime,
                 new LocationDto(0.0, 0.0), 1L, EventUpdateState.PUBLISH_EVENT
@@ -273,27 +273,27 @@ public class AdminServiceTest {
     public void testUpdateAdminEvent() {
         assertThrows(
                 NoSuchElementException.class,
-                () -> adminService.updateAdminEvent(1L, testEventAdminUpdateRequestDto)
+                () -> adminService.updateEvent(1L, testEventUpdateRequestDto)
         );
         adminService.addUser(testUserRequestDtos[0]);
         adminService.addCategory(testCategoryRequestDtos[0]);
         privateService.addEvent(1L, testEventRequestDtos[0]);
 
-        testEventAdminUpdateRequestDto.setEventDate(LocalDateTime.now());
+        testEventUpdateRequestDto.setEventDate(LocalDateTime.now());
         assertThrows(
                 DataIntegrityViolationException.class,
-                () -> adminService.updateAdminEvent(1L, testEventAdminUpdateRequestDto)
+                () -> adminService.updateEvent(1L, testEventUpdateRequestDto)
         );
-        testEventAdminUpdateRequestDto.setEventDate(testLocalDateTime);
+        testEventUpdateRequestDto.setEventDate(testLocalDateTime);
 
-        testEventAdminUpdateRequestDto.setCategory(2L);
+        testEventUpdateRequestDto.setCategory(2L);
         assertThrows(
                 NoSuchElementException.class,
-                () -> adminService.updateAdminEvent(1L, testEventAdminUpdateRequestDto)
+                () -> adminService.updateEvent(1L, testEventUpdateRequestDto)
         );
-        testEventAdminUpdateRequestDto.setCategory(1L);
+        testEventUpdateRequestDto.setCategory(1L);
 
-        assertEquals(testEventResponseDtos[1], adminService.updateAdminEvent(1L, testEventAdminUpdateRequestDto));
+        assertEquals(testEventResponseDtos[1], adminService.updateEvent(1L, testEventUpdateRequestDto));
     }
 
     //users
