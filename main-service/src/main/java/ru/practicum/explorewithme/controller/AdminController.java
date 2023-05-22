@@ -16,7 +16,7 @@ import ru.practicum.explorewithme.dto.event.EventUpdateRequestDto;
 import ru.practicum.explorewithme.dto.event.EventResponseDto;
 import ru.practicum.explorewithme.dto.user.UserRequestDto;
 import ru.practicum.explorewithme.dto.user.UserResponseDto;
-import ru.practicum.explorewithme.model.event.EventState;
+import ru.practicum.explorewithme.model.event.enums.EventState;
 import ru.practicum.explorewithme.service.AdminService;
 import ru.practicum.explorewithme.util.Admin;
 

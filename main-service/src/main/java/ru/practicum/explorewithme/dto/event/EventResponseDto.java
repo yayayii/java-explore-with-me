@@ -7,7 +7,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import ru.practicum.explorewithme.dto.category.CategoryResponseDto;
 import ru.practicum.explorewithme.dto.user.UserResponseDto;
-import ru.practicum.explorewithme.model.event.EventState;
+import ru.practicum.explorewithme.model.event.enums.EventState;
 
 import java.time.LocalDateTime;
 

@@ -4,10 +4,10 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ru.practicum.explorewithme.model.event.EventUpdateState;
+import ru.practicum.explorewithme.model.event.enums.EventUpdateState;
 import ru.practicum.explorewithme.util.Admin;
-import ru.practicum.explorewithme.util.EventAdminUpdateStatePattern;
-import ru.practicum.explorewithme.util.EventPrivateUpdateStatePattern;
+import ru.practicum.explorewithme.model.event.enums.util.EventAdminUpdateStatePattern;
+import ru.practicum.explorewithme.model.event.enums.util.EventPrivateUpdateStatePattern;
 import ru.practicum.explorewithme.util.Private;
 
 import javax.validation.constraints.Future;

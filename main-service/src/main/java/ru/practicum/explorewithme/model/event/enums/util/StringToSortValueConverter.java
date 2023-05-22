@@ -1,7 +1,7 @@
-package ru.practicum.explorewithme.util;
+package ru.practicum.explorewithme.model.event.enums.util;
 
 import org.springframework.core.convert.converter.Converter;
-import ru.practicum.explorewithme.model.event.SortValue;
+import ru.practicum.explorewithme.model.event.enums.SortValue;
 
 public class StringToSortValueConverter implements Converter<String, SortValue> {
     @Override

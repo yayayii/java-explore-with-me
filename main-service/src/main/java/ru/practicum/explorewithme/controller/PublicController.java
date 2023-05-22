@@ -13,7 +13,7 @@ import ru.practicum.explorewithme.dto.category.CategoryResponseDto;
 import ru.practicum.explorewithme.dto.compilation.CompilationResponseDto;
 import ru.practicum.explorewithme.dto.event.EventResponseDto;
 import ru.practicum.explorewithme.dto.event.EventShortResponseDto;
-import ru.practicum.explorewithme.model.event.SortValue;
+import ru.practicum.explorewithme.model.event.enums.SortValue;
 import ru.practicum.explorewithme.service.PublicService;
 
 import javax.servlet.http.HttpServletRequest;

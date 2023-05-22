@@ -19,8 +19,7 @@ import ru.practicum.explorewithme.dto.event.EventResponseDto;
 import ru.practicum.explorewithme.dto.event.EventShortResponseDto;
 import ru.practicum.explorewithme.dto.event.LocationDto;
 import ru.practicum.explorewithme.dto.user.UserResponseDto;
-import ru.practicum.explorewithme.model.event.EventState;
-import ru.practicum.explorewithme.model.event.SortValue;
+import ru.practicum.explorewithme.model.event.enums.EventState;
 import ru.practicum.explorewithme.service.PublicService;
 
 import java.time.LocalDateTime;

@@ -13,8 +13,8 @@ import ru.practicum.explorewithme.dto.category.CategoryResponseDto;
 import ru.practicum.explorewithme.dto.event.*;
 import ru.practicum.explorewithme.dto.user.UserRequestDto;
 import ru.practicum.explorewithme.dto.user.UserResponseDto;
-import ru.practicum.explorewithme.model.event.EventState;
-import ru.practicum.explorewithme.model.event.EventUpdateState;
+import ru.practicum.explorewithme.model.event.enums.EventState;
+import ru.practicum.explorewithme.model.event.enums.EventUpdateState;
 
 import javax.persistence.EntityManager;
 import java.time.LocalDateTime;
