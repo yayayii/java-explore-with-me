@@ -31,7 +31,6 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
@@ -159,6 +158,22 @@ public class PrivateService {
         return EventMapper.toResponseDto(event);
     }
 
+    public List<ParticipationResponseDto> getParticipations(Long userId, Long eventId) {
+        log.info("main-service - PrivateService - getParticipations - userId: {} / eventId: {} / ", userId, eventId);
+
+        if (!userDao.existsById(userId)) {
+            throw new NoSuchElementException("User id = " + userId + " doesn't exist"));
+        }
+        Event event = eventDao.findById(eventId)
+                .orElseThrow(() -> new NoSuchElementException("Event id = " + eventId + " doesn't exist"));
+        if (!event.getInitiator().getId().equals(userId)) {
+            throw new DataIntegrityViolationException("You are not the initiator of the event");
+        }
+
+        return participationDao.findAllByEvent_Id(eventId)
+                .stream().map(ParticipationMapper::toResponseDto).collect(Collectors.toList());
+    }
+
     @Transactional
     public ParticipationUpdateResponseDto updateParticipation(
             Long userId, Long eventId, ParticipationUpdateRequestDto requestDto
@@ -166,8 +181,9 @@ public class PrivateService {
         log.info("main-service - PrivateService - updateParticipation - userId: {} / eventId: {} / requestDto: {}",
                 userId, eventId, requestDto);
 
-        User user = userDao.findById(userId)
-                .orElseThrow(() -> new NoSuchElementException("User id = " + userId + " doesn't exist"));
+        if (!userDao.existsById(userId)) {
+            throw new NoSuchElementException("User id = " + userId + " doesn't exist"));
+        }
         Event event = eventDao.findById(eventId)
                 .orElseThrow(() -> new NoSuchElementException("Event id = " + eventId + " doesn't exist"));
         if (!event.getInitiator().getId().equals(userId)) {

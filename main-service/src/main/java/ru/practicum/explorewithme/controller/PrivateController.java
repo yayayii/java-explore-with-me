@@ -58,6 +58,14 @@ public class PrivateController {
         return ResponseEntity.ok(privateService.getEventsByInitiatorId(userId, from, size));
     }
 
+    @GetMapping("/events/{eventId}/requests")
+    public ResponseEntity<List<ParticipationResponseDto>> getParticipations(
+            @PathVariable Long userId,@PathVariable Long eventId
+    ) {
+        log.info("main-service - PrivateController - getParticipations - userId: {} / eventId: {}", userId, eventId);
+        return ResponseEntity.ok(privateService.getParticipations(userId, eventId));
+    }
+
     @PatchMapping("/events/{eventId}")
     public ResponseEntity<EventResponseDto> updateEvent(
             @PathVariable Long userId,

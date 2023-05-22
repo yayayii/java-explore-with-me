@@ -11,4 +11,6 @@ public interface ParticipationDao extends JpaRepository<Participation, Long> {
     boolean existsByRequester_IdAndEvent_Id(Long requesterId, Long eventId);
 
     List<Participation> findAllByRequester_Id(Long requesterId);
+
+    List<Participation> findAllByEvent_Id(Long eventId);
 }
