@@ -15,8 +15,12 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import ru.practicum.explorewithme.StatClient;
 import ru.practicum.explorewithme.dto.category.CategoryResponseDto;
 import ru.practicum.explorewithme.dto.compilation.CompilationResponseDto;
+import ru.practicum.explorewithme.dto.event.EventResponseDto;
 import ru.practicum.explorewithme.dto.event.EventShortResponseDto;
+import ru.practicum.explorewithme.dto.event.LocationDto;
 import ru.practicum.explorewithme.dto.user.UserResponseDto;
+import ru.practicum.explorewithme.model.event.EventState;
+import ru.practicum.explorewithme.model.event.SortValue;
 import ru.practicum.explorewithme.service.PublicService;
 
 import java.time.LocalDateTime;
@@ -43,6 +47,7 @@ public class PublicControllerTest {
     private static UserResponseDto testUserResponseDto;
     private static LocalDateTime testLocalDateTime;
     private static EventShortResponseDto testEventShortResponseDto;
+    private static EventResponseDto testEventResponseDto;
     private static CompilationResponseDto testCompilationResponseDto;
 
 
@@ -57,6 +62,12 @@ public class PublicControllerTest {
         testEventShortResponseDto = new EventShortResponseDto(
                 1L, "title1", "annotation1", false, testCategoryResponseDto, 1,
                 testLocalDateTime, 1, testUserResponseDto
+        );
+        testEventResponseDto = new EventResponseDto(
+                1L, "title1", "annotation1", "description1", false,
+                false, testCategoryResponseDto, 1, 1,
+                testLocalDateTime, testLocalDateTime, testLocalDateTime, new LocationDto(1.1, 1.1), 1,
+                testUserResponseDto, EventState.PUBLISHED
         );
         testCompilationResponseDto = new CompilationResponseDto(
                 1L, "title1", false, List.of(testEventShortResponseDto, testEventShortResponseDto)
@@ -101,9 +112,29 @@ public class PublicControllerTest {
 
     @Test
     public void testGetCompilations() throws Exception {
-        when(mockPublicService.getCompilations(anyBoolean(), anyInt(), anyInt()))
+        when(mockPublicService.getCompilations(any(), anyInt(), anyInt()))
                 .thenReturn(List.of(testCompilationResponseDto, testCompilationResponseDto));
         mockMvc.perform(get("/compilations"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$", hasSize(2)));
+    }
+
+    //events
+    @Test
+    public void testGetEventById() throws Exception {
+        when(mockPublicService.getEventById(anyLong()))
+                .thenReturn(testEventResponseDto);
+        mockMvc.perform(get("/events/1"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON));
+    }
+
+    @Test
+    public void testGetEvents() throws Exception {
+        when(mockPublicService.getEvents(anyString(), anyList(), anyBoolean(), any(), any(), anyBoolean(), any(), anyInt(), anyInt()))
+                .thenReturn(List.of(testEventShortResponseDto, testEventShortResponseDto));
+        mockMvc.perform(get("/events?text=text&categories=1,2&paid=true&rangeStart=2023-01-01 12:12:12&rangeEnd=2023-01-01 12:12:12&onlyAvailable=true&sort=VIEWS&from=1&size=1"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$", hasSize(2)));

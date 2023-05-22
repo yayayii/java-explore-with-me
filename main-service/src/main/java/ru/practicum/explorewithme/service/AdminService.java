@@ -130,7 +130,7 @@ public class AdminService {
 
     //events
     public List<EventResponseDto> searchEvents(
-            long[] userIds, EventState[] states, long[] categoryIds,
+            List<Long> userIds, List<EventState> states, List<Long> categoryIds,
             LocalDateTime rangeStart, LocalDateTime rangeEnd, int from, int size
     ) {
         log.info("main-service - AdminService - searchEvents - " +

@@ -3,7 +3,7 @@ package ru.practicum.explorewithme.util;
 import org.springframework.core.convert.converter.Converter;
 import ru.practicum.explorewithme.model.event.EventState;
 
-public class StringToEnumConverter implements Converter<String, EventState> {
+public class StringToEventStateConverter implements Converter<String, EventState> {
     @Override
     public EventState convert(String source) {
         try {

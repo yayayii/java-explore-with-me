@@ -85,9 +85,9 @@ public class AdminController {
     //events
     @GetMapping("/events")
     public ResponseEntity<List<EventResponseDto>> searchEvents(
-            @RequestParam(required = false) long[] users,
-            @RequestParam(required = false) EventState[] states,
-            @RequestParam(required = false) long[] categories,
+            @RequestParam(required = false) List<Long> users,
+            @RequestParam(required = false) List<EventState> states,
+            @RequestParam(required = false) List<Long> categories,
             @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime rangeStart,
             @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime rangeEnd,
             @RequestParam(defaultValue = "0") @PositiveOrZero int from,

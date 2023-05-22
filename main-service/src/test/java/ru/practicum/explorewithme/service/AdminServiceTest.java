@@ -249,23 +249,23 @@ public class AdminServiceTest {
         privateService.addEvent(1L, testEventRequestDtos[0]);
 
         assertEquals(Collections.emptyList(), adminService.searchEvents(
-                new long[]{2}, new EventState[]{EventState.PENDING}, new long[]{1},
+                List.of(2L), List.of(EventState.PENDING), List.of(1L),
                 testLocalDateTime.minusDays(1), testLocalDateTime.plusDays(1), 0, 10));
         assertEquals(Collections.emptyList(), adminService.searchEvents(
-                new long[]{1}, new EventState[]{EventState.PUBLISHED}, new long[]{1},
+                List.of(1L), List.of(EventState.PUBLISHED), List.of(1L),
                 testLocalDateTime.minusDays(1), testLocalDateTime.plusDays(1), 0, 10));
         assertEquals(Collections.emptyList(), adminService.searchEvents(
-                new long[]{1}, new EventState[]{EventState.PENDING}, new long[]{2},
+                List.of(1L), List.of(EventState.PENDING), List.of(2L),
                 testLocalDateTime.minusDays(1), testLocalDateTime.plusDays(1), 0, 10));
         assertEquals(Collections.emptyList(), adminService.searchEvents(
-                new long[]{1}, new EventState[]{EventState.PENDING}, new long[]{2},
+                List.of(1L), List.of(EventState.PENDING), List.of(1L),
                 testLocalDateTime.plusDays(1), testLocalDateTime.plusDays(2), 0, 10));
         assertEquals(Collections.emptyList(), adminService.searchEvents(
-                new long[]{1}, new EventState[]{EventState.PENDING}, new long[]{1},
+                List.of(1L), List.of(EventState.PENDING), List.of(1L),
                 testLocalDateTime.minusDays(2), testLocalDateTime.minusDays(1), 0, 10));
 
         assertEquals(List.of(testEventResponseDtos[0]), adminService.searchEvents(
-                new long[]{1}, new EventState[]{EventState.PENDING}, new long[]{1},
+                List.of(1L), List.of(EventState.PENDING), List.of(1L),
                 testLocalDateTime.minusDays(1), testLocalDateTime.plusDays(1), 0, 10));
     }
 

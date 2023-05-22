@@ -3,16 +3,25 @@ package ru.practicum.explorewithme.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.explorewithme.dao.CategoryDao;
 import ru.practicum.explorewithme.dao.CompilationDao;
+import ru.practicum.explorewithme.dao.EventDao;
 import ru.practicum.explorewithme.dto.category.CategoryResponseDto;
 import ru.practicum.explorewithme.dto.compilation.CompilationResponseDto;
+import ru.practicum.explorewithme.dto.event.EventResponseDto;
+import ru.practicum.explorewithme.dto.event.EventShortResponseDto;
 import ru.practicum.explorewithme.mapper.CategoryMapper;
 import ru.practicum.explorewithme.mapper.CompilationMapper;
+import ru.practicum.explorewithme.mapper.EventMapper;
 import ru.practicum.explorewithme.model.Category;
 import ru.practicum.explorewithme.model.Compilation;
+import ru.practicum.explorewithme.model.event.Event;
+import ru.practicum.explorewithme.model.event.EventState;
+import ru.practicum.explorewithme.model.event.SortValue;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
@@ -23,6 +32,7 @@ import java.util.stream.Collectors;
 public class PublicService {
     private final CategoryDao categoryDao;
     private final CompilationDao compilationDao;
+    private final EventDao eventDao;
 
 
     //categories
@@ -52,5 +62,28 @@ public class PublicService {
                 "isPinned: {} / from: {} / size: {}", isPinned, from, size);
         return compilationDao.findAllByPinned(isPinned, PageRequest.of(from, size))
                 .stream().map(CompilationMapper::toResponseDto).collect(Collectors.toList());
+    }
+
+    //events
+    public EventResponseDto getEventById(Long eventId) {
+        log.info("main-service - PublicService - getEventById - eventId: {}", eventId);
+        Event event = eventDao.findByIdAndState(eventId, EventState.PUBLISHED)
+                .orElseThrow(
+                        () -> new NoSuchElementException("Event id = " + eventId + " doesn't exist or not published")
+                );
+        return EventMapper.toResponseDto(event);
+    }
+
+    public List<EventShortResponseDto> getEvents(
+            String text, List<Long> categoryIds, Boolean isPaid, LocalDateTime rangeStart, LocalDateTime rangeEnd,
+            boolean onlyAvailable, SortValue sortValue, int from, int size
+    ) {
+        log.info("main-service - PublicService - getEvents - " +
+                "text: {} / categoryIds: {} / isPaid: {} / rangeStart: {} / rangeEnd: {} / onlyAvailable: {} / " +
+                "sortValue: {}, from: {} / size: {}",
+                text, categoryIds, isPaid, rangeStart, rangeEnd, onlyAvailable, sortValue, from, size);
+        return eventDao.searchAllByPublic(text, categoryIds, isPaid, rangeStart, rangeEnd, onlyAvailable,
+            EventState.PUBLISHED, PageRequest.of(from, size, Sort.by(sortValue.toString().toLowerCase())))
+                .stream().map(EventMapper::toShortResponseDto).collect(Collectors.toList());
     }
 }

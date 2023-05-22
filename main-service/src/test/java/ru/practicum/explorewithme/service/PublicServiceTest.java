@@ -14,9 +14,13 @@ import ru.practicum.explorewithme.dto.compilation.CompilationResponseDto;
 import ru.practicum.explorewithme.dto.event.*;
 import ru.practicum.explorewithme.dto.user.UserRequestDto;
 import ru.practicum.explorewithme.dto.user.UserResponseDto;
+import ru.practicum.explorewithme.model.event.EventState;
+import ru.practicum.explorewithme.model.event.EventUpdateState;
+import ru.practicum.explorewithme.model.event.SortValue;
 
 import javax.persistence.EntityManager;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -45,7 +49,9 @@ public class PublicServiceTest {
     private static UserRequestDto testUserRequestDto;
     private static LocalDateTime testLocalDateTime;
     private static EventRequestDto[] testEventRequestDtos;
+    private static EventAdminUpdateRequestDto[] testEventAdminUpdateRequestDtos;
     private static EventShortResponseDto[] testEventShortResponseDtos;
+    private static EventResponseDto testEventResponseDto;
     private static CompilationRequestDto[] testCompilationRequestDtos;
     private static CompilationResponseDto[] testCompilationResponseDtos;
 
@@ -74,8 +80,20 @@ public class PublicServiceTest {
                 new EventRequestDto(
                         "title2", "annotation2", "description2", false,
                         false, 1, testLocalDateTime,
-                        new LocationDto(1.1, 1.1), 1L
+                        new LocationDto(1.1, 1.1), 2L
                 ),
+        };
+        testEventAdminUpdateRequestDtos = new EventAdminUpdateRequestDto[]{
+                new EventAdminUpdateRequestDto(
+                        "title1", "annotation1", "description1",
+                        false, false, 1, testLocalDateTime,
+                        new LocationDto(1.1, 1.1), 1L, EventUpdateState.PUBLISH_EVENT
+                ),
+                new EventAdminUpdateRequestDto(
+                        "title2", "annotation2", "description2",
+                        false, false, 1, testLocalDateTime,
+                        new LocationDto(1.1, 1.1), 2L, EventUpdateState.PUBLISH_EVENT
+                )
         };
         testEventShortResponseDtos = new EventShortResponseDto[]{
                 new EventShortResponseDto(
@@ -83,10 +101,16 @@ public class PublicServiceTest {
                         0, testLocalDateTime, 0, testUserResponseDto
                 ),
                 new EventShortResponseDto(
-                        2L, "title2", "annotation2", false, testCategoryResponseDtos[0],
+                        2L, "title2", "annotation2", false, testCategoryResponseDtos[1],
                         0, testLocalDateTime, 0, testUserResponseDto
                 ),
         };
+        testEventResponseDto = new EventResponseDto(
+                1L, "title1", "annotation1", "description1", false,
+                false, testCategoryResponseDtos[0], 1, 0,
+                testLocalDateTime, testLocalDateTime, testLocalDateTime, new LocationDto(1.1, 1.1), 0,
+                testUserResponseDto, EventState.PUBLISHED
+        );
 
         testCompilationRequestDtos = new CompilationRequestDto[]{
                 new CompilationRequestDto("title1", false, new Long[]{1L, 2L}),
@@ -150,6 +174,7 @@ public class PublicServiceTest {
         assertThrows(NoSuchElementException.class, () -> publicService.getCompilationById(1L));
 
         adminService.addCategory(testCategoryRequestDtos[0]);
+        adminService.addCategory(testCategoryRequestDtos[1]);
         adminService.addUser(testUserRequestDto);
         privateService.addEvent(1L, testEventRequestDtos[0]);
         privateService.addEvent(1L, testEventRequestDtos[1]);
@@ -160,6 +185,7 @@ public class PublicServiceTest {
     @Test
     public void testGetCompilations() {
         adminService.addCategory(testCategoryRequestDtos[0]);
+        adminService.addCategory(testCategoryRequestDtos[1]);
         adminService.addUser(testUserRequestDto);
         privateService.addEvent(1L, testEventRequestDtos[0]);
         privateService.addEvent(1L, testEventRequestDtos[1]);
@@ -168,6 +194,43 @@ public class PublicServiceTest {
         assertEquals(
                 List.of(testCompilationResponseDtos[1]),
                 publicService.getCompilations(false, 1, 1)
+        );
+    }
+
+    //events
+    @Test
+    public void testGetEventById() {
+        assertThrows(NoSuchElementException.class, () -> publicService.getEventById(1L));
+
+        adminService.addCategory(testCategoryRequestDtos[0]);
+        adminService.addUser(testUserRequestDto);
+        privateService.addEvent(1L, testEventRequestDtos[0]);
+        assertThrows(NoSuchElementException.class, () -> publicService.getEventById(1L));
+
+        adminService.updateAdminEvent(1L, testEventAdminUpdateRequestDtos[0]);
+        assertEquals(testEventResponseDto, publicService.getEventById(1L));
+    }
+
+    @Test
+    public void testGetEvents() {
+        adminService.addCategory(testCategoryRequestDtos[0]);
+        adminService.addCategory(testCategoryRequestDtos[1]);
+        adminService.addUser(testUserRequestDto);
+        privateService.addEvent(1L, testEventRequestDtos[0]);
+        privateService.addEvent(1L, testEventRequestDtos[1]);
+        assertEquals(
+                Collections.emptyList(),
+                publicService.getEvents(
+                    "description", List.of(1L, 2L), false, testLocalDateTime.minusDays(1),
+                    testLocalDateTime.plusDays(1), false, SortValue.VIEWS, 1, 1
+                )
+        );
+
+        adminService.updateAdminEvent(1L, testEventAdminUpdateRequestDtos[0]);
+        adminService.updateAdminEvent(2L, testEventAdminUpdateRequestDtos[1]);
+        assertEquals(List.of(testEventShortResponseDtos[0]), publicService.getEvents(
+                "description", List.of(1L, 2L), false, testLocalDateTime.minusDays(1),
+                testLocalDateTime.plusDays(1), false, SortValue.VIEWS, 1, 1)
         );
     }
 }
