@@ -12,7 +12,7 @@ public class ParticipationMapper {
                 model.getEvent().getId(),
                 model.getRequester().getId(),
                 model.getCreated(),
-                model.getState()
+                model.getStatus()
         );
     }
 }

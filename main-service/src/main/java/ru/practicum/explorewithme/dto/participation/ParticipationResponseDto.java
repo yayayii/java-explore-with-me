@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import ru.practicum.explorewithme.model.participation.enums.ParticipationState;
+import ru.practicum.explorewithme.model.participation.enums.ParticipationStatus;
 
 import java.time.LocalDateTime;
 
@@ -19,5 +19,5 @@ public class ParticipationResponseDto {
     @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
     @EqualsAndHashCode.Exclude
     private LocalDateTime created;
-    private ParticipationState state;
+    private ParticipationStatus state;
 }

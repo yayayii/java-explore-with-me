@@ -6,11 +6,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-public class ParticipationStatePatternValidator implements ConstraintValidator<ParticipationStatePattern, Enum<?>> {
+public class ParticipationStatusPatternValidator implements ConstraintValidator<ParticipationStatusPattern, Enum<?>> {
     private Pattern pattern;
 
     @Override
-    public void initialize(ParticipationStatePattern annotation) {
+    public void initialize(ParticipationStatusPattern annotation) {
         try {
             pattern = Pattern.compile(annotation.regexp());
         } catch (PatternSyntaxException e) {

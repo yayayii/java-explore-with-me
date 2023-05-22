@@ -12,8 +12,8 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Target({METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER, TYPE_USE})
 @Retention(RUNTIME)
 @Documented
-@Constraint(validatedBy = ParticipationStatePatternValidator.class)
-public @interface ParticipationStatePattern {
+@Constraint(validatedBy = ParticipationStatusPatternValidator.class)
+public @interface ParticipationStatusPattern {
     String regexp();
     String message() default "must match \"{regexp}\"";
     Class<?>[] groups() default {};

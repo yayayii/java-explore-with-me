@@ -8,17 +8,22 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.explorewithme.dao.CategoryDao;
 import ru.practicum.explorewithme.dao.EventDao;
+import ru.practicum.explorewithme.dao.ParticipationDao;
 import ru.practicum.explorewithme.dao.UserDao;
 import ru.practicum.explorewithme.dto.event.EventRequestDto;
 import ru.practicum.explorewithme.dto.event.EventResponseDto;
 import ru.practicum.explorewithme.dto.event.EventShortResponseDto;
 import ru.practicum.explorewithme.dto.event.EventUpdateRequestDto;
+import ru.practicum.explorewithme.dto.participation.ParticipationResponseDto;
 import ru.practicum.explorewithme.mapper.EventMapper;
+import ru.practicum.explorewithme.mapper.ParticipationMapper;
 import ru.practicum.explorewithme.model.Category;
 import ru.practicum.explorewithme.model.User;
 import ru.practicum.explorewithme.model.event.Event;
 import ru.practicum.explorewithme.model.event.enums.EventState;
 import ru.practicum.explorewithme.model.event.enums.EventUpdateState;
+import ru.practicum.explorewithme.model.participation.Participation;
+import ru.practicum.explorewithme.model.participation.enums.ParticipationStatus;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -33,6 +38,7 @@ import java.util.stream.Collectors;
 public class PrivateService {
     private final CategoryDao categoryDao;
     private final EventDao eventDao;
+    private final ParticipationDao participationDao;
     private final UserDao userDao;
 
 
@@ -147,5 +153,38 @@ public class PrivateService {
         }
 
         return EventMapper.toResponseDto(event);
+    }
+
+    //participations
+    @Transactional
+    public ParticipationResponseDto addParticipation(Long userId, Long eventId) {
+        log.info("main-service - PrivateService - addParticipation - userId: {} / eventId: {}", userId, eventId);
+
+        User requester = userDao.findById(userId)
+                .orElseThrow(() -> new NoSuchElementException("User id = " + userId + " doesn't exist"));
+        Event event = eventDao.findById(eventId)
+                .orElseThrow(() -> new NoSuchElementException("Event id = " + eventId + " doesn't exist"));
+        if (event.getInitiator().getId().equals(userId)) {
+            throw new DataIntegrityViolationException("You are the initiator of the event");
+        }
+        if (event.getState() != EventState.PUBLISHED) {
+            throw new DataIntegrityViolationException("The event isn't published");
+        }
+        if (event.getParticipantLimit() == event.getConfirmedRequests()) {
+            throw new DataIntegrityViolationException("The event participation list is full");
+        }
+        if (participationDao.existsByRequester_IdAndEvent_Id(userId, eventId)) {
+            throw new DataIntegrityViolationException("The participation request is already created");
+        }
+
+        Participation participation = new Participation(event, requester, LocalDateTime.now());
+        if (!event.isRequestModeration()) {
+            event.setConfirmedRequests(event.getConfirmedRequests()+1);
+            participation.setStatus(ParticipationStatus.CONFIRMED);
+        } else {
+            participation.setStatus(ParticipationStatus.PENDING);
+        }
+
+        return ParticipationMapper.toResponseDto(participationDao.save(participation));
     }
 }

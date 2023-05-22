@@ -6,6 +6,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import ru.practicum.explorewithme.model.event.enums.util.StringToEventStateConverter;
 import ru.practicum.explorewithme.model.event.enums.util.StringToEventUpdateStateConverter;
 import ru.practicum.explorewithme.model.event.enums.util.StringToSortValueConverter;
+import ru.practicum.explorewithme.model.participation.enums.util.StringToParticipationStatusConverter;
 
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
@@ -14,5 +15,6 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addConverter(new StringToEventStateConverter());
         registry.addConverter(new StringToEventUpdateStateConverter());
         registry.addConverter(new StringToSortValueConverter());
+        registry.addConverter(new StringToParticipationStatusConverter());
     }
 }

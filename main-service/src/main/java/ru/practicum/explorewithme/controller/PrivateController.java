@@ -11,6 +11,7 @@ import ru.practicum.explorewithme.dto.event.EventRequestDto;
 import ru.practicum.explorewithme.dto.event.EventResponseDto;
 import ru.practicum.explorewithme.dto.event.EventShortResponseDto;
 import ru.practicum.explorewithme.dto.event.EventUpdateRequestDto;
+import ru.practicum.explorewithme.dto.participation.ParticipationResponseDto;
 import ru.practicum.explorewithme.service.PrivateService;
 import ru.practicum.explorewithme.util.Private;
 
@@ -64,5 +65,14 @@ public class PrivateController {
         log.info("main-service - PrivateController - updateEvent - userId: {} / eventId: {} / requestDto: {}",
                 userId, eventId, requestDto);
         return ResponseEntity.ok(privateService.updateEvent(userId, eventId, requestDto));
+    }
+
+    //participations
+    @PostMapping("/requests")
+    public ResponseEntity<ParticipationResponseDto> addParticipation(
+            @PathVariable Long userId, @RequestParam Long eventId
+    ) {
+        log.info("main-service - PrivateController - addParticipation - userId: {} / eventId: {}", userId, eventId);
+        return new ResponseEntity<>(privateService.addParticipation(userId, eventId), HttpStatus.CREATED);
     }
 }

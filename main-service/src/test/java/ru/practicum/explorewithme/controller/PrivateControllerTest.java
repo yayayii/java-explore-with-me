@@ -15,9 +15,11 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import ru.practicum.explorewithme.StatClient;
 import ru.practicum.explorewithme.dto.category.CategoryResponseDto;
 import ru.practicum.explorewithme.dto.event.*;
+import ru.practicum.explorewithme.dto.participation.ParticipationResponseDto;
 import ru.practicum.explorewithme.dto.user.UserResponseDto;
 import ru.practicum.explorewithme.model.event.enums.EventState;
 import ru.practicum.explorewithme.model.event.enums.EventUpdateState;
+import ru.practicum.explorewithme.model.participation.enums.ParticipationStatus;
 import ru.practicum.explorewithme.service.PrivateService;
 
 import java.time.LocalDateTime;
@@ -46,6 +48,7 @@ public class PrivateControllerTest {
     private static EventUpdateRequestDto testEventUpdateRequestDto;
     private static EventShortResponseDto testEventShortResponseDto;
     private static EventResponseDto testEventResponseDto;
+    private static ParticipationResponseDto testParticipationResponseDto;
 
 
     @BeforeAll
@@ -73,6 +76,9 @@ public class PrivateControllerTest {
                 false, new CategoryResponseDto(1L, "name1"), 1, 1,
                 testLocalDateTime, testLocalDateTime, testLocalDateTime, new LocationDto(1.1, 1.1), 1,
                 new UserResponseDto(1L, "email1@yandex.ru", "name1"), EventState.PUBLISHED
+        );
+        testParticipationResponseDto = new ParticipationResponseDto(
+                1L, 1L, 1L, testLocalDateTime, ParticipationStatus.CONFIRMED
         );
     }
 
@@ -200,6 +206,16 @@ public class PrivateControllerTest {
                         .content(objectMapper.writeValueAsString(testEventUpdateRequestDto))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON));
+    }
+
+    //participations
+    @Test
+    public void testAddParticipation() throws Exception {
+        when(mockPrivateService.addParticipation(anyLong(), anyLong()))
+                .thenReturn(testParticipationResponseDto);
+        mockMvc.perform(post("/users/1/requests?eventId=1"))
+                .andExpect(status().isCreated())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON));
     }
 }

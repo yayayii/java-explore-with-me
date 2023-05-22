@@ -11,10 +11,12 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.explorewithme.dto.category.CategoryRequestDto;
 import ru.practicum.explorewithme.dto.category.CategoryResponseDto;
 import ru.practicum.explorewithme.dto.event.*;
+import ru.practicum.explorewithme.dto.participation.ParticipationResponseDto;
 import ru.practicum.explorewithme.dto.user.UserRequestDto;
 import ru.practicum.explorewithme.dto.user.UserResponseDto;
 import ru.practicum.explorewithme.model.event.enums.EventState;
 import ru.practicum.explorewithme.model.event.enums.EventUpdateState;
+import ru.practicum.explorewithme.model.participation.enums.ParticipationStatus;
 
 import javax.persistence.EntityManager;
 import java.time.LocalDateTime;
@@ -46,6 +48,7 @@ public class PrivateServiceTest {
     private static EventUpdateRequestDto testEventUpdateRequestDto;
     private static EventShortResponseDto testEventShortResponseDto;
     private static EventResponseDto[] testEventResponseDtos;
+    private static ParticipationResponseDto[] testParticipationResponseDtos;
 
 
     @BeforeAll
@@ -62,8 +65,8 @@ public class PrivateServiceTest {
         );
         testEventUpdateRequestDto = new EventUpdateRequestDto(
                 "newTitle1", "newAnnotation1", "newDescription1",
-                true, true, 2, testLocalDateTime,
-                new LocationDto(0.0, 0.0), 1L, EventUpdateState.CANCEL_REVIEW
+                true, true, 0, testLocalDateTime,
+                new LocationDto(0.0, 0.0), 1L, EventUpdateState.PUBLISH_EVENT
         );
         testEventShortResponseDto = new EventShortResponseDto(
                 1L, "title1", "annotation1", false,
@@ -80,9 +83,17 @@ public class PrivateServiceTest {
                 ),
                 new EventResponseDto(
                         1L, "newTitle1", "newAnnotation1", "newDescription1", true,
-                        true, new CategoryResponseDto(1L, "name1"), 2, 0,
+                        true, new CategoryResponseDto(1L, "name1"), 0, 0,
                         testLocalDateTime, testLocalDateTime, null, new LocationDto(0.0, 0.0), 0,
-                        new UserResponseDto(1L, "email1@yandex.ru", "name1"), EventState.CANCELED
+                        new UserResponseDto(1L, "email1@yandex.ru", "name1"), EventState.PENDING
+                )
+        };
+        testParticipationResponseDtos = new ParticipationResponseDto[]{
+                new ParticipationResponseDto(
+                        1L, 2L, 2L, testLocalDateTime, ParticipationStatus.PENDING
+                ),
+                new ParticipationResponseDto(
+                        2L, 3L, 2L, testLocalDateTime, ParticipationStatus.CONFIRMED
                 )
         };
     }
@@ -90,16 +101,25 @@ public class PrivateServiceTest {
     @BeforeEach
     public void beforeEach() {
         entityManager.createNativeQuery(
+            "delete from event_compilation; " +
+            "delete from compilation; " +
+            "alter table compilation " +
+            "   alter column id " +
+            "       restart with 1; " +
+            "delete from participation; " +
+            "alter table participation " +
+            "   alter column id " +
+            "       restart with 1; " +
             "delete from event; " +
             "alter table event " +
             "   alter column id " +
             "       restart with 1; " +
-            "delete from user_account; " +
-            "alter table user_account " +
-            "   alter column id " +
-            "       restart with 1; " +
             "delete from category; " +
             "alter table category " +
+            "   alter column id " +
+            "       restart with 1; " +
+            "delete from user_account; " +
+            "alter table user_account " +
             "   alter column id " +
             "       restart with 1; "
         ).executeUpdate();
@@ -135,7 +155,7 @@ public class PrivateServiceTest {
         adminService.addCategory(testCategoryRequestDto);
         privateService.addEvent(1L, testEventRequestDto);
 
-        assertThrows(IllegalArgumentException.class, () -> privateService.getEventById(2L, 1L));
+        assertThrows(DataIntegrityViolationException.class, () -> privateService.getEventById(2L, 1L));
 
         assertEquals(testEventResponseDtos[0], privateService.getEventById(1L, 1L));
     }
@@ -183,6 +203,64 @@ public class PrivateServiceTest {
         );
         testEventUpdateRequestDto.setCategory(1L);
 
-        assertEquals(testEventResponseDtos[1], privateService.updateEvent(1L, 1L, testEventUpdateRequestDto));
+        assertEquals(
+                testEventResponseDtos[1],
+                privateService.updateEvent(1L, 1L, testEventUpdateRequestDto)
+        );
+    }
+
+    //participations
+    @Test
+    public void testAddParticipation() {
+        assertThrows(
+                NoSuchElementException.class,
+                () -> privateService.addParticipation(1L, 1L)
+        );
+        adminService.addUser(testUserRequestDtos[0]);
+
+        assertThrows(
+                NoSuchElementException.class,
+                () -> privateService.addParticipation(1L, 1L)
+        );
+        adminService.addCategory(testCategoryRequestDto);
+        privateService.addEvent(1L, testEventRequestDto);
+
+        assertThrows(
+                DataIntegrityViolationException.class,
+                () -> privateService.addParticipation(1L, 1L)
+        );
+        adminService.addUser(testUserRequestDtos[1]);
+
+        assertThrows(
+                DataIntegrityViolationException.class,
+                () -> privateService.addParticipation(2L, 1L)
+        );
+        adminService.updateEvent(1L, testEventUpdateRequestDto);
+
+        assertThrows(
+                DataIntegrityViolationException.class,
+                () -> privateService.addParticipation(2L, 1L)
+        );
+
+        privateService.addEvent(1L, testEventRequestDto);
+        testEventUpdateRequestDto.setParticipantLimit(1);
+        adminService.updateEvent(2L, testEventUpdateRequestDto);
+        testEventUpdateRequestDto.setParticipantLimit(0);
+        assertEquals(testParticipationResponseDtos[0], privateService.addParticipation(2L, 2L));
+
+        assertThrows(
+                DataIntegrityViolationException.class,
+                () -> privateService.addParticipation(2L, 1L)
+        );
+
+        privateService.addEvent(1L, testEventRequestDto);
+        testEventUpdateRequestDto.setParticipantLimit(1);
+        testEventUpdateRequestDto.setRequestModeration(false);
+        adminService.updateEvent(3L, testEventUpdateRequestDto);
+        testEventUpdateRequestDto.setRequestModeration(true);
+        testEventUpdateRequestDto.setParticipantLimit(0);
+        assertEquals(0, privateService.getEventById(1L, 3L).getConfirmedRequests());
+        assertEquals(testParticipationResponseDtos[1], privateService.addParticipation(2L, 3L));
+        assertEquals(1, privateService.getEventById(1L, 3L).getConfirmedRequests());
     }
 }

@@ -6,7 +6,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import ru.practicum.explorewithme.model.User;
 import ru.practicum.explorewithme.model.event.Event;
-import ru.practicum.explorewithme.model.participation.enums.ParticipationState;
+import ru.practicum.explorewithme.model.participation.enums.ParticipationStatus;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -27,5 +27,11 @@ public class Participation {
     private User requester;
     private LocalDateTime created;
     @Enumerated(value = EnumType.STRING)
-    private ParticipationState state;
+    private ParticipationStatus status;
+
+    public Participation(Event event, User requester, LocalDateTime created) {
+        this.event = event;
+        this.requester = requester;
+        this.created = created;
+    }
 }
