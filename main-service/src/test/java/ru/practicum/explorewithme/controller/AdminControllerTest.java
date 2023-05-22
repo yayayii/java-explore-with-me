@@ -193,8 +193,18 @@ public class AdminControllerTest {
     }
 
     @Test
-    public void testUpdateAdminEvent() throws Exception {
+    public void testUpdateEvent() throws Exception {
         testEventUpdateRequestDto.setStateAction(null);
+        mockMvc.perform(patch("/admin/events/1")
+                        .content(objectMapper.writeValueAsString(testEventUpdateRequestDto))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+        testEventUpdateRequestDto.setStateAction(EventUpdateState.CANCEL_REVIEW);
+        mockMvc.perform(patch("/admin/events/1")
+                        .content(objectMapper.writeValueAsString(testEventUpdateRequestDto))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+        testEventUpdateRequestDto.setStateAction(EventUpdateState.SEND_TO_REVIEW);
         mockMvc.perform(patch("/admin/events/1")
                         .content(objectMapper.writeValueAsString(testEventUpdateRequestDto))
                         .contentType(MediaType.APPLICATION_JSON))

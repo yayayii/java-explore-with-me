@@ -33,7 +33,7 @@ public class EventUpdateRequestDto {
     private LocalDateTime eventDate;
     private LocationDto location;
     private Long category;
-    @NotNull
+    @NotNull(groups={Admin.class, Private.class})
     @EventAdminUpdateStatePattern(regexp="PUBLISH_EVENT|REJECT_EVENT", groups={Admin.class})
     @EventPrivateUpdateStatePattern(regexp="SEND_TO_REVIEW|CANCEL_REVIEW", groups={Private.class})
     private EventUpdateState stateAction;

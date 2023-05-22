@@ -14,12 +14,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import ru.practicum.explorewithme.StatClient;
 import ru.practicum.explorewithme.dto.category.CategoryResponseDto;
-import ru.practicum.explorewithme.dto.event.EventRequestDto;
-import ru.practicum.explorewithme.dto.event.EventResponseDto;
-import ru.practicum.explorewithme.dto.event.EventShortResponseDto;
-import ru.practicum.explorewithme.dto.event.LocationDto;
+import ru.practicum.explorewithme.dto.event.*;
 import ru.practicum.explorewithme.dto.user.UserResponseDto;
 import ru.practicum.explorewithme.model.event.EventState;
+import ru.practicum.explorewithme.model.event.EventUpdateState;
 import ru.practicum.explorewithme.service.PrivateService;
 
 import java.time.LocalDateTime;
@@ -28,8 +26,8 @@ import java.util.List;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -45,6 +43,7 @@ public class PrivateControllerTest {
 
     private static LocalDateTime testLocalDateTime;
     private static EventRequestDto testEventRequestDto;
+    private static EventUpdateRequestDto testEventUpdateRequestDto;
     private static EventShortResponseDto testEventShortResponseDto;
     private static EventResponseDto testEventResponseDto;
 
@@ -58,6 +57,11 @@ public class PrivateControllerTest {
         testEventRequestDto = new EventRequestDto(
                 "title1", "annotation11111111111", "description1111111111", false,
                 false, 1, testLocalDateTime, new LocationDto(1.1, 1.1), 1L
+        );
+        testEventUpdateRequestDto = new EventUpdateRequestDto(
+                "newTitle1", "newAnnotation11111111", "newDescription1111111",
+                false, false, 1, testLocalDateTime,
+                new LocationDto(0.0, 0.0), 1L, EventUpdateState.REJECT_EVENT
         );
         testEventShortResponseDto = new EventShortResponseDto(
                 1L, "title1", "annotation1", false,
@@ -169,5 +173,33 @@ public class PrivateControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$", hasSize(2)));
+    }
+
+    @Test
+    public void testUpdateEvent() throws Exception {
+        testEventUpdateRequestDto.setStateAction(null);
+        mockMvc.perform(patch("/users/1/events/1")
+                        .content(objectMapper.writeValueAsString(testEventUpdateRequestDto))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+        testEventUpdateRequestDto.setStateAction(EventUpdateState.PUBLISH_EVENT);
+        mockMvc.perform(patch("/users/1/events/1")
+                        .content(objectMapper.writeValueAsString(testEventUpdateRequestDto))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+        testEventUpdateRequestDto.setStateAction(EventUpdateState.REJECT_EVENT);
+        mockMvc.perform(patch("/users/1/events/1")
+                        .content(objectMapper.writeValueAsString(testEventUpdateRequestDto))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+        testEventUpdateRequestDto.setStateAction(EventUpdateState.CANCEL_REVIEW);
+
+        when(mockPrivateService.updateEvent(anyLong(), anyLong(), any()))
+                .thenReturn(testEventResponseDto);
+        mockMvc.perform(patch("/users/1/events/1")
+                        .content(objectMapper.writeValueAsString(testEventUpdateRequestDto))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON));
     }
 }

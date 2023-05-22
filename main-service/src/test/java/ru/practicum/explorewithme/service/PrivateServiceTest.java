@@ -10,13 +10,11 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.explorewithme.dto.category.CategoryRequestDto;
 import ru.practicum.explorewithme.dto.category.CategoryResponseDto;
-import ru.practicum.explorewithme.dto.event.EventRequestDto;
-import ru.practicum.explorewithme.dto.event.EventResponseDto;
-import ru.practicum.explorewithme.dto.event.EventShortResponseDto;
-import ru.practicum.explorewithme.dto.event.LocationDto;
+import ru.practicum.explorewithme.dto.event.*;
 import ru.practicum.explorewithme.dto.user.UserRequestDto;
 import ru.practicum.explorewithme.dto.user.UserResponseDto;
 import ru.practicum.explorewithme.model.event.EventState;
+import ru.practicum.explorewithme.model.event.EventUpdateState;
 
 import javax.persistence.EntityManager;
 import java.time.LocalDateTime;
@@ -45,8 +43,9 @@ public class PrivateServiceTest {
     private static UserRequestDto[] testUserRequestDtos;
     private static LocalDateTime testLocalDateTime;
     private static EventRequestDto testEventRequestDto;
+    private static EventUpdateRequestDto testEventUpdateRequestDto;
     private static EventShortResponseDto testEventShortResponseDto;
-    private static EventResponseDto testEventResponseDto;
+    private static EventResponseDto[] testEventResponseDtos;
 
 
     @BeforeAll
@@ -61,17 +60,31 @@ public class PrivateServiceTest {
                 "title1", "annotation1", "description1", false, false,
                 1, testLocalDateTime, new LocationDto(1.1, 1.1), 1L
         );
+        testEventUpdateRequestDto = new EventUpdateRequestDto(
+                "newTitle1", "newAnnotation1", "newDescription1",
+                true, true, 2, testLocalDateTime,
+                new LocationDto(0.0, 0.0), 1L, EventUpdateState.CANCEL_REVIEW
+        );
         testEventShortResponseDto = new EventShortResponseDto(
                 1L, "title1", "annotation1", false,
                 new CategoryResponseDto(1L, "name1"), 0, testLocalDateTime, 0,
                 new UserResponseDto(1L, "email1@yandex.ru", "name1")
         );
-        testEventResponseDto = new EventResponseDto(
-                1L, "title1", "annotation1", "description1", false,
-                false, new CategoryResponseDto(1L, "name1"), 1, 0,
-                testLocalDateTime, testLocalDateTime, null, new LocationDto(1.1, 1.1), 0,
-                new UserResponseDto(1L, "email1@yandex.ru", "name1"), EventState.PENDING
-        );
+        testEventResponseDtos = new EventResponseDto[] {
+                new EventResponseDto(
+                        1L, "title1", "annotation1", "description1", false,
+                        false, new CategoryResponseDto(1L, "name1"), 1,
+                        0, testLocalDateTime, testLocalDateTime, null,
+                        new LocationDto(1.1, 1.1), 0,
+                        new UserResponseDto(1L, "email1@yandex.ru", "name1"), EventState.PENDING
+                ),
+                new EventResponseDto(
+                        1L, "newTitle1", "newAnnotation1", "newDescription1", true,
+                        true, new CategoryResponseDto(1L, "name1"), 2, 0,
+                        testLocalDateTime, testLocalDateTime, null, new LocationDto(0.0, 0.0), 0,
+                        new UserResponseDto(1L, "email1@yandex.ru", "name1"), EventState.CANCELED
+                )
+        };
     }
 
     @BeforeEach
@@ -109,7 +122,7 @@ public class PrivateServiceTest {
         );
         testEventRequestDto.setEventDate(testLocalDateTime);
 
-        assertEquals(testEventResponseDto, privateService.addEvent(1L, testEventRequestDto));
+        assertEquals(testEventResponseDtos[0], privateService.addEvent(1L, testEventRequestDto));
     }
 
     @Test
@@ -124,7 +137,7 @@ public class PrivateServiceTest {
 
         assertThrows(IllegalArgumentException.class, () -> privateService.getEventById(2L, 1L));
 
-        assertEquals(testEventResponseDto, privateService.getEventById(1L, 1L));
+        assertEquals(testEventResponseDtos[0], privateService.getEventById(1L, 1L));
     }
 
     @Test
@@ -139,5 +152,37 @@ public class PrivateServiceTest {
         privateService.addEvent(1L, testEventRequestDto);
 
         assertEquals(List.of(testEventShortResponseDto), privateService.getEventsByInitiatorId(1L, 0, 1));
+    }
+
+    @Test
+    public void testUpdateEvent() {
+        assertThrows(
+                NoSuchElementException.class,
+                () -> privateService.updateEvent(1L, 1L, testEventUpdateRequestDto)
+        );
+        adminService.addUser(testUserRequestDtos[0]);
+
+        assertThrows(
+                NoSuchElementException.class,
+                () -> privateService.updateEvent(1L, 1L, testEventUpdateRequestDto)
+        );
+        adminService.addCategory(testCategoryRequestDto);
+        privateService.addEvent(1L, testEventRequestDto);
+
+        testEventUpdateRequestDto.setEventDate(LocalDateTime.now());
+        assertThrows(
+                DataIntegrityViolationException.class,
+                () -> privateService.updateEvent(1L, 1L, testEventUpdateRequestDto)
+        );
+        testEventUpdateRequestDto.setEventDate(testLocalDateTime);
+
+        testEventUpdateRequestDto.setCategory(2L);
+        assertThrows(
+                NoSuchElementException.class,
+                () -> privateService.updateEvent(1L, 1L, testEventUpdateRequestDto)
+        );
+        testEventUpdateRequestDto.setCategory(1L);
+
+        assertEquals(testEventResponseDtos[1], privateService.updateEvent(1L, 1L, testEventUpdateRequestDto));
     }
 }

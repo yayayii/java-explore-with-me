@@ -270,7 +270,7 @@ public class AdminServiceTest {
     }
 
     @Test
-    public void testUpdateAdminEvent() {
+    public void testUpdateEvent() {
         assertThrows(
                 NoSuchElementException.class,
                 () -> adminService.updateEvent(1L, testEventUpdateRequestDto)

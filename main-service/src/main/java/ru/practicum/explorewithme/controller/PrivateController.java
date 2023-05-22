@@ -10,7 +10,9 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.explorewithme.dto.event.EventRequestDto;
 import ru.practicum.explorewithme.dto.event.EventResponseDto;
 import ru.practicum.explorewithme.dto.event.EventShortResponseDto;
+import ru.practicum.explorewithme.dto.event.EventUpdateRequestDto;
 import ru.practicum.explorewithme.service.PrivateService;
+import ru.practicum.explorewithme.util.Private;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
@@ -51,5 +53,16 @@ public class PrivateController {
         log.info("main-service - PrivateController - getEventsByInitiatorId - userId: {} / from: {} / size: {}",
                 userId, from, size);
         return ResponseEntity.ok(privateService.getEventsByInitiatorId(userId, from, size));
+    }
+
+    @PatchMapping("/events/{eventId}")
+    public ResponseEntity<EventResponseDto> updateEvent(
+            @PathVariable Long userId,
+            @PathVariable Long eventId,
+            @RequestBody @Validated(Private.class) EventUpdateRequestDto requestDto
+    ) {
+        log.info("main-service - PrivateController - updateEvent - userId: {} / eventId: {} / requestDto: {}",
+                userId, eventId, requestDto);
+        return ResponseEntity.ok(privateService.updateEvent(userId, eventId, requestDto));
     }
 }
