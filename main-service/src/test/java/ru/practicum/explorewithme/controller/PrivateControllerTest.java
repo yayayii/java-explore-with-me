@@ -218,4 +218,14 @@ public class PrivateControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON));
     }
+
+    @Test
+    public void testGetParticipations() throws Exception {
+        when(mockPrivateService.getParticipations(anyLong()))
+                .thenReturn(List.of(testParticipationResponseDto, testParticipationResponseDto));
+        mockMvc.perform(get("/users/1/requests"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$", hasSize(2)));
+    }
 }

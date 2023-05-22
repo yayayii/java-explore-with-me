@@ -75,4 +75,10 @@ public class PrivateController {
         log.info("main-service - PrivateController - addParticipation - userId: {} / eventId: {}", userId, eventId);
         return new ResponseEntity<>(privateService.addParticipation(userId, eventId), HttpStatus.CREATED);
     }
+
+    @GetMapping("requests")
+    public ResponseEntity<List<ParticipationResponseDto>> getParticipations(@PathVariable Long userId) {
+        log.info("main-service - PrivateController - addParticipation - userId: {}", userId);
+        return ResponseEntity.ok(privateService.getParticipations(userId));
+    }
 }

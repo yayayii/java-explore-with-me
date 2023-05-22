@@ -212,16 +212,10 @@ public class PrivateServiceTest {
     //participations
     @Test
     public void testAddParticipation() {
-        assertThrows(
-                NoSuchElementException.class,
-                () -> privateService.addParticipation(1L, 1L)
-        );
+        assertThrows(NoSuchElementException.class, () -> privateService.addParticipation(1L, 1L));
         adminService.addUser(testUserRequestDtos[0]);
 
-        assertThrows(
-                NoSuchElementException.class,
-                () -> privateService.addParticipation(1L, 1L)
-        );
+        assertThrows(NoSuchElementException.class, () -> privateService.addParticipation(1L, 1L));
         adminService.addCategory(testCategoryRequestDto);
         privateService.addEvent(1L, testEventRequestDto);
 
@@ -262,5 +256,32 @@ public class PrivateServiceTest {
         assertEquals(0, privateService.getEventById(1L, 3L).getConfirmedRequests());
         assertEquals(testParticipationResponseDtos[1], privateService.addParticipation(2L, 3L));
         assertEquals(1, privateService.getEventById(1L, 3L).getConfirmedRequests());
+    }
+
+    @Test
+    public void testGetParticipations() {
+        assertThrows(NoSuchElementException.class, () -> privateService.getParticipations(1L));
+
+        adminService.addUser(testUserRequestDtos[0]);
+        adminService.addUser(testUserRequestDtos[1]);
+        adminService.addCategory(testCategoryRequestDto);
+        privateService.addEvent(1L, testEventRequestDto);
+        privateService.addEvent(1L, testEventRequestDto);
+        testEventUpdateRequestDto.setParticipantLimit(1);
+        adminService.updateEvent(1L, testEventUpdateRequestDto);
+        adminService.updateEvent(2L, testEventUpdateRequestDto);
+        testEventUpdateRequestDto.setParticipantLimit(0);
+        privateService.addParticipation(2L, 1L);
+        privateService.addParticipation(2L, 2L);
+        testParticipationResponseDtos[0].setEvent(1L);
+        testParticipationResponseDtos[1].setEvent(2L);
+        testParticipationResponseDtos[1].setState(ParticipationStatus.PENDING);
+        assertEquals(
+                List.of(testParticipationResponseDtos[0], testParticipationResponseDtos[1]),
+                privateService.getParticipations(2L)
+        );
+        testParticipationResponseDtos[1].setState(ParticipationStatus.CONFIRMED);
+        testParticipationResponseDtos[0].setEvent(2L);
+        testParticipationResponseDtos[1].setEvent(3L);
     }
 }

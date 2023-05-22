@@ -187,4 +187,14 @@ public class PrivateService {
 
         return ParticipationMapper.toResponseDto(participationDao.save(participation));
     }
+
+    @Transactional
+    public List<ParticipationResponseDto> getParticipations(Long userId) {
+        log.info("main-service - PrivateService - getParticipations - userId: {}", userId);
+        if (!userDao.existsById(userId)) {
+            throw new NoSuchElementException("User id = " + userId + " doesn't exist");
+        }
+        return participationDao.findAllByRequester_Id(userId)
+                .stream().map(ParticipationMapper::toResponseDto).collect(Collectors.toList());
+    }
 }
