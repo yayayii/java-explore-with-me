@@ -8,24 +8,24 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.explorewithme.dao.CategoryDao;
 import ru.practicum.explorewithme.dao.EventDao;
-import ru.practicum.explorewithme.dao.ParticipationDao;
+import ru.practicum.explorewithme.dao.EventRequestDao;
 import ru.practicum.explorewithme.dao.UserDao;
 import ru.practicum.explorewithme.dto.event.EventRequestDto;
 import ru.practicum.explorewithme.dto.event.EventResponseDto;
 import ru.practicum.explorewithme.dto.event.EventShortResponseDto;
 import ru.practicum.explorewithme.dto.event.EventUpdateRequestDto;
-import ru.practicum.explorewithme.dto.participation.ParticipationResponseDto;
-import ru.practicum.explorewithme.dto.participation.ParticipationUpdateRequestDto;
-import ru.practicum.explorewithme.dto.participation.ParticipationUpdateResponseDto;
+import ru.practicum.explorewithme.dto.request.EventRequestResponseDto;
+import ru.practicum.explorewithme.dto.request.EventRequestUpdateRequestDto;
+import ru.practicum.explorewithme.dto.request.EventRequestUpdateResponseDto;
 import ru.practicum.explorewithme.mapper.EventMapper;
-import ru.practicum.explorewithme.mapper.ParticipationMapper;
+import ru.practicum.explorewithme.mapper.EventRequestMapper;
 import ru.practicum.explorewithme.model.Category;
 import ru.practicum.explorewithme.model.User;
 import ru.practicum.explorewithme.model.event.Event;
 import ru.practicum.explorewithme.model.event.enums.EventState;
 import ru.practicum.explorewithme.model.event.enums.EventUpdateState;
-import ru.practicum.explorewithme.model.participation.Participation;
-import ru.practicum.explorewithme.model.participation.enums.ParticipationStatus;
+import ru.practicum.explorewithme.model.request.EventRequest;
+import ru.practicum.explorewithme.model.request.enums.EventRequestStatus;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -41,7 +41,7 @@ import java.util.stream.Collectors;
 public class PrivateService {
     private final CategoryDao categoryDao;
     private final EventDao eventDao;
-    private final ParticipationDao participationDao;
+    private final EventRequestDao eventRequestDao;
     private final UserDao userDao;
 
 
@@ -158,81 +158,10 @@ public class PrivateService {
         return EventMapper.toResponseDto(event);
     }
 
-    public List<ParticipationResponseDto> getParticipations(Long userId, Long eventId) {
-        log.info("main-service - PrivateService - getParticipations - userId: {} / eventId: {} / ", userId, eventId);
-
-        if (!userDao.existsById(userId)) {
-            throw new NoSuchElementException("User id = " + userId + " doesn't exist"));
-        }
-        Event event = eventDao.findById(eventId)
-                .orElseThrow(() -> new NoSuchElementException("Event id = " + eventId + " doesn't exist"));
-        if (!event.getInitiator().getId().equals(userId)) {
-            throw new DataIntegrityViolationException("You are not the initiator of the event");
-        }
-
-        return participationDao.findAllByEvent_Id(eventId)
-                .stream().map(ParticipationMapper::toResponseDto).collect(Collectors.toList());
-    }
-
+    //requests
     @Transactional
-    public ParticipationUpdateResponseDto updateParticipation(
-            Long userId, Long eventId, ParticipationUpdateRequestDto requestDto
-    ) {
-        log.info("main-service - PrivateService - updateParticipation - userId: {} / eventId: {} / requestDto: {}",
-                userId, eventId, requestDto);
-
-        if (!userDao.existsById(userId)) {
-            throw new NoSuchElementException("User id = " + userId + " doesn't exist"));
-        }
-        Event event = eventDao.findById(eventId)
-                .orElseThrow(() -> new NoSuchElementException("Event id = " + eventId + " doesn't exist"));
-        if (!event.getInitiator().getId().equals(userId)) {
-            throw new DataIntegrityViolationException("You are not the initiator of the event");
-        }
-        List<Participation> participations = new ArrayList<>();
-        for (Long participationId : requestDto.getRequestIds()) {
-            Participation participation = participationDao.findById(participationId).orElseThrow(
-                    () -> new NoSuchElementException("Participation id = " + participationId + " doesn't exist")
-            );
-            if (!participation.getEvent().getId().equals(eventId)) {
-                throw new DataIntegrityViolationException(
-                        "Participation id = " + participationId + " is for event id =" + eventId
-                );
-            }
-            if (participation.getRequester().getId().equals(userId)) {
-                throw new DataIntegrityViolationException("Participation id = " + participationId + " is yours");
-            }
-            if (participation.getStatus() != ParticipationStatus.PENDING) {
-                throw new DataIntegrityViolationException("Participation id = " + participationId + " is already updated");
-            }
-
-            if (requestDto.getState() == ParticipationStatus.CONFIRMED) {
-                participation.setStatus(ParticipationStatus.CONFIRMED);
-            }
-            if (requestDto.getState() == ParticipationStatus.REJECTED) {
-                participation.setStatus(ParticipationStatus.REJECTED);
-            }
-            participations.add(participation);
-        }
-
-        ParticipationUpdateResponseDto responseDto = new ParticipationUpdateResponseDto();
-        if (requestDto.getState() == ParticipationStatus.CONFIRMED) {
-            responseDto.getConfirmedRequests().addAll(
-                    participations.stream().map(ParticipationMapper::toResponseDto).collect(Collectors.toList())
-            );
-        }
-        if (requestDto.getState() == ParticipationStatus.REJECTED) {
-            responseDto.getRejectedRequests().addAll(
-                    participations.stream().map(ParticipationMapper::toResponseDto).collect(Collectors.toList())
-            );
-        }
-        return responseDto;
-    }
-
-    //participations
-    @Transactional
-    public ParticipationResponseDto addParticipation(Long userId, Long eventId) {
-        log.info("main-service - PrivateService - addParticipation - userId: {} / eventId: {}", userId, eventId);
+    public EventRequestResponseDto addRequest(Long userId, Long eventId) {
+        log.info("main-service - PrivateService - addRequest - userId: {} / eventId: {}", userId, eventId);
 
         User requester = userDao.findById(userId)
                 .orElseThrow(() -> new NoSuchElementException("User id = " + userId + " doesn't exist"));
@@ -245,56 +174,127 @@ public class PrivateService {
             throw new DataIntegrityViolationException("The event isn't published");
         }
         if (event.getParticipantLimit() == event.getConfirmedRequests()) {
-            throw new DataIntegrityViolationException("The event participation list is full");
+            throw new DataIntegrityViolationException("The event request list is full");
         }
-        if (participationDao.existsByRequester_IdAndEvent_Id(userId, eventId)) {
-            throw new DataIntegrityViolationException("The participation request is already created");
+        if (eventRequestDao.existsByRequester_IdAndEvent_Id(userId, eventId)) {
+            throw new DataIntegrityViolationException("The event request is already created");
         }
 
-        Participation participation = new Participation(event, requester, LocalDateTime.now());
+        EventRequest eventRequest = new EventRequest(event, requester, LocalDateTime.now());
         if (!event.isRequestModeration() || event.getParticipantLimit() == 0) {
             event.setConfirmedRequests(event.getConfirmedRequests()+1);
-            participation.setStatus(ParticipationStatus.CONFIRMED);
+            eventRequest.setStatus(EventRequestStatus.CONFIRMED);
         } else {
-            participation.setStatus(ParticipationStatus.PENDING);
+            eventRequest.setStatus(EventRequestStatus.PENDING);
         }
 
-        return ParticipationMapper.toResponseDto(participationDao.save(participation));
+        return EventRequestMapper.toResponseDto(eventRequestDao.save(eventRequest));
     }
 
-    public List<ParticipationResponseDto> getParticipations(Long userId) {
-        log.info("main-service - PrivateService - getParticipations - userId: {}", userId);
+    public List<EventRequestResponseDto> getRequestsForUser(Long userId) {
+        log.info("main-service - PrivateService - getRequestsForUser - userId: {}", userId);
         if (!userDao.existsById(userId)) {
             throw new NoSuchElementException("User id = " + userId + " doesn't exist");
         }
-        return participationDao.findAllByRequester_Id(userId)
-                .stream().map(ParticipationMapper::toResponseDto).collect(Collectors.toList());
+        return eventRequestDao.findAllByRequester_Id(userId)
+                .stream().map(EventRequestMapper::toResponseDto).collect(Collectors.toList());
+    }
+
+    public List<EventRequestResponseDto> getRequestsForEvent(Long userId, Long eventId) {
+        log.info("main-service - PrivateService - getRequestsForEvent - userId: {} / eventId: {} / ", userId, eventId);
+
+        if (!userDao.existsById(userId)) {
+            throw new NoSuchElementException("User id = " + userId + " doesn't exist");
+        }
+        Event event = eventDao.findById(eventId)
+                .orElseThrow(() -> new NoSuchElementException("Event id = " + eventId + " doesn't exist"));
+        if (!event.getInitiator().getId().equals(userId)) {
+            throw new DataIntegrityViolationException("You are not the initiator of the event");
+        }
+
+        return eventRequestDao.findAllByEvent_Id(eventId)
+                .stream().map(EventRequestMapper::toResponseDto).collect(Collectors.toList());
     }
 
     @Transactional
-    public ParticipationResponseDto cancelParticipation(Long userId, Long requestId) {
-        log.info("main-service - PrivateService - getParticipations - userId: {} / requestId: {}", userId, requestId);
+    public EventRequestUpdateResponseDto moderateRequest(
+            Long userId, Long eventId, EventRequestUpdateRequestDto requestDto
+    ) {
+        log.info("main-service - PrivateService - moderateRequest - userId: {} / eventId: {} / requestDto: {}",
+                userId, eventId, requestDto);
+
+        if (!userDao.existsById(userId)) {
+            throw new NoSuchElementException("User id = " + userId + " doesn't exist");
+        }
+        Event event = eventDao.findById(eventId)
+                .orElseThrow(() -> new NoSuchElementException("Event id = " + eventId + " doesn't exist"));
+        if (!event.getInitiator().getId().equals(userId)) {
+            throw new DataIntegrityViolationException("You are not the initiator of the event");
+        }
+        List<EventRequest> eventRequests = new ArrayList<>();
+        for (Long requestId : requestDto.getRequestIds()) {
+            EventRequest request = eventRequestDao.findById(requestId).orElseThrow(
+                    () -> new NoSuchElementException("Request id = " + requestId + " doesn't exist")
+            );
+            if (!request.getEvent().getId().equals(eventId)) {
+                throw new DataIntegrityViolationException(
+                        "Request id = " + requestId + " is for event id =" + eventId
+                );
+            }
+            if (request.getRequester().getId().equals(userId)) {
+                throw new DataIntegrityViolationException("Request id = " + requestId + " is yours");
+            }
+            if (request.getStatus() != EventRequestStatus.PENDING) {
+                throw new DataIntegrityViolationException("Request id = " + requestId + " is already updated");
+            }
+
+            if (requestDto.getStatus() == EventRequestStatus.CONFIRMED) {
+                request.setStatus(EventRequestStatus.CONFIRMED);
+            }
+            if (requestDto.getStatus() == EventRequestStatus.REJECTED) {
+                request.setStatus(EventRequestStatus.REJECTED);
+            }
+            eventRequests.add(request);
+        }
+
+        EventRequestUpdateResponseDto responseDto = new EventRequestUpdateResponseDto();
+        if (requestDto.getStatus() == EventRequestStatus.CONFIRMED) {
+            responseDto.getConfirmedRequests().addAll(
+                    eventRequests.stream().map(EventRequestMapper::toResponseDto).collect(Collectors.toList())
+            );
+        }
+        if (requestDto.getStatus() == EventRequestStatus.REJECTED) {
+            responseDto.getRejectedRequests().addAll(
+                    eventRequests.stream().map(EventRequestMapper::toResponseDto).collect(Collectors.toList())
+            );
+        }
+        return responseDto;
+    }
+
+    @Transactional
+    public EventRequestResponseDto cancelRequest(Long userId, Long requestId) {
+        log.info("main-service - PrivateService - cancelRequest - userId: {} / requestId: {}", userId, requestId);
 
         User requester = userDao.findById(userId)
                 .orElseThrow(() -> new NoSuchElementException("User id = " + userId + " doesn't exist"));
-        Participation participation = participationDao.findById(requestId)
-                .orElseThrow(() -> new NoSuchElementException("Participation id = " + requestId + " doesn't exist"));
-        if (!participation.getRequester().getId().equals(requester.getId())) {
-            throw new DataIntegrityViolationException("You are not the requester of this participation");
+        EventRequest request = eventRequestDao.findById(requestId)
+                .orElseThrow(() -> new NoSuchElementException("Event request id = " + requestId + " doesn't exist"));
+        if (!request.getRequester().getId().equals(requester.getId())) {
+            throw new DataIntegrityViolationException("You are not the requester of this request");
         }
-        if (participation.getStatus() == ParticipationStatus.REJECTED) {
-            throw new DataIntegrityViolationException("Your participation is already canceled");
+        if (request.getStatus() == EventRequestStatus.REJECTED) {
+            throw new DataIntegrityViolationException("Your request is already canceled");
         }
 
-        if (participation.getStatus() == ParticipationStatus.PENDING) {
-            participation.setStatus(ParticipationStatus.REJECTED);
+        if (request.getStatus() == EventRequestStatus.PENDING) {
+            request.setStatus(EventRequestStatus.REJECTED);
         }
-        if (participation.getStatus() == ParticipationStatus.CONFIRMED) {
-            Event event = eventDao.findById(participation.getEvent().getId()).get();
+        if (request.getStatus() == EventRequestStatus.CONFIRMED) {
+            Event event = eventDao.findById(request.getEvent().getId()).get();
             event.setConfirmedRequests(event.getConfirmedRequests()-1);
-            participation.setStatus(ParticipationStatus.REJECTED);
+            request.setStatus(EventRequestStatus.REJECTED);
         }
 
-        return ParticipationMapper.toResponseDto(participation);
+        return EventRequestMapper.toResponseDto(request);
     }
 }

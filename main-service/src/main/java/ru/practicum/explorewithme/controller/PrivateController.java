@@ -11,9 +11,9 @@ import ru.practicum.explorewithme.dto.event.EventRequestDto;
 import ru.practicum.explorewithme.dto.event.EventResponseDto;
 import ru.practicum.explorewithme.dto.event.EventShortResponseDto;
 import ru.practicum.explorewithme.dto.event.EventUpdateRequestDto;
-import ru.practicum.explorewithme.dto.participation.ParticipationResponseDto;
-import ru.practicum.explorewithme.dto.participation.ParticipationUpdateRequestDto;
-import ru.practicum.explorewithme.dto.participation.ParticipationUpdateResponseDto;
+import ru.practicum.explorewithme.dto.request.EventRequestResponseDto;
+import ru.practicum.explorewithme.dto.request.EventRequestUpdateRequestDto;
+import ru.practicum.explorewithme.dto.request.EventRequestUpdateResponseDto;
 import ru.practicum.explorewithme.service.PrivateService;
 import ru.practicum.explorewithme.util.Private;
 
@@ -58,14 +58,6 @@ public class PrivateController {
         return ResponseEntity.ok(privateService.getEventsByInitiatorId(userId, from, size));
     }
 
-    @GetMapping("/events/{eventId}/requests")
-    public ResponseEntity<List<ParticipationResponseDto>> getParticipations(
-            @PathVariable Long userId,@PathVariable Long eventId
-    ) {
-        log.info("main-service - PrivateController - getParticipations - userId: {} / eventId: {}", userId, eventId);
-        return ResponseEntity.ok(privateService.getParticipations(userId, eventId));
-    }
-
     @PatchMapping("/events/{eventId}")
     public ResponseEntity<EventResponseDto> updateEvent(
             @PathVariable Long userId,
@@ -77,38 +69,46 @@ public class PrivateController {
         return ResponseEntity.ok(privateService.updateEvent(userId, eventId, requestDto));
     }
 
-    @PatchMapping("/events/{eventId}/requests")
-    public ResponseEntity<ParticipationUpdateResponseDto> updateParticipation(
-            @PathVariable Long userId,
-            @PathVariable Long eventId,
-            @RequestBody @Valid ParticipationUpdateRequestDto requestDto
-    ) {
-        log.info("main-service - PrivateController - updateParticipation - userId: {} / eventId: {} / requestDto: {}",
-                userId, eventId, requestDto);
-        return ResponseEntity.ok(privateService.updateParticipation(userId, eventId, requestDto));
-    }
-
-    //participations
+    //requests
     @PostMapping("/requests")
-    public ResponseEntity<ParticipationResponseDto> addParticipation(
+    public ResponseEntity<EventRequestResponseDto> addRequest(
             @PathVariable Long userId, @RequestParam Long eventId
     ) {
-        log.info("main-service - PrivateController - addParticipation - userId: {} / eventId: {}", userId, eventId);
-        return new ResponseEntity<>(privateService.addParticipation(userId, eventId), HttpStatus.CREATED);
+        log.info("main-service - PrivateController - addRequest - userId: {} / eventId: {}", userId, eventId);
+        return new ResponseEntity<>(privateService.addRequest(userId, eventId), HttpStatus.CREATED);
     }
 
     @GetMapping("/requests")
-    public ResponseEntity<List<ParticipationResponseDto>> getParticipations(@PathVariable Long userId) {
-        log.info("main-service - PrivateController - addParticipation - userId: {}", userId);
-        return ResponseEntity.ok(privateService.getParticipations(userId));
+    public ResponseEntity<List<EventRequestResponseDto>> getRequestsForUser(@PathVariable Long userId) {
+        log.info("main-service - PrivateController - getRequestsForUser - userId: {}", userId);
+        return ResponseEntity.ok(privateService.getRequestsForUser(userId));
+    }
+
+    @GetMapping("/events/{eventId}/requests")
+    public ResponseEntity<List<EventRequestResponseDto>> getRequestsForEvent(
+            @PathVariable Long userId,@PathVariable Long eventId
+    ) {
+        log.info("main-service - PrivateController - getRequestsForEvent - userId: {} / eventId: {}", userId, eventId);
+        return ResponseEntity.ok(privateService.getRequestsForEvent(userId, eventId));
+    }
+
+    @PatchMapping("/events/{eventId}/requests")
+    public ResponseEntity<EventRequestUpdateResponseDto> moderateRequest(
+            @PathVariable Long userId,
+            @PathVariable Long eventId,
+            @RequestBody @Valid EventRequestUpdateRequestDto requestDto
+    ) {
+        log.info("main-service - PrivateController - moderateRequest - userId: {} / eventId: {} / requestDto: {}",
+                userId, eventId, requestDto);
+        return ResponseEntity.ok(privateService.moderateRequest(userId, eventId, requestDto));
     }
 
     @PatchMapping("/requests/{requestId}/cancel")
-    public ResponseEntity<ParticipationResponseDto> cancelParticipation(
+    public ResponseEntity<EventRequestResponseDto> cancelRequest(
             @PathVariable Long userId, @PathVariable Long requestId
     ) {
-        log.info("main-service - PrivateController - cancelParticipation - userId: {} / requestId: {}",
+        log.info("main-service - PrivateController - cancelRequest - userId: {} / requestId: {}",
                 userId, requestId);
-        return ResponseEntity.ok(privateService.cancelParticipation(userId, requestId));
+        return ResponseEntity.ok(privateService.cancelRequest(userId, requestId));
     }
 }
