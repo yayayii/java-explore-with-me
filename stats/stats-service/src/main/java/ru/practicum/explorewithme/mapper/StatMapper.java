@@ -1,7 +1,6 @@
 package ru.practicum.explorewithme.mapper;
 
 import lombok.experimental.UtilityClass;
-import ru.practicum.explorewithme.dto.StatFullResponseDto;
 import ru.practicum.explorewithme.dto.StatRequestDto;
 import ru.practicum.explorewithme.dto.StatResponseDto;
 import ru.practicum.explorewithme.model.StatModel;
@@ -15,9 +14,5 @@ public class StatMapper {
 
     public StatResponseDto toResponseDto(StatProjection model) {
         return new StatResponseDto(model.getApp(), model.getUri(), model.getHits());
-    }
-
-    public StatFullResponseDto toFullResponseDto(StatModel model) {
-        return new StatFullResponseDto(model.getId(), model.getApp(), model.getUri(), model.getIp(), model.getCreated());
     }
 }

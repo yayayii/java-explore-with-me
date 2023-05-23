@@ -15,7 +15,7 @@ public interface StatDao extends JpaRepository<StatModel, Long> {
     @Query(
             "select new ru.practicum.explorewithme.model.StatProjection(sm.app, sm.uri, count(sm.ip) as hits) " +
             "from StatModel sm " +
-            "where sm.created between ?1 and ?2 " +
+            "where sm.created between :start and :end " +
             "group by sm.app, sm.uri "
     )
     List<StatProjection> getStatModel(LocalDateTime start, LocalDateTime end, Sort sort);
@@ -23,7 +23,7 @@ public interface StatDao extends JpaRepository<StatModel, Long> {
     @Query(
             "select new ru.practicum.explorewithme.model.StatProjection(sm.app, sm.uri, count(distinct sm.ip) as hits) " +
             "from StatModel sm " +
-            "where sm.created between ?1 and ?2 " +
+            "where sm.created between :start and :end " +
             "group by sm.app, sm.uri "
     )
     List<StatProjection> getStatModelWithUniqueIp(LocalDateTime start, LocalDateTime end, Sort sort);
@@ -31,18 +31,20 @@ public interface StatDao extends JpaRepository<StatModel, Long> {
     @Query(
             "select new ru.practicum.explorewithme.model.StatProjection(sm.app, sm.uri, count(sm.ip) as hits) " +
             "from StatModel sm " +
-            "where sm.created between ?1 and ?2 " +
-            "and sm.uri in ?3 " +
+            "where sm.created between :start and :end " +
+            "and sm.uri in (:uris) " +
             "group by sm.app, sm.uri "
     )
-    List<StatProjection> getStatModelInUris(LocalDateTime start, LocalDateTime end, String[] uris, Sort sort);
+    List<StatProjection> getStatModelInUris(LocalDateTime start, LocalDateTime end, List<String> uris, Sort sort);
 
     @Query(
             "select new ru.practicum.explorewithme.model.StatProjection(sm.app, sm.uri, count(distinct sm.ip) as hits) " +
             "from StatModel sm " +
-            "where sm.created between ?1 and ?2 " +
-            "and sm.uri in ?3 " +
+            "where sm.created between :start and :end " +
+            "and sm.uri in (:uris) " +
             "group by sm.app, sm.uri "
     )
-    List<StatProjection> getStatModelInUrisWithUniqueIp(LocalDateTime start, LocalDateTime end, String[] uris, Sort sort);
+    List<StatProjection> getStatModelInUrisWithUniqueIp(
+            LocalDateTime start, LocalDateTime end, List<String> uris, Sort sort
+    );
 }

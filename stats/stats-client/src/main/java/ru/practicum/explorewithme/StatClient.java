@@ -1,42 +1,61 @@
 package ru.practicum.explorewithme;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
-import org.springframework.http.ResponseEntity;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.*;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.DefaultUriBuilderFactory;
+import org.springframework.web.util.UriComponentsBuilder;
 import ru.practicum.explorewithme.dto.StatRequestDto;
+import ru.practicum.explorewithme.dto.StatResponseDto;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 
-@Service
-public class StatClient extends BaseClient {
+@Slf4j
+@Component
+public class StatClient {
+    private final RestTemplate rest;
+    private final String serverUrl;
+
+
     @Autowired
     public StatClient(@Value("http://stats-server:9090") String serverUrl, RestTemplateBuilder builder) {
-        super(
-                builder.uriTemplateHandler(new DefaultUriBuilderFactory(serverUrl))
-                        .requestFactory(HttpComponentsClientHttpRequestFactory::new).build()
-        );
+        rest = builder.uriTemplateHandler(new DefaultUriBuilderFactory(serverUrl))
+                .requestFactory(HttpComponentsClientHttpRequestFactory::new).build();
+        this.serverUrl = serverUrl;
     }
 
-    public ResponseEntity<Object> saveEndpointRequest(StatRequestDto requestDto) {
-        return post("/hit", requestDto);
+
+    public ResponseEntity<Void> saveEndpointRequest(StatRequestDto requestDto) {
+        log.info("stats - stats-service - StatClient - saveEndpointRequest - requestDto: {}", requestDto);
+        HttpEntity<StatRequestDto> request = new HttpEntity<>(requestDto);
+        return rest.exchange(serverUrl + "/hit", HttpMethod.POST, request, Void.class);
     }
 
-    public ResponseEntity<Object> getStatById(Long statId) {
-        return get("/stats/" + statId);
-    }
-
-    public ResponseEntity<Object> getStats(LocalDateTime start, LocalDateTime end, String[] uris, boolean unique) {
+    public ResponseEntity<List<StatResponseDto>> getStats(
+            LocalDateTime start, LocalDateTime end, List<String> uris, boolean unique
+    ) {
+        log.info("stats - stats-service - StatClient - getStats - start: {} / end: {} / uris: {} / unique: {}",
+                start, end, uris, unique);
+        String urlTemplate = UriComponentsBuilder.fromHttpUrl(serverUrl + "/stats")
+                .queryParam("start", "{start}")
+                .queryParam("end", "{end}")
+                .queryParam("uris", "{uris}")
+                .queryParam("unique", "{unique}")
+                .encode().toUriString();
         Map<String, Object> parameters = Map.of(
-                "start", start.toString(),
-                "end", end.toString(),
-                "uris", String.join(",", uris),
-                "unique", unique
+            "start", start,
+            "end", end,
+            "uris", String.join(",", uris),
+            "unique", unique
         );
-        return get("/stats", parameters);
+        return rest.exchange(urlTemplate, HttpMethod.GET, null, new ParameterizedTypeReference<>() {}, parameters);
     }
 }
