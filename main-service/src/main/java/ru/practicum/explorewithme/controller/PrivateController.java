@@ -93,14 +93,14 @@ public class PrivateController {
     }
 
     @PatchMapping("/events/{eventId}/requests")
-    public ResponseEntity<EventRequestUpdateResponseDto> moderateRequest(
+    public ResponseEntity<EventRequestUpdateResponseDto> moderateRequests(
             @PathVariable Long userId,
             @PathVariable Long eventId,
             @RequestBody @Valid EventRequestUpdateRequestDto requestDto
     ) {
-        log.info("main-service - PrivateController - moderateRequest - userId: {} / eventId: {} / requestDto: {}",
+        log.info("main-service - PrivateController - moderateRequests - userId: {} / eventId: {} / requestDto: {}",
                 userId, eventId, requestDto);
-        return ResponseEntity.ok(privateService.moderateRequest(userId, eventId, requestDto));
+        return ResponseEntity.ok(privateService.moderateRequests(userId, eventId, requestDto));
     }
 
     @PatchMapping("/requests/{requestId}/cancel")

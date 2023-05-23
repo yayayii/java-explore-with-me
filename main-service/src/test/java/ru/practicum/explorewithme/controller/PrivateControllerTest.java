@@ -15,11 +15,13 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import ru.practicum.explorewithme.StatClient;
 import ru.practicum.explorewithme.dto.category.CategoryResponseDto;
 import ru.practicum.explorewithme.dto.event.*;
-import ru.practicum.explorewithme.dto.participation.ParticipationResponseDto;
+import ru.practicum.explorewithme.dto.request.EventRequestResponseDto;
+import ru.practicum.explorewithme.dto.request.EventRequestUpdateRequestDto;
+import ru.practicum.explorewithme.dto.request.EventRequestUpdateResponseDto;
 import ru.practicum.explorewithme.dto.user.UserResponseDto;
 import ru.practicum.explorewithme.model.event.enums.EventState;
 import ru.practicum.explorewithme.model.event.enums.EventUpdateState;
-import ru.practicum.explorewithme.model.participation.enums.ParticipationStatus;
+import ru.practicum.explorewithme.model.request.enums.EventRequestStatus;
 import ru.practicum.explorewithme.service.PrivateService;
 
 import java.time.LocalDateTime;
@@ -48,7 +50,9 @@ public class PrivateControllerTest {
     private static EventUpdateRequestDto testEventUpdateRequestDto;
     private static EventShortResponseDto testEventShortResponseDto;
     private static EventResponseDto testEventResponseDto;
-    private static ParticipationResponseDto testParticipationResponseDto;
+    private static EventRequestResponseDto testEventRequestResponseDto;
+    private static EventRequestUpdateRequestDto testEventRequestUpdateRequestDto;
+    private static EventRequestUpdateResponseDto testEventRequestUpdateResponseDto;
 
 
     @BeforeAll
@@ -77,8 +81,14 @@ public class PrivateControllerTest {
                 testLocalDateTime, testLocalDateTime, testLocalDateTime, new LocationDto(1.1, 1.1), 1,
                 new UserResponseDto(1L, "email1@yandex.ru", "name1"), EventState.PUBLISHED
         );
-        testParticipationResponseDto = new ParticipationResponseDto(
-                1L, 1L, 1L, testLocalDateTime, ParticipationStatus.CONFIRMED
+        testEventRequestResponseDto = new EventRequestResponseDto(
+                1L, 1L, 1L, testLocalDateTime, EventRequestStatus.CONFIRMED
+        );
+        testEventRequestUpdateRequestDto = new EventRequestUpdateRequestDto(
+                List.of(1L, 2L), EventRequestStatus.CONFIRMED
+        );
+        testEventRequestUpdateResponseDto = new EventRequestUpdateResponseDto(
+                List.of(testEventRequestResponseDto), List.of(testEventRequestResponseDto)
         );
     }
 
@@ -209,23 +219,72 @@ public class PrivateControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON));
     }
 
-    //participations
+    //requests
     @Test
-    public void testAddParticipation() throws Exception {
-        when(mockPrivateService.addParticipation(anyLong(), anyLong()))
-                .thenReturn(testParticipationResponseDto);
+    public void testAddRequest() throws Exception {
+        when(mockPrivateService.addRequest(anyLong(), anyLong()))
+                .thenReturn(testEventRequestResponseDto);
         mockMvc.perform(post("/users/1/requests?eventId=1"))
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON));
     }
 
     @Test
-    public void testGetParticipations() throws Exception {
-        when(mockPrivateService.getParticipations(anyLong()))
-                .thenReturn(List.of(testParticipationResponseDto, testParticipationResponseDto));
+    public void testGetRequestsForEvent() throws Exception {
+        when(mockPrivateService.getRequestsForEvent(anyLong(), anyLong()))
+                .thenReturn(List.of(testEventRequestResponseDto, testEventRequestResponseDto));
+        mockMvc.perform(get("/users/1/events/1/requests"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$", hasSize(2)));
+    }
+
+    @Test
+    public void testGetRequestsForUser() throws Exception {
+        when(mockPrivateService.getRequestsForUser(anyLong()))
+                .thenReturn(List.of(testEventRequestResponseDto, testEventRequestResponseDto));
         mockMvc.perform(get("/users/1/requests"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$", hasSize(2)));
+    }
+
+    @Test
+    public void testModerateRequests() throws Exception {
+        mockMvc.perform(patch("/users/1/events/1/requests")
+                    .content(objectMapper.writeValueAsString(
+                            new EventRequestUpdateRequestDto(null, EventRequestStatus.CONFIRMED))
+                    )
+                    .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+        mockMvc.perform(patch("/users/1/events/1/requests")
+                        .content(objectMapper.writeValueAsString(
+                                new EventRequestUpdateRequestDto(List.of(1L, 2L), null))
+                        )
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+        mockMvc.perform(patch("/users/1/events/1/requests")
+                        .content(objectMapper.writeValueAsString(
+                                new EventRequestUpdateRequestDto(List.of(1L, 2L), EventRequestStatus.PENDING))
+                        )
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+
+        when(mockPrivateService.moderateRequests(anyLong(), anyLong(), any()))
+                .thenReturn(testEventRequestUpdateResponseDto);
+        mockMvc.perform(patch("/users/1/events/1/requests")
+                    .content(objectMapper.writeValueAsString(testEventRequestUpdateRequestDto))
+                    .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON));
+    }
+
+    @Test
+    public void testCancelRequest() throws Exception {
+        when(mockPrivateService.cancelRequest(anyLong(), anyLong()))
+                .thenReturn(testEventRequestResponseDto);
+        mockMvc.perform(patch("/users/1/requests/1/cancel"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON));
     }
 }

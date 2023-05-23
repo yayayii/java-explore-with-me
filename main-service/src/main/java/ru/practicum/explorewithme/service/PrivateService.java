@@ -173,7 +173,7 @@ public class PrivateService {
         if (event.getState() != EventState.PUBLISHED) {
             throw new DataIntegrityViolationException("The event isn't published");
         }
-        if (event.getParticipantLimit() == event.getConfirmedRequests()) {
+        if (event.getParticipantLimit() != 0 && event.getParticipantLimit() == event.getConfirmedRequests()) {
             throw new DataIntegrityViolationException("The event request list is full");
         }
         if (eventRequestDao.existsByRequester_IdAndEvent_Id(userId, eventId)) {
@@ -181,9 +181,9 @@ public class PrivateService {
         }
 
         EventRequest eventRequest = new EventRequest(event, requester, LocalDateTime.now());
-        if (!event.isRequestModeration() || event.getParticipantLimit() == 0) {
-            event.setConfirmedRequests(event.getConfirmedRequests()+1);
+        if (!event.isRequestModeration()) {
             eventRequest.setStatus(EventRequestStatus.CONFIRMED);
+            event.setConfirmedRequests(event.getConfirmedRequests()+1);
         } else {
             eventRequest.setStatus(EventRequestStatus.PENDING);
         }
@@ -193,9 +193,11 @@ public class PrivateService {
 
     public List<EventRequestResponseDto> getRequestsForUser(Long userId) {
         log.info("main-service - PrivateService - getRequestsForUser - userId: {}", userId);
+
         if (!userDao.existsById(userId)) {
             throw new NoSuchElementException("User id = " + userId + " doesn't exist");
         }
+
         return eventRequestDao.findAllByRequester_Id(userId)
                 .stream().map(EventRequestMapper::toResponseDto).collect(Collectors.toList());
     }
@@ -217,10 +219,10 @@ public class PrivateService {
     }
 
     @Transactional
-    public EventRequestUpdateResponseDto moderateRequest(
+    public EventRequestUpdateResponseDto moderateRequests(
             Long userId, Long eventId, EventRequestUpdateRequestDto requestDto
     ) {
-        log.info("main-service - PrivateService - moderateRequest - userId: {} / eventId: {} / requestDto: {}",
+        log.info("main-service - PrivateService - moderateRequests - userId: {} / eventId: {} / requestDto: {}",
                 userId, eventId, requestDto);
 
         if (!userDao.existsById(userId)) {
@@ -238,11 +240,8 @@ public class PrivateService {
             );
             if (!request.getEvent().getId().equals(eventId)) {
                 throw new DataIntegrityViolationException(
-                        "Request id = " + requestId + " is for event id =" + eventId
+                        "Request id = " + requestId + " is for event id = " + eventId
                 );
-            }
-            if (request.getRequester().getId().equals(userId)) {
-                throw new DataIntegrityViolationException("Request id = " + requestId + " is yours");
             }
             if (request.getStatus() != EventRequestStatus.PENDING) {
                 throw new DataIntegrityViolationException("Request id = " + requestId + " is already updated");
