@@ -15,6 +15,7 @@ import ru.practicum.explorewithme.dto.StatRequestDto;
 import ru.practicum.explorewithme.dto.StatResponseDto;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 
@@ -50,9 +51,10 @@ public class StatClient {
                 .queryParam("uris", "{uris}")
                 .queryParam("unique", "{unique}")
                 .encode().toUriString();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         Map<String, Object> parameters = Map.of(
-            "start", start,
-            "end", end,
+            "start", start.format(formatter),
+            "end", end.format(formatter),
             "uris", String.join(",", uris),
             "unique", unique
         );

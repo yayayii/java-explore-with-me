@@ -83,7 +83,7 @@ public class AdminControllerTest {
         );
         testEventShortResponseDto = new EventShortResponseDto(
                 1L, "title1", "annotation1", false, testCategoryResponseDto, 1,
-                testLocalDateTime, 1, testUserResponseDto
+                testLocalDateTime, 1, testUserResponseDto, EventState.PUBLISHED
         );
         testEventResponseDto = new EventResponseDto(
                 1L, "title1", "annotation1", "description1", false,
@@ -92,7 +92,7 @@ public class AdminControllerTest {
                 testUserResponseDto, EventState.PUBLISHED
         );
 
-        testCompilationRequestDto = new CompilationRequestDto("title1", false, new Long[]{1L, 2L});
+        testCompilationRequestDto = new CompilationRequestDto("title1", false, List.of(1L, 2L));
         testCompilationResponseDto = new CompilationResponseDto(
                 1L, "title1", false, List.of(testEventShortResponseDto, testEventShortResponseDto)
         );
@@ -202,11 +202,6 @@ public class AdminControllerTest {
 
     @Test
     public void testUpdateEvent() throws Exception {
-        testEventUpdateRequestDto.setStateAction(null);
-        mockMvc.perform(patch("/admin/events/1")
-                        .content(objectMapper.writeValueAsString(testEventUpdateRequestDto))
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
         testEventUpdateRequestDto.setStateAction(EventUpdateState.CANCEL_REVIEW);
         mockMvc.perform(patch("/admin/events/1")
                         .content(objectMapper.writeValueAsString(testEventUpdateRequestDto))
@@ -255,7 +250,7 @@ public class AdminControllerTest {
 
     @Test
     public void testGetUsers() throws Exception {
-        when(mockAdminService.getUsers(anyInt(), anyInt()))
+        when(mockAdminService.getUsers(any(), anyInt(), anyInt()))
                 .thenReturn(List.of(testUserResponseDto, testUserResponseDto));
         mockMvc.perform(get("/admin/users"))
                 .andExpect(status().isOk())

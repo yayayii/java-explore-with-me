@@ -136,6 +136,11 @@ public class AdminService {
         log.info("main-service - AdminService - searchEvents - " +
                 "userIds: {} / states: {} / categoryIds: {} / rangeStart: {} / rangeEnd: {} / from: {} / size: {}",
                 userIds, states, categoryIds, rangeStart, rangeEnd, from, size);
+
+        if (rangeStart != null && rangeEnd != null && !rangeStart.isBefore(rangeEnd)) {
+            throw new IllegalArgumentException("Start date must be before end date");
+        }
+
         return eventDao.searchAllByAdmin(userIds, states, categoryIds, rangeStart, rangeEnd, PageRequest.of(from, size))
                 .stream().map(EventMapper::toResponseDto).collect(Collectors.toList());
     }
@@ -170,12 +175,12 @@ public class AdminService {
         }
         if (requestDto.getEventDate() != null) {
             if (ChronoUnit.MINUTES.between(requestDto.getEventDate(), LocalDateTime.now()) > -60) {
-                throw new DataIntegrityViolationException("The event date must be at least 1 hour later");
+                throw new IllegalArgumentException("The event date must be at least 1 hour later");
             }
             event.setEventDate(requestDto.getEventDate());
         } else {
             if (ChronoUnit.MINUTES.between(event.getEventDate(), LocalDateTime.now()) > -60) {
-                throw new DataIntegrityViolationException("The event date must be at least 1 hour later");
+                throw new IllegalArgumentException("The event date must be at least 1 hour later");
             }
         }
         if (requestDto.getLocation() != null) {
@@ -193,11 +198,11 @@ public class AdminService {
                     ));
             event.setCategory(category);
         }
-        if (requestDto.getStateAction() == EventUpdateState.PUBLISH_EVENT) {
+        if (requestDto.getStateAction() != null && requestDto.getStateAction() == EventUpdateState.PUBLISH_EVENT) {
             event.setState(EventState.PUBLISHED);
             event.setPublishedOn(LocalDateTime.now());
         }
-        if (requestDto.getStateAction() == EventUpdateState.REJECT_EVENT) {
+        if (requestDto.getStateAction() != null && requestDto.getStateAction() == EventUpdateState.REJECT_EVENT) {
             event.setState(EventState.CANCELED);
         }
 
@@ -212,10 +217,16 @@ public class AdminService {
         return UserMapper.toResponseDto(userDao.save(user));
     }
 
-    public List<UserResponseDto> getUsers(int from, int size) {
-        log.info("main-service - AdminService - getUsers - from: {} / size: {}", from, size);
-        return userDao.findAll(PageRequest.of(from, size))
-                .stream().map(UserMapper::toResponseDto).collect(Collectors.toList());
+    public List<UserResponseDto> getUsers(List<Long> ids, int from, int size) {
+        log.info("main-service - AdminService - getUsers - uris: {} / from: {} / size: {}", ids, from, size);
+
+        if (ids == null) {
+            return userDao.findAll(PageRequest.of(from, size))
+                    .stream().map(UserMapper::toResponseDto).collect(Collectors.toList());
+        } else {
+            return userDao.findAllByIdIn(ids, PageRequest.of(from, size))
+                    .stream().map(UserMapper::toResponseDto).collect(Collectors.toList());
+        }
     }
 
     @Transactional

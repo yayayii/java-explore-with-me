@@ -15,6 +15,7 @@ import ru.practicum.explorewithme.dto.event.EventUpdateRequestDto;
 import ru.practicum.explorewithme.dto.request.EventRequestResponseDto;
 import ru.practicum.explorewithme.dto.request.EventRequestUpdateRequestDto;
 import ru.practicum.explorewithme.dto.request.EventRequestUpdateResponseDto;
+import ru.practicum.explorewithme.model.event.enums.EventState;
 import ru.practicum.explorewithme.service.PrivateService;
 import ru.practicum.explorewithme.util.Private;
 
@@ -54,14 +55,20 @@ public class PrivateController {
 
         List<EventShortResponseDto> events = privateService.getEventsByInitiatorId(userId, from, size);
         for (EventShortResponseDto event : events) {
-            event.setViews(
-                    statClient.getStats(
+            if (event.getState() == EventState.PUBLISHED) {
+                long views;
+                try {
+                    views = statClient.getStats(
                             LocalDateTime.of(2000, 1, 1, 1, 1),
                             LocalDateTime.of(2999, 1, 1, 1, 1),
                             List.of("/events/" + event.getId()),
-                            false
-                    ).getBody().get(0).getHits()
-            );
+                            true
+                    ).getBody().get(0).getHits();
+                } catch (IndexOutOfBoundsException e) {
+                    views = 0;
+                }
+                event.setViews(views);
+            }
         }
 
         return ResponseEntity.ok(events);
@@ -73,14 +80,20 @@ public class PrivateController {
                 userId, eventId);
 
         EventResponseDto event = privateService.getEventById(userId, eventId);
-        event.setViews(
-                statClient.getStats(
+        if (event.getState() == EventState.PUBLISHED) {
+            long views;
+            try {
+                views = statClient.getStats(
                         LocalDateTime.of(2000, 1, 1, 1, 1),
                         LocalDateTime.of(2999, 1, 1, 1, 1),
-                        List.of("/events/" + eventId),
-                        false
-                ).getBody().get(0).getHits()
-        );
+                        List.of("/events/" + event.getId()),
+                        true
+                ).getBody().get(0).getHits();
+            } catch (IndexOutOfBoundsException e) {
+                views = 0;
+            }
+            event.setViews(views);
+        }
 
         return ResponseEntity.ok(event);
     }

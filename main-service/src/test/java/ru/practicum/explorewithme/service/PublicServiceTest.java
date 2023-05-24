@@ -16,7 +16,6 @@ import ru.practicum.explorewithme.dto.user.UserRequestDto;
 import ru.practicum.explorewithme.dto.user.UserResponseDto;
 import ru.practicum.explorewithme.model.event.enums.EventState;
 import ru.practicum.explorewithme.model.event.enums.EventUpdateState;
-import ru.practicum.explorewithme.model.event.enums.SortValue;
 
 import javax.persistence.EntityManager;
 import java.time.LocalDateTime;
@@ -98,11 +97,15 @@ public class PublicServiceTest {
         testEventShortResponseDtos = new EventShortResponseDto[]{
                 new EventShortResponseDto(
                         1L, "title1", "annotation1", false, testCategoryResponseDtos[0],
-                        0, testLocalDateTime, 0, testUserResponseDto
+                        0, testLocalDateTime, 0, testUserResponseDto, EventState.PENDING
                 ),
                 new EventShortResponseDto(
                         2L, "title2", "annotation2", false, testCategoryResponseDtos[1],
-                        0, testLocalDateTime, 0, testUserResponseDto
+                        0, testLocalDateTime, 0, testUserResponseDto, EventState.PENDING
+                ),
+                new EventShortResponseDto(
+                        2L, "title2", "annotation2", false, testCategoryResponseDtos[1],
+                        0, testLocalDateTime, 0, testUserResponseDto, EventState.PUBLISHED
                 ),
         };
         testEventResponseDto = new EventResponseDto(
@@ -113,8 +116,8 @@ public class PublicServiceTest {
         );
 
         testCompilationRequestDtos = new CompilationRequestDto[]{
-                new CompilationRequestDto("title1", false, new Long[]{1L, 2L}),
-                new CompilationRequestDto("newTitle1", false, new Long[]{2L})
+                new CompilationRequestDto("title1", false, List.of(1L, 2L)),
+                new CompilationRequestDto("newTitle1", false, List.of(2L))
         };
         testCompilationResponseDtos = new CompilationResponseDto[]{
                 new CompilationResponseDto(
@@ -232,7 +235,7 @@ public class PublicServiceTest {
 
         adminService.updateEvent(1L, testEventUpdateRequestDtos[0]);
         adminService.updateEvent(2L, testEventUpdateRequestDtos[1]);
-        assertEquals(List.of(testEventShortResponseDtos[1]), publicService.getEvents(
+        assertEquals(List.of(testEventShortResponseDtos[2]), publicService.getEvents(
                 "description", List.of(1L, 2L), false, testLocalDateTime.minusDays(1),
                 testLocalDateTime.plusDays(1), false, 1, 1)
         );

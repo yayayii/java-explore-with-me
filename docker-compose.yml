@@ -40,8 +40,10 @@ services:
       - DB_HOST=ewm-db
       - DB_PORT=5432
       - SERVER_PORT=8080
+      - JAVA_TOOL_OPTIONS=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:7777
     ports:
       - "8080:8080"
+      - "7777:7777"
 
   ewm-db:
     image: postgres:14-alpine

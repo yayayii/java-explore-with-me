@@ -77,7 +77,7 @@ public class PrivateControllerTest {
         testEventShortResponseDto = new EventShortResponseDto(
                 1L, "title1", "annotation1", false,
                 new CategoryResponseDto(1L, "name1"), 1, testLocalDateTime, 1,
-                new UserResponseDto(1L, "email1@yandex.ru", "name1")
+                new UserResponseDto(1L, "email1@yandex.ru", "name1"), EventState.PUBLISHED
         );
         testEventResponseDto = new EventResponseDto(
                 1L, "title1", "annotation1", "description1", false,
@@ -203,12 +203,6 @@ public class PrivateControllerTest {
 
     @Test
     public void testUpdateEvent() throws Exception {
-        testEventUpdateRequestDto.setStateAction(null);
-        mockMvc.perform(patch("/users/1/events/1")
-                        .content(objectMapper.writeValueAsString(testEventUpdateRequestDto))
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
-        testEventUpdateRequestDto.setStateAction(EventUpdateState.PUBLISH_EVENT);
         mockMvc.perform(patch("/users/1/events/1")
                         .content(objectMapper.writeValueAsString(testEventUpdateRequestDto))
                         .contentType(MediaType.APPLICATION_JSON))

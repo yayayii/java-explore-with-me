@@ -129,7 +129,7 @@ public class PrivateService {
         }
         if (requestDto.getEventDate() != null) {
             if (ChronoUnit.MINUTES.between(requestDto.getEventDate(), LocalDateTime.now()) > -120) {
-                throw new DataIntegrityViolationException("The event date must be at least 2 hour later");
+                throw new IllegalArgumentException("The event date must be at least 2 hour later");
             }
             event.setEventDate(requestDto.getEventDate());
         }
@@ -148,10 +148,10 @@ public class PrivateService {
                     ));
             event.setCategory(category);
         }
-        if (requestDto.getStateAction() == EventUpdateState.CANCEL_REVIEW) {
+        if (requestDto.getStateAction() != null && requestDto.getStateAction() == EventUpdateState.CANCEL_REVIEW) {
             event.setState(EventState.CANCELED);
         }
-        if (requestDto.getStateAction() == EventUpdateState.SEND_TO_REVIEW) {
+        if (requestDto.getStateAction() != null && requestDto.getStateAction() == EventUpdateState.SEND_TO_REVIEW) {
             event.setState(EventState.PENDING);
         }
 
@@ -181,7 +181,7 @@ public class PrivateService {
         }
 
         EventRequest eventRequest = new EventRequest(event, requester, LocalDateTime.now());
-        if (!event.isRequestModeration()) {
+        if (!event.isRequestModeration() || event.getParticipantLimit() == 0) {
             eventRequest.setStatus(EventRequestStatus.CONFIRMED);
             event.setConfirmedRequests(event.getConfirmedRequests()+1);
         } else {
@@ -248,6 +248,10 @@ public class PrivateService {
             }
 
             if (requestDto.getStatus() == EventRequestStatus.CONFIRMED) {
+                if (event.getParticipantLimit() != 0 && event.getParticipantLimit() == event.getConfirmedRequests()) {
+                    throw new DataIntegrityViolationException("The event request list is full");
+                }
+                event.setConfirmedRequests(event.getConfirmedRequests()+1);
                 request.setStatus(EventRequestStatus.CONFIRMED);
             }
             if (requestDto.getStatus() == EventRequestStatus.REJECTED) {
@@ -281,17 +285,17 @@ public class PrivateService {
         if (!request.getRequester().getId().equals(requester.getId())) {
             throw new DataIntegrityViolationException("You are not the requester of this request");
         }
-        if (request.getStatus() == EventRequestStatus.REJECTED) {
+        if (request.getStatus() == EventRequestStatus.CANCELED) {
             throw new DataIntegrityViolationException("Your request is already canceled");
         }
 
         if (request.getStatus() == EventRequestStatus.PENDING) {
-            request.setStatus(EventRequestStatus.REJECTED);
+            request.setStatus(EventRequestStatus.CANCELED);
         }
         if (request.getStatus() == EventRequestStatus.CONFIRMED) {
             Event event = eventDao.findById(request.getEvent().getId()).get();
             event.setConfirmedRequests(event.getConfirmedRequests()-1);
-            request.setStatus(EventRequestStatus.REJECTED);
+            request.setStatus(EventRequestStatus.CANCELED);
         }
 
         return EventRequestMapper.toResponseDto(request);

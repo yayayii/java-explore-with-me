@@ -53,6 +53,7 @@ public class EventMapper {
                 .confirmedRequests(model.getConfirmedRequests())
                 .eventDate(model.getEventDate())
                 .initiator(UserMapper.toResponseDto(model.getInitiator()))
+                .state(model.getState())
         .build();
     }
 }

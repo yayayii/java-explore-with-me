@@ -18,7 +18,6 @@ import ru.practicum.explorewithme.model.Category;
 import ru.practicum.explorewithme.model.Compilation;
 import ru.practicum.explorewithme.model.event.Event;
 import ru.practicum.explorewithme.model.event.enums.EventState;
-import ru.practicum.explorewithme.model.event.enums.SortValue;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -80,6 +79,11 @@ public class PublicService {
         log.info("main-service - PublicService - getEvents - text: {} / categoryIds: {} / isPaid: {} " +
                         "/ rangeStart: {} / rangeEnd: {} / onlyAvailable: {} / from: {} / size: {}",
                 text, categoryIds, isPaid, rangeStart, rangeEnd, onlyAvailable, from, size);
+
+        if (rangeStart != null && rangeEnd != null && !rangeStart.isBefore(rangeEnd)) {
+            throw new IllegalArgumentException("Start date must be before end date");
+        }
+
         return eventDao.searchAllByPublic(
                 text, categoryIds, isPaid, rangeStart, rangeEnd,
                 onlyAvailable, EventState.PUBLISHED, PageRequest.of(from, size)

@@ -97,11 +97,11 @@ public class AdminServiceTest {
         testEventShortResponseDtos = new EventShortResponseDto[]{
                 new EventShortResponseDto(
                         1L, "title1", "annotation1", false, testCategoryResponseDtos[0],
-                        0, testLocalDateTime, 0, testUserResponseDtos[0]
+                        0, testLocalDateTime, 0, testUserResponseDtos[0], EventState.PENDING
                 ),
                 new EventShortResponseDto(
                         2L, "title2", "annotation2", false, testCategoryResponseDtos[0],
-                        0, testLocalDateTime, 0, testUserResponseDtos[0]
+                        0, testLocalDateTime, 0, testUserResponseDtos[0], EventState.PENDING
                 ),
         };
         testEventResponseDtos = new EventResponseDto[] {
@@ -121,8 +121,8 @@ public class AdminServiceTest {
         };
 
         testCompilationRequestDtos = new CompilationRequestDto[]{
-                new CompilationRequestDto("title1", false, new Long[]{1L, 2L}),
-                new CompilationRequestDto("newTitle1", true, new Long[]{2L})
+                new CompilationRequestDto("title1", false, List.of(1L, 2L)),
+                new CompilationRequestDto("newTitle1", true, List.of(2L))
         };
         testCompilationResponseDtos = new CompilationResponseDto[]{
                 new CompilationResponseDto(
@@ -219,12 +219,12 @@ public class AdminServiceTest {
         privateService.addEvent(1L, testEventRequestDtos[0]);
         privateService.addEvent(1L, testEventRequestDtos[1]);
         adminService.addCompilation(testCompilationRequestDtos[0]);
-        testCompilationRequestDtos[1].setEvents(new Long[]{3L});
+        testCompilationRequestDtos[1].setEvents(List.of(3L));
         assertThrows(
                 NoSuchElementException.class,
                 () -> adminService.updateCompilation(1L, testCompilationRequestDtos[1])
         );
-        testCompilationRequestDtos[1].setEvents(new Long[]{2L});
+        testCompilationRequestDtos[1].setEvents(List.of(2L));
 
         assertEquals(
                 testCompilationResponseDtos[1],
@@ -285,7 +285,7 @@ public class AdminServiceTest {
 
         testEventUpdateRequestDto.setEventDate(LocalDateTime.now());
         assertThrows(
-                DataIntegrityViolationException.class,
+                IllegalArgumentException.class,
                 () -> adminService.updateEvent(1L, testEventUpdateRequestDto)
         );
         testEventUpdateRequestDto.setEventDate(testLocalDateTime);
@@ -312,7 +312,7 @@ public class AdminServiceTest {
     public void testGetUsers() {
         adminService.addUser(testUserRequestDtos[0]);
         adminService.addUser(testUserRequestDtos[1]);
-        assertEquals(List.of(testUserResponseDtos[1]), adminService.getUsers(1, 1));
+        assertEquals(List.of(testUserResponseDtos[1]), adminService.getUsers(null, 1, 1));
     }
 
     @Test

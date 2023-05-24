@@ -14,6 +14,7 @@ import ru.practicum.explorewithme.dto.category.CategoryResponseDto;
 import ru.practicum.explorewithme.dto.compilation.CompilationResponseDto;
 import ru.practicum.explorewithme.dto.event.EventResponseDto;
 import ru.practicum.explorewithme.dto.event.EventShortResponseDto;
+import ru.practicum.explorewithme.model.event.enums.EventState;
 import ru.practicum.explorewithme.model.event.enums.SortValue;
 import ru.practicum.explorewithme.service.PublicService;
 
@@ -76,14 +77,16 @@ public class PublicController {
         statClient.saveEndpointRequest(new StatRequestDto(
                 "main-service", request.getRequestURI(), request.getRemoteAddr(), LocalDateTime.now()
         ));
-        event.setViews(
-                statClient.getStats(
-                        LocalDateTime.of(2000, 1, 1, 1, 1),
-                        LocalDateTime.of(2999, 1, 1, 1, 1),
-                        List.of("/events/" + eventId),
-                        false
-                ).getBody().get(0).getHits()
-        );
+        if (event.getState() == EventState.PUBLISHED) {
+            event.setViews(
+                    statClient.getStats(
+                            LocalDateTime.of(2000, 1, 1, 1, 1),
+                            LocalDateTime.of(2999, 1, 1, 1, 1),
+                            List.of("/events/" + eventId),
+                            true
+                    ).getBody().get(0).getHits()
+            );
+        }
 
         return ResponseEntity.ok(event);
     }
@@ -109,20 +112,25 @@ public class PublicController {
         List<EventShortResponseDto> events = publicService.getEvents(
                 text, categories, paid, rangeStart, rangeEnd, onlyAvailable, from, size
         );
+        statClient.saveEndpointRequest(new StatRequestDto(
+                "main-service", "/events", request.getRemoteAddr(), LocalDateTime.now()
+        ));
         for (EventShortResponseDto event : events) {
             statClient.saveEndpointRequest(new StatRequestDto(
                     "main-service", "/events/" + event.getId(), request.getRemoteAddr(), LocalDateTime.now()
             ));
         }
         for (EventShortResponseDto event : events) {
-            event.setViews(
-                    statClient.getStats(
-                            LocalDateTime.of(2000, 1, 1, 1, 1),
-                            LocalDateTime.of(2999, 1, 1, 1, 1),
-                            List.of("/events/" + event.getId()),
-                            false
-                    ).getBody().get(0).getHits()
-            );
+            if (event.getState() == EventState.PUBLISHED) {
+                event.setViews(
+                        statClient.getStats(
+                                LocalDateTime.of(2000, 1, 1, 1, 1),
+                                LocalDateTime.of(2999, 1, 1, 1, 1),
+                                List.of("/events/" + event.getId()),
+                                true
+                        ).getBody().get(0).getHits()
+                );
+            }
         }
         if (sort == SortValue.VIEWS) {
             events = events.stream().sorted(

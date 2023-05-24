@@ -68,7 +68,7 @@ public class StatControllerTest {
     public void testGetStats() throws Exception {
         when(mockStatService.getStats(any(), any(), any(), anyBoolean()))
                 .thenReturn(List.of(testStatResponseDto, testStatResponseDto));
-        mockMvc.perform(get("/stats?start=2022-09-06T10:00:23&end=2022-09-06T10:00:23"))
+        mockMvc.perform(get("/stats?start=2022-09-06 10:00:23&end=2022-09-06 10:00:23"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$", hasSize(2)));

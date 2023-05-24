@@ -98,7 +98,7 @@ public class PrivateServiceTest {
         testEventShortResponseDto = new EventShortResponseDto(
                 1L, "title1", "annotation1", false,
                 new CategoryResponseDto(1L, "name1"), 0, testLocalDateTime, 0,
-                new UserResponseDto(1L, "email1@yandex.ru", "name1")
+                new UserResponseDto(1L, "email1@yandex.ru", "name1"), EventState.PENDING
         );
         testEventResponseDtos = new EventResponseDto[] {
                 new EventResponseDto(
@@ -142,7 +142,7 @@ public class PrivateServiceTest {
                         3L, 1L, 4L, testLocalDateTime, EventRequestStatus.CONFIRMED
                 ),
                 new EventRequestResponseDto(
-                        2L, 1L, 3L, testLocalDateTime, EventRequestStatus.REJECTED
+                        2L, 1L, 3L, testLocalDateTime, EventRequestStatus.CANCELED
                 )
         };
         testEventRequestUpdateResponseDto = new EventRequestUpdateResponseDto(
@@ -256,7 +256,7 @@ public class PrivateServiceTest {
 
         testEventUserUpdateRequestDto.setEventDate(LocalDateTime.now());
         assertThrows(
-                DataIntegrityViolationException.class,
+                IllegalArgumentException.class,
                 () -> privateService.updateEvent(1L, 1L, testEventUserUpdateRequestDto)
         );
         testEventUserUpdateRequestDto.setEventDate(testLocalDateTime);

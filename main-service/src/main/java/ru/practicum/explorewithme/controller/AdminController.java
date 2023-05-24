@@ -20,6 +20,8 @@ import ru.practicum.explorewithme.dto.user.UserResponseDto;
 import ru.practicum.explorewithme.model.event.enums.EventState;
 import ru.practicum.explorewithme.service.AdminService;
 import ru.practicum.explorewithme.util.Admin;
+import ru.practicum.explorewithme.util.Create;
+import ru.practicum.explorewithme.util.Update;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
@@ -63,7 +65,7 @@ public class AdminController {
     //compilations
     @PostMapping("/compilations")
     public ResponseEntity<CompilationResponseDto> addCompilation(
-            @RequestBody @Valid CompilationRequestDto requestDto
+            @RequestBody @Validated(Create.class) CompilationRequestDto requestDto
     ) {
         log.info("main-service - AdminController - addCompilation - requestDto: {}", requestDto);
         return new ResponseEntity<>(adminService.addCompilation(requestDto), HttpStatus.CREATED);
@@ -71,7 +73,7 @@ public class AdminController {
 
     @PatchMapping("/compilations/{compilationId}")
     public ResponseEntity<CompilationResponseDto> updateCompilation(
-            @PathVariable Long compilationId, @RequestBody CompilationRequestDto requestDto
+            @PathVariable Long compilationId, @RequestBody @Validated(Update.class) CompilationRequestDto requestDto
     ) {
         log.info("main-service - AdminController - updateCompilation - compilationId: {} / requestDto: {}",
                 compilationId, requestDto);
@@ -105,14 +107,18 @@ public class AdminController {
         );
         for (EventResponseDto event : events) {
             if (event.getState() == EventState.PUBLISHED) {
-                event.setViews(
-                        statClient.getStats(
-                                LocalDateTime.of(2000, 1, 1, 1, 1),
-                                LocalDateTime.of(2999, 1, 1, 1, 1),
-                                List.of("/events/" + event.getId()),
-                                false
-                        ).getBody().get(0).getHits()
-                );
+                long views;
+                try {
+                    views = statClient.getStats(
+                            LocalDateTime.of(2000, 1, 1, 1, 1),
+                            LocalDateTime.of(2999, 1, 1, 1, 1),
+                            List.of("/events/" + event.getId()),
+                            true
+                    ).getBody().get(0).getHits();
+                } catch (IndexOutOfBoundsException e) {
+                    views = 0;
+                }
+                event.setViews(views);
             }
         }
 
@@ -137,11 +143,12 @@ public class AdminController {
 
     @GetMapping("/users")
     public ResponseEntity<List<UserResponseDto>> getUsers(
+        @RequestParam(required = false) List<Long> ids,
         @RequestParam(defaultValue = "0") @PositiveOrZero int from,
         @RequestParam(defaultValue = "10") @Positive int size
     ) {
-        log.info("main-service - AdminController - getUsers - from: {} / size: {}", from, size);
-        return ResponseEntity.ok(adminService.getUsers(from, size));
+        log.info("main-service - AdminController - getUsers - uris: {} / from: {} / size: {}", ids, from, size);
+        return ResponseEntity.ok(adminService.getUsers(ids, from, size));
     }
 
     @DeleteMapping("/users/{userId}")

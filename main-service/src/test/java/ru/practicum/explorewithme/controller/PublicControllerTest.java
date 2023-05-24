@@ -58,7 +58,7 @@ public class PublicControllerTest {
         testLocalDateTime = LocalDateTime.of(2024, 1, 1, 1, 1);
         testEventShortResponseDto = new EventShortResponseDto(
                 1L, "title1", "annotation1", false, testCategoryResponseDto, 1,
-                testLocalDateTime, 1, testUserResponseDto
+                testLocalDateTime, 1, testUserResponseDto, EventState.PUBLISHED
         );
         testEventResponseDto = new EventResponseDto(
                 1L, "title1", "annotation1", "description1", false,
