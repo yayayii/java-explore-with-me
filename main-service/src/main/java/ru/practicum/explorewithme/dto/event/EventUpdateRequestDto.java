@@ -28,7 +28,7 @@ public class EventUpdateRequestDto {
     private Boolean requestModeration;
     private Integer participantLimit;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    @Future(groups={Admin.class, Private.class})
+    @Future(groups = {Admin.class, Private.class})
     private LocalDateTime eventDate;
     private LocationDto location;
     private Long category;

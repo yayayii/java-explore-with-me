@@ -183,7 +183,7 @@ public class PrivateService {
         EventRequest eventRequest = new EventRequest(event, requester, LocalDateTime.now());
         if (!event.isRequestModeration() || event.getParticipantLimit() == 0) {
             eventRequest.setStatus(EventRequestStatus.CONFIRMED);
-            event.setConfirmedRequests(event.getConfirmedRequests()+1);
+            event.setConfirmedRequests(event.getConfirmedRequests() + 1);
         } else {
             eventRequest.setStatus(EventRequestStatus.PENDING);
         }
@@ -251,7 +251,7 @@ public class PrivateService {
                 if (event.getParticipantLimit() != 0 && event.getParticipantLimit() == event.getConfirmedRequests()) {
                     throw new DataIntegrityViolationException("The event request list is full");
                 }
-                event.setConfirmedRequests(event.getConfirmedRequests()+1);
+                event.setConfirmedRequests(event.getConfirmedRequests() + 1);
                 request.setStatus(EventRequestStatus.CONFIRMED);
             }
             if (requestDto.getStatus() == EventRequestStatus.REJECTED) {
@@ -294,7 +294,7 @@ public class PrivateService {
         }
         if (request.getStatus() == EventRequestStatus.CONFIRMED) {
             Event event = eventDao.findById(request.getEvent().getId()).get();
-            event.setConfirmedRequests(event.getConfirmedRequests()-1);
+            event.setConfirmedRequests(event.getConfirmedRequests() - 1);
             request.setStatus(EventRequestStatus.CANCELED);
         }
 
