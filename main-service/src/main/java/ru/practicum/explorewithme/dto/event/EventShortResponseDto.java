@@ -23,7 +23,7 @@ public class EventShortResponseDto {
     private boolean paid;
     private CategoryResponseDto category;
     private int confirmedRequests;
-    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime eventDate;
     private long views;
     private UserResponseDto initiator;

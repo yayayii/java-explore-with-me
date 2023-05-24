@@ -16,7 +16,7 @@ public class EventRequestResponseDto {
     private Long id;
     private Long event;
     private Long requester;
-    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @EqualsAndHashCode.Exclude
     private LocalDateTime created;
     private EventRequestStatus status;

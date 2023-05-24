@@ -15,6 +15,6 @@ import java.util.List;
 public class EventRequestUpdateRequestDto {
     @NotNull
     private List<Long> requestIds;
-    @NotNull @EventRequestStatusPattern(regexp="REJECTED|CONFIRMED")
+    @NotNull @EventRequestStatusPattern(regexp = "REJECTED|CONFIRMED")
     private EventRequestStatus status;
 }

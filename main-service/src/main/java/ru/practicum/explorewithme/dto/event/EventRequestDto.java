@@ -23,7 +23,7 @@ public class EventRequestDto {
     private boolean paid;
     private boolean requestModeration = true;
     private int participantLimit;
-    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @NotNull @Future
     private LocalDateTime eventDate;
     @NotNull

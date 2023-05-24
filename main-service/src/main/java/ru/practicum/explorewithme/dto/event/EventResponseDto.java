@@ -22,12 +22,12 @@ public class EventResponseDto {
     private CategoryResponseDto category;
     private int participantLimit;
     private int confirmedRequests;
-    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @EqualsAndHashCode.Exclude
     private LocalDateTime createdOn;
-    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime eventDate;
-    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @EqualsAndHashCode.Exclude
     private LocalDateTime publishedOn;
     private LocationDto location;
