@@ -9,10 +9,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import ru.practicum.explorewithme.StatClient;
+import ru.practicum.explorewithme.dto.StatResponseDto;
 import ru.practicum.explorewithme.dto.category.CategoryRequestDto;
 import ru.practicum.explorewithme.dto.category.CategoryResponseDto;
 import ru.practicum.explorewithme.dto.compilation.CompilationRequestDto;
@@ -58,6 +61,7 @@ public class AdminControllerTest {
     private static EventResponseDto testEventResponseDto;
     private static UserRequestDto testUserRequestDto;
     private static UserResponseDto testUserResponseDto;
+    private static StatResponseDto testStatResponseDto;
 
 
     @BeforeAll
@@ -92,6 +96,8 @@ public class AdminControllerTest {
         testCompilationResponseDto = new CompilationResponseDto(
                 1L, "title1", false, List.of(testEventShortResponseDto, testEventShortResponseDto)
         );
+
+        testStatResponseDto = new StatResponseDto("app1", "uri1", 1L);
     }
 
     @BeforeEach
@@ -182,6 +188,8 @@ public class AdminControllerTest {
     public void testSearchEvents() throws Exception {
         when(mockAdminService.searchEvents(any(), any(), any(), any(), any(), anyInt(), anyInt()))
                 .thenReturn(List.of(testEventResponseDto, testEventResponseDto));
+        when(mockStatClient.getStats(any(), any(), any(), anyBoolean()))
+                .thenReturn(new ResponseEntity<>(List.of(testStatResponseDto), HttpStatus.OK));
         mockMvc.perform(get("/admin/events?users=1,2&states=PUBLISHED,PENDING&categories=1,2&rangeStart=2023-01-01 12:12:12&rangeEnd=2023-01-01 12:12:12&from=1&size=1"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))

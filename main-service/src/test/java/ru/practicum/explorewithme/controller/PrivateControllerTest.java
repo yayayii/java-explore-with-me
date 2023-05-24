@@ -9,10 +9,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import ru.practicum.explorewithme.StatClient;
+import ru.practicum.explorewithme.dto.StatResponseDto;
 import ru.practicum.explorewithme.dto.category.CategoryResponseDto;
 import ru.practicum.explorewithme.dto.event.*;
 import ru.practicum.explorewithme.dto.request.EventRequestResponseDto;
@@ -53,6 +56,7 @@ public class PrivateControllerTest {
     private static EventRequestResponseDto testEventRequestResponseDto;
     private static EventRequestUpdateRequestDto testEventRequestUpdateRequestDto;
     private static EventRequestUpdateResponseDto testEventRequestUpdateResponseDto;
+    private static StatResponseDto testStatResponseDto;
 
 
     @BeforeAll
@@ -90,6 +94,8 @@ public class PrivateControllerTest {
         testEventRequestUpdateResponseDto = new EventRequestUpdateResponseDto(
                 List.of(testEventRequestResponseDto), List.of(testEventRequestResponseDto)
         );
+
+        testStatResponseDto = new StatResponseDto("app1", "uri1", 1L);
     }
 
     @BeforeEach
@@ -176,6 +182,8 @@ public class PrivateControllerTest {
     public void testGetEventById() throws Exception {
         when(mockPrivateService.getEventById(anyLong(), anyLong()))
                 .thenReturn(testEventResponseDto);
+        when(mockStatClient.getStats(any(), any(), any(), anyBoolean()))
+                .thenReturn(new ResponseEntity<>(List.of(testStatResponseDto), HttpStatus.OK));
         mockMvc.perform(get("/users/1/events/1"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON));
@@ -185,6 +193,8 @@ public class PrivateControllerTest {
     public void testGetEventsByInitiatorId() throws Exception {
         when(mockPrivateService.getEventsByInitiatorId(anyLong(), anyInt(), anyInt()))
                 .thenReturn(List.of(testEventShortResponseDto, testEventShortResponseDto));
+        when(mockStatClient.getStats(any(), any(), any(), anyBoolean()))
+                .thenReturn(new ResponseEntity<>(List.of(testStatResponseDto), HttpStatus.OK));
         mockMvc.perform(get("/users/1/events?from=1&size=1"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))

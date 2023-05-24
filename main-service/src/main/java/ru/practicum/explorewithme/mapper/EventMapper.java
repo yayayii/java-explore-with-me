@@ -24,37 +24,35 @@ public class EventMapper {
     }
 
     public EventResponseDto toResponseDto(Event model) {
-        return new EventResponseDto(
-                model.getId(),
-                model.getTitle(),
-                model.getAnnotation(),
-                model.getDescription(),
-                model.isPaid(),
-                model.isRequestModeration(),
-                CategoryMapper.toResponseDto(model.getCategory()),
-                model.getParticipantLimit(),
-                model.getConfirmedRequests(),
-                model.getCreatedOn(),
-                model.getEventDate(),
-                model.getPublishedOn(),
-                new LocationDto(model.getLocationLat(), model.getLocationLon()),
-                model.getViews(),
-                UserMapper.toResponseDto(model.getInitiator()),
-                model.getState()
-        );
+        return EventResponseDto.builder()
+                .id(model.getId())
+                .title(model.getTitle())
+                .annotation(model.getAnnotation())
+                .description(model.getDescription())
+                .paid(model.isPaid())
+                .requestModeration(model.isRequestModeration())
+                .category(CategoryMapper.toResponseDto(model.getCategory()))
+                .participantLimit(model.getParticipantLimit())
+                .confirmedRequests(model.getConfirmedRequests())
+                .createdOn(model.getCreatedOn())
+                .eventDate(model.getEventDate())
+                .publishedOn(model.getPublishedOn())
+                .location(new LocationDto(model.getLocationLat(), model.getLocationLon()))
+                .initiator(UserMapper.toResponseDto(model.getInitiator()))
+                .state(model.getState())
+        .build();
     }
 
     public EventShortResponseDto toShortResponseDto(Event model) {
-        return new EventShortResponseDto(
-                model.getId(),
-                model.getTitle(),
-                model.getAnnotation(),
-                model.isPaid(),
-                CategoryMapper.toResponseDto(model.getCategory()),
-                model.getConfirmedRequests(),
-                model.getEventDate(),
-                model.getViews(),
-                UserMapper.toResponseDto(model.getInitiator())
-        );
+        return EventShortResponseDto.builder()
+                .id(model.getId())
+                .title(model.getTitle())
+                .annotation(model.getAnnotation())
+                .paid(model.isPaid())
+                .category(CategoryMapper.toResponseDto(model.getCategory()))
+                .confirmedRequests(model.getConfirmedRequests())
+                .eventDate(model.getEventDate())
+                .initiator(UserMapper.toResponseDto(model.getInitiator()))
+        .build();
     }
 }

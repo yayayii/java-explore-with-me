@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.explorewithme.StatClient;
 import ru.practicum.explorewithme.dto.category.CategoryRequestDto;
 import ru.practicum.explorewithme.dto.category.CategoryResponseDto;
 import ru.practicum.explorewithme.dto.compilation.CompilationRequestDto;
@@ -33,6 +34,7 @@ import java.util.List;
 @RequestMapping(path = "/admin")
 public class AdminController {
     private final AdminService adminService;
+    private final StatClient statClient;
 
 
     //categories
@@ -97,7 +99,24 @@ public class AdminController {
         log.info("main-service - AdminController - searchEvents - " +
                         "users: {} / states: {} / categories: {} / rangeStart: {} / rangeEnd: {} / from: {} / size: {}",
                 users, states, categories, rangeStart, rangeEnd, from, size);
-        return ResponseEntity.ok(adminService.searchEvents(users, states, categories, rangeStart, rangeEnd, from, size));
+
+        List<EventResponseDto> events = adminService.searchEvents(
+                users, states, categories, rangeStart, rangeEnd, from, size
+        );
+        for (EventResponseDto event : events) {
+            if (event.getState() == EventState.PUBLISHED) {
+                event.setViews(
+                        statClient.getStats(
+                                LocalDateTime.of(2000, 1, 1, 1, 1),
+                                LocalDateTime.of(2999, 1, 1, 1, 1),
+                                List.of("/events/" + event.getId()),
+                                false
+                        ).getBody().get(0).getHits()
+                );
+            }
+        }
+
+        return ResponseEntity.ok(events);
     }
 
     @PatchMapping("/events/{eventId}")

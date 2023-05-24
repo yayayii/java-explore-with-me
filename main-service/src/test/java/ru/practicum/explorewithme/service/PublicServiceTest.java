@@ -1,8 +1,8 @@
 package ru.practicum.explorewithme.service;
 
 import lombok.AllArgsConstructor;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -128,12 +128,16 @@ public class PublicServiceTest {
         };
     }
 
-    @AfterEach
-    public void afterEach() {
+    @BeforeEach
+    public void beforeEach() {
         entityManager.createNativeQuery(
             "delete from event_compilation; " +
             "delete from compilation; " +
             "alter table compilation " +
+            "   alter column id " +
+            "       restart with 1; " +
+            "delete from event_request; " +
+            "alter table event_request " +
             "   alter column id " +
             "       restart with 1; " +
             "delete from event; " +
@@ -222,15 +226,15 @@ public class PublicServiceTest {
                 Collections.emptyList(),
                 publicService.getEvents(
                     "description", List.of(1L, 2L), false, testLocalDateTime.minusDays(1),
-                    testLocalDateTime.plusDays(1), false, SortValue.VIEWS, 1, 1
+                    testLocalDateTime.plusDays(1), false, 1, 1
                 )
         );
 
         adminService.updateEvent(1L, testEventUpdateRequestDtos[0]);
         adminService.updateEvent(2L, testEventUpdateRequestDtos[1]);
-        assertEquals(List.of(testEventShortResponseDtos[0]), publicService.getEvents(
+        assertEquals(List.of(testEventShortResponseDtos[1]), publicService.getEvents(
                 "description", List.of(1L, 2L), false, testLocalDateTime.minusDays(1),
-                testLocalDateTime.plusDays(1), false, SortValue.VIEWS, 1, 1)
+                testLocalDateTime.plusDays(1), false, 1, 1)
         );
     }
 }

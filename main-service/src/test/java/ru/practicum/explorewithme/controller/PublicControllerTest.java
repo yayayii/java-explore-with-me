@@ -1,7 +1,5 @@
 package ru.practicum.explorewithme.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -9,10 +7,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import ru.practicum.explorewithme.StatClient;
+import ru.practicum.explorewithme.dto.StatResponseDto;
 import ru.practicum.explorewithme.dto.category.CategoryResponseDto;
 import ru.practicum.explorewithme.dto.compilation.CompilationResponseDto;
 import ru.practicum.explorewithme.dto.event.EventResponseDto;
@@ -39,7 +40,6 @@ public class PublicControllerTest {
     private StatClient mockStatClient;
     @InjectMocks
     private PublicController publicController;
-    private static ObjectMapper objectMapper;
     private MockMvc mockMvc;
 
     private static CategoryResponseDto testCategoryResponseDto;
@@ -48,13 +48,11 @@ public class PublicControllerTest {
     private static EventShortResponseDto testEventShortResponseDto;
     private static EventResponseDto testEventResponseDto;
     private static CompilationResponseDto testCompilationResponseDto;
+    private static StatResponseDto testStatResponseDto;
 
 
     @BeforeAll
     public static void beforeAll() {
-        objectMapper = new ObjectMapper();
-        objectMapper.registerModule(new JavaTimeModule());
-
         testCategoryResponseDto = new CategoryResponseDto(1L, "name1");
         testUserResponseDto = new UserResponseDto(1L, "email1@email.ru", "name1");
         testLocalDateTime = LocalDateTime.of(2024, 1, 1, 1, 1);
@@ -71,6 +69,7 @@ public class PublicControllerTest {
         testCompilationResponseDto = new CompilationResponseDto(
                 1L, "title1", false, List.of(testEventShortResponseDto, testEventShortResponseDto)
         );
+        testStatResponseDto = new StatResponseDto("app1", "uri1", 1L);
     }
 
     @BeforeEach
@@ -124,6 +123,10 @@ public class PublicControllerTest {
     public void testGetEventById() throws Exception {
         when(mockPublicService.getEventById(anyLong()))
                 .thenReturn(testEventResponseDto);
+        when(mockStatClient.saveEndpointRequest(any()))
+                .thenReturn(new ResponseEntity<>(HttpStatus.CREATED));
+        when(mockStatClient.getStats(any(), any(), any(), anyBoolean()))
+                .thenReturn(new ResponseEntity<>(List.of(testStatResponseDto), HttpStatus.OK));
         mockMvc.perform(get("/events/1"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON));
@@ -131,8 +134,12 @@ public class PublicControllerTest {
 
     @Test
     public void testGetEvents() throws Exception {
-        when(mockPublicService.getEvents(anyString(), anyList(), anyBoolean(), any(), any(), anyBoolean(), any(), anyInt(), anyInt()))
+        when(mockPublicService.getEvents(anyString(), anyList(), anyBoolean(), any(), any(), anyBoolean(), anyInt(), anyInt()))
                 .thenReturn(List.of(testEventShortResponseDto, testEventShortResponseDto));
+        when(mockStatClient.saveEndpointRequest(any()))
+                .thenReturn(new ResponseEntity<>(HttpStatus.CREATED));
+        when(mockStatClient.getStats(any(), any(), any(), anyBoolean()))
+                .thenReturn(new ResponseEntity<>(List.of(testStatResponseDto), HttpStatus.OK));
         mockMvc.perform(get("/events?text=text&categories=1,2&paid=true&rangeStart=2023-01-01 12:12:12&rangeEnd=2023-01-01 12:12:12&onlyAvailable=true&sort=VIEWS&from=1&size=1"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))

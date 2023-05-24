@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.explorewithme.StatClient;
 import ru.practicum.explorewithme.dto.event.EventRequestDto;
 import ru.practicum.explorewithme.dto.event.EventResponseDto;
 import ru.practicum.explorewithme.dto.event.EventShortResponseDto;
@@ -20,6 +21,7 @@ import ru.practicum.explorewithme.util.Private;
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -29,6 +31,7 @@ import java.util.List;
 @RequestMapping(path = "/users/{userId}")
 public class PrivateController {
     private final PrivateService privateService;
+    private final StatClient statClient;
 
 
     //events
@@ -40,13 +43,6 @@ public class PrivateController {
         return new ResponseEntity<>(privateService.addEvent(userId, requestDto), HttpStatus.CREATED);
     }
 
-    @GetMapping("/events/{eventId}")
-    public ResponseEntity<EventResponseDto> getEventById(@PathVariable Long userId, @PathVariable Long eventId) {
-        log.info("main-service - PrivateController - getEventsByInitiatorId - userId: {} / eventId: {}",
-                userId, eventId);
-        return ResponseEntity.ok(privateService.getEventById(userId, eventId));
-    }
-
     @GetMapping("/events")
     public ResponseEntity<List<EventShortResponseDto>> getEventsByInitiatorId(
             @PathVariable Long userId,
@@ -55,7 +51,38 @@ public class PrivateController {
     ) {
         log.info("main-service - PrivateController - getEventsByInitiatorId - userId: {} / from: {} / size: {}",
                 userId, from, size);
-        return ResponseEntity.ok(privateService.getEventsByInitiatorId(userId, from, size));
+
+        List<EventShortResponseDto> events = privateService.getEventsByInitiatorId(userId, from, size);
+        for (EventShortResponseDto event : events) {
+            event.setViews(
+                    statClient.getStats(
+                            LocalDateTime.of(2000, 1, 1, 1, 1),
+                            LocalDateTime.of(2999, 1, 1, 1, 1),
+                            List.of("/events/" + event.getId()),
+                            false
+                    ).getBody().get(0).getHits()
+            );
+        }
+
+        return ResponseEntity.ok(events);
+    }
+
+    @GetMapping("/events/{eventId}")
+    public ResponseEntity<EventResponseDto> getEventById(@PathVariable Long userId, @PathVariable Long eventId) {
+        log.info("main-service - PrivateController - getEventsByInitiatorId - userId: {} / eventId: {}",
+                userId, eventId);
+
+        EventResponseDto event = privateService.getEventById(userId, eventId);
+        event.setViews(
+                statClient.getStats(
+                        LocalDateTime.of(2000, 1, 1, 1, 1),
+                        LocalDateTime.of(2999, 1, 1, 1, 1),
+                        List.of("/events/" + eventId),
+                        false
+                ).getBody().get(0).getHits()
+        );
+
+        return ResponseEntity.ok(event);
     }
 
     @PatchMapping("/events/{eventId}")

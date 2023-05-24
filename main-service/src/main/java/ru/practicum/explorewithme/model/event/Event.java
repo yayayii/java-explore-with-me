@@ -33,7 +33,6 @@ public class Event {
     private LocalDateTime createdOn;
     private LocalDateTime eventDate;
     private LocalDateTime publishedOn;
-    private long views;
     @ManyToOne
     private User initiator;
     @Enumerated(value = EnumType.STRING)

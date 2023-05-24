@@ -144,6 +144,10 @@ public class AdminServiceTest {
             "alter table compilation " +
             "   alter column id " +
             "       restart with 1; " +
+            "delete from event_request; " +
+            "alter table event_request " +
+            "   alter column id " +
+            "       restart with 1; " +
             "delete from event; " +
             "alter table event " +
             "   alter column id " +

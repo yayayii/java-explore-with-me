@@ -24,7 +24,6 @@ create table if not exists event (
     created_on timestamp,
     event_date timestamp,
     published_on timestamp,
-    views bigint,
     initiator_id bigint references user_account,
     state varchar
 );

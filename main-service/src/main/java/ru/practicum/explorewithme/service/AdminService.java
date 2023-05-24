@@ -42,9 +42,9 @@ import java.util.stream.Collectors;
 @Service
 public class AdminService {
     private final CategoryDao categoryDao;
+    private final CompilationDao compilationDao;
     private final EventDao eventDao;
     private final UserDao userDao;
-    private final CompilationDao compilationDao;
 
 
     //categories

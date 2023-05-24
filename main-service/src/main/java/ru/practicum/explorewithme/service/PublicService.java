@@ -3,7 +3,6 @@ package ru.practicum.explorewithme.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.explorewithme.dao.CategoryDao;
 import ru.practicum.explorewithme.dao.CompilationDao;
@@ -76,14 +75,14 @@ public class PublicService {
 
     public List<EventShortResponseDto> getEvents(
             String text, List<Long> categoryIds, Boolean isPaid, LocalDateTime rangeStart, LocalDateTime rangeEnd,
-            boolean onlyAvailable, SortValue sortValue, int from, int size
+            boolean onlyAvailable, int from, int size
     ) {
-        log.info("main-service - PublicService - getEvents - " +
-                "text: {} / categoryIds: {} / isPaid: {} / rangeStart: {} / rangeEnd: {} / onlyAvailable: {} / " +
-                "sortValue: {}, from: {} / size: {}",
-                text, categoryIds, isPaid, rangeStart, rangeEnd, onlyAvailable, sortValue, from, size);
-        return eventDao.searchAllByPublic(text, categoryIds, isPaid, rangeStart, rangeEnd, onlyAvailable,
-            EventState.PUBLISHED, PageRequest.of(from, size, Sort.by(sortValue.toString().toLowerCase())))
-                .stream().map(EventMapper::toShortResponseDto).collect(Collectors.toList());
+        log.info("main-service - PublicService - getEvents - text: {} / categoryIds: {} / isPaid: {} " +
+                        "/ rangeStart: {} / rangeEnd: {} / onlyAvailable: {} / from: {} / size: {}",
+                text, categoryIds, isPaid, rangeStart, rangeEnd, onlyAvailable, from, size);
+        return eventDao.searchAllByPublic(
+                text, categoryIds, isPaid, rangeStart, rangeEnd,
+                onlyAvailable, EventState.PUBLISHED, PageRequest.of(from, size)
+        ).stream().map(EventMapper::toShortResponseDto).collect(Collectors.toList());
     }
 }
