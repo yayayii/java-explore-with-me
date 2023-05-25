@@ -2,10 +2,7 @@ package ru.practicum.explorewithme.dto.event;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import ru.practicum.explorewithme.dto.category.CategoryResponseDto;
 import ru.practicum.explorewithme.dto.user.UserResponseDto;
 import ru.practicum.explorewithme.model.event.enums.EventState;
@@ -29,4 +26,7 @@ public class EventShortResponseDto {
     private UserResponseDto initiator;
     @JsonIgnore
     private EventState state;
+    @JsonIgnore
+    @EqualsAndHashCode.Exclude
+    private LocalDateTime publishedOn;
 }

@@ -58,7 +58,7 @@ public class PublicControllerTest {
         testLocalDateTime = LocalDateTime.of(2024, 1, 1, 1, 1);
         testEventShortResponseDto = new EventShortResponseDto(
                 1L, "title1", "annotation1", false, testCategoryResponseDto, 1,
-                testLocalDateTime, 1, testUserResponseDto, EventState.PUBLISHED
+                testLocalDateTime, 1, testUserResponseDto, EventState.PUBLISHED, testLocalDateTime
         );
         testEventResponseDto = new EventResponseDto(
                 1L, "title1", "annotation1", "description1", false,
@@ -101,6 +101,8 @@ public class PublicControllerTest {
     //compilations
     @Test
     public void testGetCompilationById() throws Exception {
+        when(mockStatClient.getStats(any(), any(), any(), anyBoolean()))
+                .thenReturn(new ResponseEntity<>(List.of(testStatResponseDto), HttpStatus.OK));
         when(mockPublicService.getCompilationById(anyLong()))
                 .thenReturn(testCompilationResponseDto);
         mockMvc.perform(get("/compilations/1"))
@@ -110,6 +112,8 @@ public class PublicControllerTest {
 
     @Test
     public void testGetCompilations() throws Exception {
+        when(mockStatClient.getStats(any(), any(), any(), anyBoolean()))
+                .thenReturn(new ResponseEntity<>(List.of(testStatResponseDto), HttpStatus.OK));
         when(mockPublicService.getCompilations(any(), anyInt(), anyInt()))
                 .thenReturn(List.of(testCompilationResponseDto, testCompilationResponseDto));
         mockMvc.perform(get("/compilations"))

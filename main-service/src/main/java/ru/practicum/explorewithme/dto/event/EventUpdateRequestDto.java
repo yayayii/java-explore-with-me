@@ -4,13 +4,14 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ru.practicum.explorewithme.model.event.enums.EventUpdateState;
+import ru.practicum.explorewithme.dto.event.enums.EventUpdateState;
 import ru.practicum.explorewithme.util.Admin;
-import ru.practicum.explorewithme.model.event.enums.util.EventAdminUpdateStatePattern;
-import ru.practicum.explorewithme.model.event.enums.util.EventPrivateUpdateStatePattern;
+import ru.practicum.explorewithme.dto.event.enums.util.EventAdminUpdateStatePattern;
+import ru.practicum.explorewithme.dto.event.enums.util.EventPrivateUpdateStatePattern;
 import ru.practicum.explorewithme.util.Private;
 
 import javax.validation.constraints.Future;
+import javax.validation.constraints.PositiveOrZero;
 import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
 
@@ -26,6 +27,7 @@ public class EventUpdateRequestDto {
     private String description;
     private Boolean paid;
     private Boolean requestModeration;
+    @PositiveOrZero(groups = {Admin.class, Private.class})
     private Integer participantLimit;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @Future(groups = {Admin.class, Private.class})

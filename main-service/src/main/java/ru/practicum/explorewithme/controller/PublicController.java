@@ -14,8 +14,9 @@ import ru.practicum.explorewithme.dto.category.CategoryResponseDto;
 import ru.practicum.explorewithme.dto.compilation.CompilationResponseDto;
 import ru.practicum.explorewithme.dto.event.EventResponseDto;
 import ru.practicum.explorewithme.dto.event.EventShortResponseDto;
+import ru.practicum.explorewithme.model.Compilation;
 import ru.practicum.explorewithme.model.event.enums.EventState;
-import ru.practicum.explorewithme.model.event.enums.SortValue;
+import ru.practicum.explorewithme.dto.event.enums.SortValue;
 import ru.practicum.explorewithme.service.PublicService;
 
 import javax.servlet.http.HttpServletRequest;
@@ -54,7 +55,27 @@ public class PublicController {
     @GetMapping("/compilations/{compId}")
     public ResponseEntity<CompilationResponseDto> getCompilationById(@PathVariable Long compId) {
         log.info("main-service - PublicController - getCompilationById - compId: {}", compId);
-        return ResponseEntity.ok(publicService.getCompilationById(compId));
+
+        CompilationResponseDto compilation = publicService.getCompilationById(compId);
+        List<EventShortResponseDto> events = compilation.getEvents();
+        for (EventShortResponseDto event : events) {
+            if (event.getState() == EventState.PUBLISHED) {
+                long views;
+                try {
+                    views = statClient.getStats(
+                            event.getPublishedOn(),
+                            LocalDateTime.now(),
+                            List.of("/events/" + event.getId()),
+                            true
+                    ).getBody().get(0).getHits();
+                } catch (IndexOutOfBoundsException e) {
+                    views = 0;
+                }
+                event.setViews(views);
+            }
+        }
+
+        return ResponseEntity.ok(compilation);
     }
 
     @GetMapping("/compilations")
@@ -65,7 +86,29 @@ public class PublicController {
     ) {
         log.info("main-service - PublicController - getCompilations - pinned: {} / from: {} / size: {}",
                 pinned, from, size);
-        return ResponseEntity.ok(publicService.getCompilations(pinned, from, size));
+
+        List<CompilationResponseDto> compilations = publicService.getCompilations(pinned, from, size);
+        for (CompilationResponseDto compilation : compilations) {
+            List<EventShortResponseDto> events = compilation.getEvents();
+            for (EventShortResponseDto event : events) {
+                if (event.getState() == EventState.PUBLISHED) {
+                    long views;
+                    try {
+                        views = statClient.getStats(
+                                event.getPublishedOn(),
+                                LocalDateTime.now(),
+                                List.of("/events/" + event.getId()),
+                                true
+                        ).getBody().get(0).getHits();
+                    } catch (IndexOutOfBoundsException e) {
+                        views = 0;
+                    }
+                    event.setViews(views);
+                }
+            }
+        }
+
+        return ResponseEntity.ok(compilations);
     }
 
     //events
@@ -78,14 +121,18 @@ public class PublicController {
                 "main-service", request.getRequestURI(), request.getRemoteAddr(), LocalDateTime.now()
         ));
         if (event.getState() == EventState.PUBLISHED) {
-            event.setViews(
-                    statClient.getStats(
-                            LocalDateTime.of(2000, 1, 1, 1, 1),
-                            LocalDateTime.of(2999, 1, 1, 1, 1),
-                            List.of("/events/" + eventId),
-                            true
-                    ).getBody().get(0).getHits()
-            );
+            long views;
+            try {
+                views = statClient.getStats(
+                        event.getPublishedOn(),
+                        LocalDateTime.now(),
+                        List.of("/events/" + event.getId()),
+                        true
+                ).getBody().get(0).getHits();
+            } catch (IndexOutOfBoundsException e) {
+                views = 0;
+            }
+            event.setViews(views);
         }
 
         return ResponseEntity.ok(event);
@@ -122,14 +169,18 @@ public class PublicController {
         }
         for (EventShortResponseDto event : events) {
             if (event.getState() == EventState.PUBLISHED) {
-                event.setViews(
-                        statClient.getStats(
-                                LocalDateTime.of(2000, 1, 1, 1, 1),
-                                LocalDateTime.of(2999, 1, 1, 1, 1),
-                                List.of("/events/" + event.getId()),
-                                true
-                        ).getBody().get(0).getHits()
-                );
+                long views;
+                try {
+                    views = statClient.getStats(
+                            event.getPublishedOn(),
+                            LocalDateTime.now(),
+                            List.of("/events/" + event.getId()),
+                            true
+                    ).getBody().get(0).getHits();
+                } catch (IndexOutOfBoundsException e) {
+                    views = 0;
+                }
+                event.setViews(views);
             }
         }
         if (sort == SortValue.VIEWS) {

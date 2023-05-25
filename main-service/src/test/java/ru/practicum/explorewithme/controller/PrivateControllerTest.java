@@ -23,7 +23,7 @@ import ru.practicum.explorewithme.dto.request.EventRequestUpdateRequestDto;
 import ru.practicum.explorewithme.dto.request.EventRequestUpdateResponseDto;
 import ru.practicum.explorewithme.dto.user.UserResponseDto;
 import ru.practicum.explorewithme.model.event.enums.EventState;
-import ru.practicum.explorewithme.model.event.enums.EventUpdateState;
+import ru.practicum.explorewithme.dto.event.enums.EventUpdateState;
 import ru.practicum.explorewithme.model.request.enums.EventRequestStatus;
 import ru.practicum.explorewithme.service.PrivateService;
 
@@ -76,8 +76,9 @@ public class PrivateControllerTest {
         );
         testEventShortResponseDto = new EventShortResponseDto(
                 1L, "title1", "annotation1", false,
-                new CategoryResponseDto(1L, "name1"), 1, testLocalDateTime, 1,
-                new UserResponseDto(1L, "email1@yandex.ru", "name1"), EventState.PUBLISHED
+                new CategoryResponseDto(1L, "name1"), 1,testLocalDateTime,
+                1, new UserResponseDto(1L, "email1@yandex.ru", "name1"),
+                EventState.PUBLISHED, testLocalDateTime
         );
         testEventResponseDto = new EventResponseDto(
                 1L, "title1", "annotation1", "description1", false,

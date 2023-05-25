@@ -1,7 +1,7 @@
-package ru.practicum.explorewithme.model.event.enums.util;
+package ru.practicum.explorewithme.dto.event.enums.util;
 
 import org.springframework.core.convert.converter.Converter;
-import ru.practicum.explorewithme.model.event.enums.EventUpdateState;
+import ru.practicum.explorewithme.dto.event.enums.EventUpdateState;
 
 public class StringToEventUpdateStateConverter implements Converter<String, EventUpdateState> {
     @Override

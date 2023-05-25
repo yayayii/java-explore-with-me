@@ -27,7 +27,7 @@ import ru.practicum.explorewithme.dto.event.LocationDto;
 import ru.practicum.explorewithme.dto.user.UserRequestDto;
 import ru.practicum.explorewithme.dto.user.UserResponseDto;
 import ru.practicum.explorewithme.model.event.enums.EventState;
-import ru.practicum.explorewithme.model.event.enums.EventUpdateState;
+import ru.practicum.explorewithme.dto.event.enums.EventUpdateState;
 import ru.practicum.explorewithme.service.AdminService;
 
 import java.time.LocalDateTime;
@@ -83,7 +83,7 @@ public class AdminControllerTest {
         );
         testEventShortResponseDto = new EventShortResponseDto(
                 1L, "title1", "annotation1", false, testCategoryResponseDto, 1,
-                testLocalDateTime, 1, testUserResponseDto, EventState.PUBLISHED
+                testLocalDateTime, 1, testUserResponseDto, EventState.PUBLISHED, testLocalDateTime
         );
         testEventResponseDto = new EventResponseDto(
                 1L, "title1", "annotation1", "description1", false,
@@ -156,6 +156,8 @@ public class AdminControllerTest {
                 .andExpect(status().isBadRequest());
         testCompilationRequestDto.setTitle("title1");
 
+        when(mockStatClient.getStats(any(), any(), any(), anyBoolean()))
+                .thenReturn(new ResponseEntity<>(List.of(testStatResponseDto), HttpStatus.OK));
         when(mockAdminService.addCompilation(any()))
                 .thenReturn(testCompilationResponseDto);
         mockMvc.perform(post("/admin/compilations")
@@ -167,6 +169,8 @@ public class AdminControllerTest {
 
     @Test
     public void testUpdateCompilation() throws Exception {
+        when(mockStatClient.getStats(any(), any(), any(), anyBoolean()))
+                .thenReturn(new ResponseEntity<>(List.of(testStatResponseDto), HttpStatus.OK));
         when(mockAdminService.updateCompilation(anyLong(), any()))
                 .thenReturn(testCompilationResponseDto);
         mockMvc.perform(patch("/admin/compilations/1")

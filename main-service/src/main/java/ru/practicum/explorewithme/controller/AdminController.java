@@ -13,6 +13,7 @@ import ru.practicum.explorewithme.dto.category.CategoryRequestDto;
 import ru.practicum.explorewithme.dto.category.CategoryResponseDto;
 import ru.practicum.explorewithme.dto.compilation.CompilationRequestDto;
 import ru.practicum.explorewithme.dto.compilation.CompilationResponseDto;
+import ru.practicum.explorewithme.dto.event.EventShortResponseDto;
 import ru.practicum.explorewithme.dto.event.EventUpdateRequestDto;
 import ru.practicum.explorewithme.dto.event.EventResponseDto;
 import ru.practicum.explorewithme.dto.user.UserRequestDto;
@@ -68,7 +69,27 @@ public class AdminController {
             @RequestBody @Validated(Create.class) CompilationRequestDto requestDto
     ) {
         log.info("main-service - AdminController - addCompilation - requestDto: {}", requestDto);
-        return new ResponseEntity<>(adminService.addCompilation(requestDto), HttpStatus.CREATED);
+
+        CompilationResponseDto compilation = adminService.addCompilation(requestDto);
+        List<EventShortResponseDto> events = compilation.getEvents();
+        for (EventShortResponseDto event : events) {
+            if (event.getState() == EventState.PUBLISHED) {
+                long views;
+                try {
+                    views = statClient.getStats(
+                            event.getPublishedOn(),
+                            LocalDateTime.now(),
+                            List.of("/events/" + event.getId()),
+                            true
+                    ).getBody().get(0).getHits();
+                } catch (IndexOutOfBoundsException e) {
+                    views = 0;
+                }
+                event.setViews(views);
+            }
+        }
+
+        return new ResponseEntity<>(compilation, HttpStatus.CREATED);
     }
 
     @PatchMapping("/compilations/{compilationId}")
@@ -77,7 +98,27 @@ public class AdminController {
     ) {
         log.info("main-service - AdminController - updateCompilation - compilationId: {} / requestDto: {}",
                 compilationId, requestDto);
-        return ResponseEntity.ok(adminService.updateCompilation(compilationId, requestDto));
+
+        CompilationResponseDto compilation = adminService.updateCompilation(compilationId, requestDto);
+        List<EventShortResponseDto> events = compilation.getEvents();
+        for (EventShortResponseDto event : events) {
+            if (event.getState() == EventState.PUBLISHED) {
+                long views;
+                try {
+                    views = statClient.getStats(
+                            event.getPublishedOn(),
+                            LocalDateTime.now(),
+                            List.of("/events/" + event.getId()),
+                            true
+                    ).getBody().get(0).getHits();
+                } catch (IndexOutOfBoundsException e) {
+                    views = 0;
+                }
+                event.setViews(views);
+            }
+        }
+
+        return ResponseEntity.ok(compilation);
     }
 
     @DeleteMapping("/compilations/{compilationId}")
@@ -110,8 +151,8 @@ public class AdminController {
                 long views;
                 try {
                     views = statClient.getStats(
-                            LocalDateTime.of(2000, 1, 1, 1, 1),
-                            LocalDateTime.of(2999, 1, 1, 1, 1),
+                            event.getPublishedOn(),
+                            LocalDateTime.now(),
                             List.of("/events/" + event.getId()),
                             true
                     ).getBody().get(0).getHits();

@@ -3,10 +3,10 @@ package ru.practicum.explorewithme.util;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.format.FormatterRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import ru.practicum.explorewithme.model.event.enums.util.StringToEventStateConverter;
-import ru.practicum.explorewithme.model.event.enums.util.StringToEventUpdateStateConverter;
-import ru.practicum.explorewithme.model.event.enums.util.StringToSortValueConverter;
-import ru.practicum.explorewithme.model.request.enums.util.StringToEventRequestStatusConverter;
+import ru.practicum.explorewithme.dto.event.enums.util.StringToEventStateConverter;
+import ru.practicum.explorewithme.dto.event.enums.util.StringToEventUpdateStateConverter;
+import ru.practicum.explorewithme.dto.event.enums.util.StringToSortValueConverter;
+import ru.practicum.explorewithme.dto.request.enums.util.StringToEventRequestStatusConverter;
 
 @Configuration
 public class WebConfig implements WebMvcConfigurer {

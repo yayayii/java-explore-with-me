@@ -27,7 +27,7 @@ import ru.practicum.explorewithme.model.Compilation;
 import ru.practicum.explorewithme.model.User;
 import ru.practicum.explorewithme.model.event.Event;
 import ru.practicum.explorewithme.model.event.enums.EventState;
-import ru.practicum.explorewithme.model.event.enums.EventUpdateState;
+import ru.practicum.explorewithme.dto.event.enums.EventUpdateState;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -100,7 +100,7 @@ public class AdminService {
 
         Compilation compilation = compilationDao.findById(compilationId)
                 .orElseThrow(() -> new NoSuchElementException("Compilation id = " + compilationId + " doesn't exist"));
-        if (requestDto.getTitle() != null) {
+        if (requestDto.getTitle() != null && !requestDto.getTitle().isBlank()) {
             compilation.setTitle(requestDto.getTitle());
         }
         if (requestDto.getPinned() != null) {
@@ -155,13 +155,13 @@ public class AdminService {
             throw new DataIntegrityViolationException("Event state is already changed");
         }
 
-        if (requestDto.getTitle() != null) {
+        if (requestDto.getTitle() != null && !requestDto.getTitle().isBlank()) {
             event.setTitle(requestDto.getTitle());
         }
-        if (requestDto.getAnnotation() != null) {
+        if (requestDto.getAnnotation() != null && !requestDto.getAnnotation().isBlank()) {
             event.setAnnotation(requestDto.getAnnotation());
         }
-        if (requestDto.getDescription() != null) {
+        if (requestDto.getDescription() != null && !requestDto.getDescription().isBlank()) {
             event.setDescription(requestDto.getDescription());
         }
         if (requestDto.getPaid() != null) {

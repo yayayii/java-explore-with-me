@@ -3,7 +3,6 @@ package ru.practicum.explorewithme.dao;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.stereotype.Repository;
 import ru.practicum.explorewithme.model.event.Event;
 import ru.practicum.explorewithme.model.event.enums.EventState;
 
@@ -11,7 +10,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-@Repository
 public interface EventDao extends JpaRepository<Event, Long> {
     @Query(
         "select e from Event e " +

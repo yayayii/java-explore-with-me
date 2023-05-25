@@ -1,4 +1,4 @@
-package ru.practicum.explorewithme.model.request.enums.util;
+package ru.practicum.explorewithme.dto.request.enums.util;
 
 import org.springframework.core.convert.converter.Converter;
 import ru.practicum.explorewithme.model.request.enums.EventRequestStatus;

@@ -34,7 +34,7 @@ public class StatService {
         log.info("stats - stats-service - StatService - getStats - start: {} / end: {} / uris: {} / unique: {}",
                 start, end, uris, unique);
 
-        if (!start.isBefore(end)) {
+        if (!start.isEqual(end) && !start.isBefore(end)) {
             throw new IllegalArgumentException("Start date must be before end date");
         }
 

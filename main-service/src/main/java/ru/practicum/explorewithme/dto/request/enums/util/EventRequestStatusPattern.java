@@ -1,4 +1,4 @@
-package ru.practicum.explorewithme.model.event.enums.util;
+package ru.practicum.explorewithme.dto.request.enums.util;
 
 import javax.validation.Constraint;
 import javax.validation.Payload;
@@ -12,8 +12,8 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Target({METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER, TYPE_USE})
 @Retention(RUNTIME)
 @Documented
-@Constraint(validatedBy = EventPrivateUpdateStatePatternValidator.class)
-public @interface EventPrivateUpdateStatePattern {
+@Constraint(validatedBy = EventRequestStatusPatternValidator.class)
+public @interface EventRequestStatusPattern {
     String regexp();
     String message() default "must match \"{regexp}\"";
     Class<?>[] groups() default {};

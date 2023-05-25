@@ -23,7 +23,7 @@ import ru.practicum.explorewithme.model.Category;
 import ru.practicum.explorewithme.model.User;
 import ru.practicum.explorewithme.model.event.Event;
 import ru.practicum.explorewithme.model.event.enums.EventState;
-import ru.practicum.explorewithme.model.event.enums.EventUpdateState;
+import ru.practicum.explorewithme.dto.event.enums.EventUpdateState;
 import ru.practicum.explorewithme.model.request.EventRequest;
 import ru.practicum.explorewithme.model.request.enums.EventRequestStatus;
 
@@ -97,6 +97,9 @@ public class PrivateService {
 
     @Transactional
     public EventResponseDto updateEvent(Long userId, Long eventId, EventUpdateRequestDto requestDto) {
+        log.info("main-service - PrivateService - updateEvent - userId: {} / eventId: {} / requestDto: {}",
+                userId, eventId, requestDto);
+
         if (!userDao.existsById(userId)) {
             throw new NoSuchElementException("User id = " + userId + " doesn't exist");
         }
@@ -109,13 +112,13 @@ public class PrivateService {
             throw new DataIntegrityViolationException("This event is already published");
         }
 
-        if (requestDto.getTitle() != null) {
+        if (requestDto.getTitle() != null && !requestDto.getTitle().isBlank()) {
             event.setTitle(requestDto.getTitle());
         }
-        if (requestDto.getAnnotation() != null) {
+        if (requestDto.getAnnotation() != null && !requestDto.getAnnotation().isBlank()) {
             event.setAnnotation(requestDto.getAnnotation());
         }
-        if (requestDto.getDescription() != null) {
+        if (requestDto.getDescription() != null && !requestDto.getDescription().isBlank()) {
             event.setDescription(requestDto.getDescription());
         }
         if (requestDto.getPaid() != null) {

@@ -17,7 +17,7 @@ import ru.practicum.explorewithme.dto.request.EventRequestUpdateResponseDto;
 import ru.practicum.explorewithme.dto.user.UserRequestDto;
 import ru.practicum.explorewithme.dto.user.UserResponseDto;
 import ru.practicum.explorewithme.model.event.enums.EventState;
-import ru.practicum.explorewithme.model.event.enums.EventUpdateState;
+import ru.practicum.explorewithme.dto.event.enums.EventUpdateState;
 import ru.practicum.explorewithme.model.request.enums.EventRequestStatus;
 
 import javax.persistence.EntityManager;
@@ -98,7 +98,8 @@ public class PrivateServiceTest {
         testEventShortResponseDto = new EventShortResponseDto(
                 1L, "title1", "annotation1", false,
                 new CategoryResponseDto(1L, "name1"), 0, testLocalDateTime, 0,
-                new UserResponseDto(1L, "email1@yandex.ru", "name1"), EventState.PENDING
+                new UserResponseDto(1L, "email1@yandex.ru", "name1"),
+                EventState.PENDING, testLocalDateTime
         );
         testEventResponseDtos = new EventResponseDto[] {
                 new EventResponseDto(

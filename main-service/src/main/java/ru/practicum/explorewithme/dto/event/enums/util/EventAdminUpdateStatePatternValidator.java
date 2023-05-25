@@ -1,4 +1,4 @@
-package ru.practicum.explorewithme.model.event.enums.util;
+package ru.practicum.explorewithme.dto.event.enums.util;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;

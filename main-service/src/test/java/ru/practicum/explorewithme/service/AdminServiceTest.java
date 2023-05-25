@@ -16,7 +16,7 @@ import ru.practicum.explorewithme.dto.event.*;
 import ru.practicum.explorewithme.dto.user.UserRequestDto;
 import ru.practicum.explorewithme.dto.user.UserResponseDto;
 import ru.practicum.explorewithme.model.event.enums.EventState;
-import ru.practicum.explorewithme.model.event.enums.EventUpdateState;
+import ru.practicum.explorewithme.dto.event.enums.EventUpdateState;
 
 import javax.persistence.EntityManager;
 
@@ -51,7 +51,7 @@ public class AdminServiceTest {
     private static UserResponseDto[] testUserResponseDtos;
     private static LocalDateTime testLocalDateTime;
     private static EventRequestDto[] testEventRequestDtos;
-    private static EventUpdateRequestDto testEventUpdateRequestDto;
+    private static EventUpdateRequestDto[] testEventUpdateRequestDtos;
     private static EventShortResponseDto[] testEventShortResponseDtos;
     private static EventResponseDto[] testEventResponseDtos;
 
@@ -89,19 +89,33 @@ public class AdminServiceTest {
                         new LocationDto(1.1, 1.1), 1L
                 ),
         };
-        testEventUpdateRequestDto = new EventUpdateRequestDto(
-                "newTitle1", "newAnnotation1", "newDescription1",
-                true, true, 2, testLocalDateTime,
-                new LocationDto(0.0, 0.0), 1L, EventUpdateState.PUBLISH_EVENT
-        );
+        testEventUpdateRequestDtos = new EventUpdateRequestDto[]{
+                new EventUpdateRequestDto(
+                        "newTitle1", "newAnnotation1", "newDescription1",
+                        true, true, 2, testLocalDateTime,
+                        new LocationDto(0.0, 0.0), 1L, EventUpdateState.PUBLISH_EVENT
+                ),
+                new EventUpdateRequestDto(
+                        "title1", "annotation1", "description1",
+                        false, false, 1, testLocalDateTime,
+                        new LocationDto(1.1, 1.1), 1L, EventUpdateState.PUBLISH_EVENT
+                ),
+                new EventUpdateRequestDto(
+                        "title2", "annotation2", "description2",
+                        false, false, 1, testLocalDateTime,
+                        new LocationDto(1.1, 1.1), 1L, EventUpdateState.PUBLISH_EVENT
+                )
+        };
         testEventShortResponseDtos = new EventShortResponseDto[]{
                 new EventShortResponseDto(
                         1L, "title1", "annotation1", false, testCategoryResponseDtos[0],
-                        0, testLocalDateTime, 0, testUserResponseDtos[0], EventState.PENDING
+                        0, testLocalDateTime, 0, testUserResponseDtos[0],
+                        EventState.PUBLISHED, testLocalDateTime
                 ),
                 new EventShortResponseDto(
                         2L, "title2", "annotation2", false, testCategoryResponseDtos[0],
-                        0, testLocalDateTime, 0, testUserResponseDtos[0], EventState.PENDING
+                        0, testLocalDateTime, 0, testUserResponseDtos[0],
+                        EventState.PUBLISHED, testLocalDateTime
                 ),
         };
         testEventResponseDtos = new EventResponseDto[] {
@@ -204,6 +218,8 @@ public class AdminServiceTest {
         adminService.addUser(testUserRequestDtos[0]);
         privateService.addEvent(1L, testEventRequestDtos[0]);
         privateService.addEvent(1L, testEventRequestDtos[1]);
+        adminService.updateEvent(1L, testEventUpdateRequestDtos[1]);
+        adminService.updateEvent(2L, testEventUpdateRequestDtos[2]);
         assertEquals(testCompilationResponseDtos[0], adminService.addCompilation(testCompilationRequestDtos[0]));
     }
 
@@ -218,6 +234,8 @@ public class AdminServiceTest {
         adminService.addUser(testUserRequestDtos[0]);
         privateService.addEvent(1L, testEventRequestDtos[0]);
         privateService.addEvent(1L, testEventRequestDtos[1]);
+        adminService.updateEvent(1L, testEventUpdateRequestDtos[1]);
+        adminService.updateEvent(2L, testEventUpdateRequestDtos[2]);
         adminService.addCompilation(testCompilationRequestDtos[0]);
         testCompilationRequestDtos[1].setEvents(List.of(3L));
         assertThrows(
@@ -240,6 +258,8 @@ public class AdminServiceTest {
         adminService.addUser(testUserRequestDtos[0]);
         privateService.addEvent(1L, testEventRequestDtos[0]);
         privateService.addEvent(1L, testEventRequestDtos[1]);
+        adminService.updateEvent(1L, testEventUpdateRequestDtos[1]);
+        adminService.updateEvent(2L, testEventUpdateRequestDtos[2]);
         adminService.addCompilation(testCompilationRequestDtos[0]);
         assertDoesNotThrow(() -> adminService.deleteCompilation(1L));
         assertThrows(NoSuchElementException.class, () -> adminService.deleteCompilation(1L));
@@ -277,27 +297,27 @@ public class AdminServiceTest {
     public void testUpdateEvent() {
         assertThrows(
                 NoSuchElementException.class,
-                () -> adminService.updateEvent(1L, testEventUpdateRequestDto)
+                () -> adminService.updateEvent(1L, testEventUpdateRequestDtos[0])
         );
         adminService.addUser(testUserRequestDtos[0]);
         adminService.addCategory(testCategoryRequestDtos[0]);
         privateService.addEvent(1L, testEventRequestDtos[0]);
 
-        testEventUpdateRequestDto.setEventDate(LocalDateTime.now());
+        testEventUpdateRequestDtos[0].setEventDate(LocalDateTime.now());
         assertThrows(
                 IllegalArgumentException.class,
-                () -> adminService.updateEvent(1L, testEventUpdateRequestDto)
+                () -> adminService.updateEvent(1L, testEventUpdateRequestDtos[0])
         );
-        testEventUpdateRequestDto.setEventDate(testLocalDateTime);
+        testEventUpdateRequestDtos[0].setEventDate(testLocalDateTime);
 
-        testEventUpdateRequestDto.setCategory(2L);
+        testEventUpdateRequestDtos[0].setCategory(2L);
         assertThrows(
                 NoSuchElementException.class,
-                () -> adminService.updateEvent(1L, testEventUpdateRequestDto)
+                () -> adminService.updateEvent(1L, testEventUpdateRequestDtos[0])
         );
-        testEventUpdateRequestDto.setCategory(1L);
+        testEventUpdateRequestDtos[0].setCategory(1L);
 
-        assertEquals(testEventResponseDtos[1], adminService.updateEvent(1L, testEventUpdateRequestDto));
+        assertEquals(testEventResponseDtos[1], adminService.updateEvent(1L, testEventUpdateRequestDtos[0]));
     }
 
     //users

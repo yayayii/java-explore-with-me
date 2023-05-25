@@ -1,4 +1,4 @@
-package ru.practicum.explorewithme.model.event.enums.util;
+package ru.practicum.explorewithme.dto.request.enums.util;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
@@ -6,11 +6,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-public class EventPrivateUpdateStatePatternValidator implements ConstraintValidator<EventPrivateUpdateStatePattern, Enum<?>> {
+public class EventRequestStatusPatternValidator implements ConstraintValidator<EventRequestStatusPattern, Enum<?>> {
     private Pattern pattern;
 
     @Override
-    public void initialize(EventPrivateUpdateStatePattern annotation) {
+    public void initialize(EventRequestStatusPattern annotation) {
         try {
             pattern = Pattern.compile(annotation.regexp());
         } catch (PatternSyntaxException e) {

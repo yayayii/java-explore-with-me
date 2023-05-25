@@ -59,8 +59,8 @@ public class PrivateController {
                 long views;
                 try {
                     views = statClient.getStats(
-                            LocalDateTime.of(2000, 1, 1, 1, 1),
-                            LocalDateTime.of(2999, 1, 1, 1, 1),
+                            event.getPublishedOn(),
+                            LocalDateTime.now(),
                             List.of("/events/" + event.getId()),
                             true
                     ).getBody().get(0).getHits();
@@ -84,8 +84,8 @@ public class PrivateController {
             long views;
             try {
                 views = statClient.getStats(
-                        LocalDateTime.of(2000, 1, 1, 1, 1),
-                        LocalDateTime.of(2999, 1, 1, 1, 1),
+                        event.getPublishedOn(),
+                        LocalDateTime.now(),
                         List.of("/events/" + event.getId()),
                         true
                 ).getBody().get(0).getHits();

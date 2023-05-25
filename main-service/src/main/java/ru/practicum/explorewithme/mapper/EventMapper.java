@@ -54,6 +54,7 @@ public class EventMapper {
                 .eventDate(model.getEventDate())
                 .initiator(UserMapper.toResponseDto(model.getInitiator()))
                 .state(model.getState())
+                .publishedOn(model.getPublishedOn())
         .build();
     }
 }
