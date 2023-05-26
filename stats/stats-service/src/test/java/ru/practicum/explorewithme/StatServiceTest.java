@@ -1,7 +1,6 @@
 package ru.practicum.explorewithme;
 
 import lombok.AllArgsConstructor;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
