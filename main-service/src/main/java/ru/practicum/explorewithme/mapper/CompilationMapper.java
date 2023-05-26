@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 @UtilityClass
 public class CompilationMapper {
     public Compilation toModel(CompilationRequestDto requestDto) {
-        return new Compilation(requestDto.getTitle(), requestDto.getPinned());
+        return new Compilation(requestDto.getTitle(), requestDto.isPinned());
     }
 
     public CompilationResponseDto toResponseDto(Compilation model) {
