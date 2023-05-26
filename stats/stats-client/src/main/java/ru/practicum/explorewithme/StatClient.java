@@ -36,7 +36,7 @@ public class StatClient {
 
 
     public ResponseEntity<Void> saveEndpointRequest(HttpServletRequest request) {
-        log.info("stats - stats-client - StatClient - saveEndpointRequest - request: {}" , request);
+        log.info("stats - stats-client - StatClient - saveEndpointRequest - request: {}", request);
         StatRequestDto requestDto = new StatRequestDto(
                 "main-service", request.getRequestURI(), request.getRemoteAddr(), LocalDateTime.now()
         );
