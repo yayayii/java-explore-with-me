@@ -22,7 +22,6 @@ import ru.practicum.explorewithme.service.private_.PrivateEventSerivce;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
