@@ -26,8 +26,8 @@ import ru.practicum.explorewithme.model.Category;
 import ru.practicum.explorewithme.model.Compilation;
 import ru.practicum.explorewithme.model.User;
 import ru.practicum.explorewithme.model.event.Event;
-import ru.practicum.explorewithme.model.event.enums.EventState;
-import ru.practicum.explorewithme.dto.event.enums.EventUpdateState;
+import ru.practicum.explorewithme.model.event.enum_.EventState;
+import ru.practicum.explorewithme.dto.event.enum_.EventUpdateState;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;

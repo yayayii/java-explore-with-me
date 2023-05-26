@@ -16,9 +16,9 @@ import ru.practicum.explorewithme.dto.request.EventRequestUpdateRequestDto;
 import ru.practicum.explorewithme.dto.request.EventRequestUpdateResponseDto;
 import ru.practicum.explorewithme.dto.user.UserRequestDto;
 import ru.practicum.explorewithme.dto.user.UserResponseDto;
-import ru.practicum.explorewithme.model.event.enums.EventState;
-import ru.practicum.explorewithme.dto.event.enums.EventUpdateState;
-import ru.practicum.explorewithme.model.request.enums.EventRequestStatus;
+import ru.practicum.explorewithme.model.event.enum_.EventState;
+import ru.practicum.explorewithme.dto.event.enum_.EventUpdateState;
+import ru.practicum.explorewithme.model.request.enum_.EventRequestStatus;
 
 import javax.persistence.EntityManager;
 import java.time.LocalDateTime;

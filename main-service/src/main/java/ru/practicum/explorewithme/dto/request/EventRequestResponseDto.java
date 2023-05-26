@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import ru.practicum.explorewithme.model.request.enums.EventRequestStatus;
+import ru.practicum.explorewithme.model.request.enum_.EventRequestStatus;
 
 import java.time.LocalDateTime;
 

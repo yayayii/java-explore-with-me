@@ -3,8 +3,8 @@ package ru.practicum.explorewithme.dto.request;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ru.practicum.explorewithme.model.request.enums.EventRequestStatus;
-import ru.practicum.explorewithme.dto.request.enums.util.EventRequestStatusPattern;
+import ru.practicum.explorewithme.model.request.enum_.EventRequestStatus;
+import ru.practicum.explorewithme.dto.request.enum_.util.EventRequestStatusPattern;
 
 import javax.validation.constraints.NotNull;
 import java.util.List;

@@ -22,10 +22,10 @@ import ru.practicum.explorewithme.mapper.EventRequestMapper;
 import ru.practicum.explorewithme.model.Category;
 import ru.practicum.explorewithme.model.User;
 import ru.practicum.explorewithme.model.event.Event;
-import ru.practicum.explorewithme.model.event.enums.EventState;
-import ru.practicum.explorewithme.dto.event.enums.EventUpdateState;
+import ru.practicum.explorewithme.model.event.enum_.EventState;
+import ru.practicum.explorewithme.dto.event.enum_.EventUpdateState;
 import ru.practicum.explorewithme.model.request.EventRequest;
-import ru.practicum.explorewithme.model.request.enums.EventRequestStatus;
+import ru.practicum.explorewithme.model.request.enum_.EventRequestStatus;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
