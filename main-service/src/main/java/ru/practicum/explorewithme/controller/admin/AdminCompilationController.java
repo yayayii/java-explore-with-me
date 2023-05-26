@@ -12,7 +12,7 @@ import ru.practicum.explorewithme.dto.compilation.CompilationRequestDto;
 import ru.practicum.explorewithme.dto.compilation.CompilationResponseDto;
 import ru.practicum.explorewithme.dto.event.EventShortResponseDto;
 import ru.practicum.explorewithme.model.event.enum_.EventState;
-import ru.practicum.explorewithme.service.AdminService;
+import ru.practicum.explorewithme.service.admin.AdminCompilationService;
 import ru.practicum.explorewithme.util.Create;
 import ru.practicum.explorewithme.util.Update;
 
@@ -25,7 +25,7 @@ import java.util.List;
 @Validated
 @RequestMapping(path = "/admin/compilations")
 public class AdminCompilationController {
-    private final AdminService adminService;
+    private final AdminCompilationService adminService;
     private final StatClient statClient;
 
 

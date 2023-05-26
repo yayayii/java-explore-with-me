@@ -21,7 +21,7 @@ import ru.practicum.explorewithme.dto.compilation.CompilationResponseDto;
 import ru.practicum.explorewithme.dto.event.EventShortResponseDto;
 import ru.practicum.explorewithme.dto.user.UserResponseDto;
 import ru.practicum.explorewithme.model.event.enum_.EventState;
-import ru.practicum.explorewithme.service.AdminService;
+import ru.practicum.explorewithme.service.admin.AdminCompilationService;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -36,7 +36,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith(MockitoExtension.class)
 public class AdminCompilationControllerTest {
     @Mock
-    private AdminService mockAdminService;
+    private AdminCompilationService mockAdminService;
     @Mock
     private StatClient mockStatClient;
     @InjectMocks
@@ -54,7 +54,6 @@ public class AdminCompilationControllerTest {
     public static void beforeAll() {
         objectMapper = new ObjectMapper();
 
-        testCompilationRequestDto = new CompilationRequestDto("title1", false, List.of(1L, 2L));
         LocalDateTime testLocalDateTime = LocalDateTime.of(2024, 1, 1, 1, 1);
         EventShortResponseDto testEventShortResponseDto = new EventShortResponseDto(
                 1L, "title1", "annotation1", false,
@@ -62,6 +61,8 @@ public class AdminCompilationControllerTest {
                 testLocalDateTime, 1, new UserResponseDto(1L, "email1@email.ru", "name1"),
                 EventState.PUBLISHED, testLocalDateTime
         );
+
+        testCompilationRequestDto = new CompilationRequestDto("title1", false, List.of(1L, 2L));
         testCompilationResponseDto = new CompilationResponseDto(
                 1L, "title1", false, List.of(testEventShortResponseDto, testEventShortResponseDto)
         );

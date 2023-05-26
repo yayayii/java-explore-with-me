@@ -12,7 +12,8 @@ import ru.practicum.explorewithme.StatClient;
 import ru.practicum.explorewithme.dto.compilation.CompilationResponseDto;
 import ru.practicum.explorewithme.dto.event.EventShortResponseDto;
 import ru.practicum.explorewithme.model.event.enum_.EventState;
-import ru.practicum.explorewithme.service.PublicService;
+import ru.practicum.explorewithme.service.public_.PublicCompilationService;
+import ru.practicum.explorewithme.service.public_.PublicEventService;
 
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
@@ -24,7 +25,7 @@ import java.util.List;
 @Controller
 @RequestMapping(path = "/compilations")
 public class PublicCompilationController {
-    private final PublicService publicService;
+    private final PublicCompilationService publicService;
     private final StatClient statClient;
 
 

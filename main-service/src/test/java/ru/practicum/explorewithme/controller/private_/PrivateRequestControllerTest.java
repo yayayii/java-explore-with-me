@@ -16,7 +16,7 @@ import ru.practicum.explorewithme.dto.request.EventRequestResponseDto;
 import ru.practicum.explorewithme.dto.request.EventRequestUpdateRequestDto;
 import ru.practicum.explorewithme.dto.request.EventRequestUpdateResponseDto;
 import ru.practicum.explorewithme.model.request.enum_.EventRequestStatus;
-import ru.practicum.explorewithme.service.PrivateService;
+import ru.practicum.explorewithme.service.private_.PrivateRequestService;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -31,7 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith(MockitoExtension.class)
 public class PrivateRequestControllerTest {
     @Mock
-    private PrivateService mockPrivateService;
+    private PrivateRequestService mockPrivateService;
     @InjectMocks
     private PrivateRequestController privateController;
     private static ObjectMapper objectMapper;

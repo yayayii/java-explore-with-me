@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import ru.practicum.explorewithme.dto.category.CategoryResponseDto;
-import ru.practicum.explorewithme.service.PublicService;
+import ru.practicum.explorewithme.service.public_.PublicCategoryService;
 
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
@@ -20,7 +20,7 @@ import java.util.List;
 @Controller
 @RequestMapping(path = "/categories")
 public class PublicCategoryController {
-    private final PublicService publicService;
+    private final PublicCategoryService publicService;
 
     @GetMapping("/{categoryId}")
     public ResponseEntity<CategoryResponseDto> getCategoryById(@PathVariable Long categoryId) {

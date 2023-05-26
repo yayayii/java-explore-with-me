@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.explorewithme.dto.request.EventRequestResponseDto;
 import ru.practicum.explorewithme.dto.request.EventRequestUpdateRequestDto;
 import ru.practicum.explorewithme.dto.request.EventRequestUpdateResponseDto;
-import ru.practicum.explorewithme.service.PrivateService;
+import ru.practicum.explorewithme.service.private_.PrivateRequestService;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -21,7 +21,7 @@ import java.util.List;
 @Validated
 @RequestMapping(path = "/users/{userId}")
 public class PrivateRequestController {
-    private final PrivateService privateService;
+    private final PrivateRequestService privateService;
 
 
     @PostMapping("/requests")

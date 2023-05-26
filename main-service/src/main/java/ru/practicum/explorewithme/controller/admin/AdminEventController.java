@@ -11,7 +11,7 @@ import ru.practicum.explorewithme.StatClient;
 import ru.practicum.explorewithme.dto.event.EventResponseDto;
 import ru.practicum.explorewithme.dto.event.EventUpdateRequestDto;
 import ru.practicum.explorewithme.model.event.enum_.EventState;
-import ru.practicum.explorewithme.service.AdminService;
+import ru.practicum.explorewithme.service.admin.AdminEventService;
 import ru.practicum.explorewithme.util.Admin;
 
 import javax.validation.constraints.Positive;
@@ -25,7 +25,7 @@ import java.util.List;
 @Validated
 @RequestMapping(path = "/admin/events")
 public class AdminEventController {
-    private final AdminService adminService;
+    private final AdminEventService adminService;
     private final StatClient statClient;
 
 

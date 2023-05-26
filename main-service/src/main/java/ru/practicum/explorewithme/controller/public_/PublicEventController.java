@@ -15,7 +15,7 @@ import ru.practicum.explorewithme.dto.event.EventResponseDto;
 import ru.practicum.explorewithme.dto.event.EventShortResponseDto;
 import ru.practicum.explorewithme.model.event.enum_.EventState;
 import ru.practicum.explorewithme.dto.event.enum_.SortValue;
-import ru.practicum.explorewithme.service.PublicService;
+import ru.practicum.explorewithme.service.public_.PublicEventService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.Positive;
@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
 @Controller
 @RequestMapping(path = "/events")
 public class PublicEventController {
-    private final PublicService publicService;
+    private final PublicEventService publicService;
     private final StatClient statClient;
 
 

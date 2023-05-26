@@ -13,7 +13,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import ru.practicum.explorewithme.dto.user.UserRequestDto;
 import ru.practicum.explorewithme.dto.user.UserResponseDto;
-import ru.practicum.explorewithme.service.AdminService;
+import ru.practicum.explorewithme.service.admin.AdminUserService;
 
 import java.util.List;
 
@@ -27,7 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith(MockitoExtension.class)
 public class AdminUserControllerTest {
     @Mock
-    private AdminService mockAdminService;
+    private AdminUserService mockAdminService;
     @InjectMocks
     private AdminUserController adminController;
     private static ObjectMapper objectMapper;

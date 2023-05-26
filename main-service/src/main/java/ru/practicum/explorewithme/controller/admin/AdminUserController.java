@@ -9,7 +9,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.explorewithme.dto.user.UserRequestDto;
 import ru.practicum.explorewithme.dto.user.UserResponseDto;
-import ru.practicum.explorewithme.service.AdminService;
+import ru.practicum.explorewithme.service.admin.AdminUserService;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
@@ -22,7 +22,7 @@ import java.util.List;
 @Validated
 @RequestMapping(path = "/admin/users")
 public class AdminUserController {
-    private final AdminService adminService;
+    private final AdminUserService adminService;
 
 
     @PostMapping

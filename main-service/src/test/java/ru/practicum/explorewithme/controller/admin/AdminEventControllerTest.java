@@ -23,7 +23,7 @@ import ru.practicum.explorewithme.dto.event.LocationDto;
 import ru.practicum.explorewithme.dto.event.enum_.EventUpdateState;
 import ru.practicum.explorewithme.dto.user.UserResponseDto;
 import ru.practicum.explorewithme.model.event.enum_.EventState;
-import ru.practicum.explorewithme.service.AdminService;
+import ru.practicum.explorewithme.service.admin.AdminEventService;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -38,7 +38,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith(MockitoExtension.class)
 public class AdminEventControllerTest {
     @Mock
-    private AdminService mockAdminService;
+    private AdminEventService mockAdminService;
     @Mock
     private StatClient mockStatClient;
     @InjectMocks

@@ -9,7 +9,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.explorewithme.dto.category.CategoryRequestDto;
 import ru.practicum.explorewithme.dto.category.CategoryResponseDto;
-import ru.practicum.explorewithme.service.AdminService;
+import ru.practicum.explorewithme.service.admin.AdminCategoryService;
 
 import javax.validation.Valid;
 
@@ -19,7 +19,7 @@ import javax.validation.Valid;
 @Validated
 @RequestMapping(path = "/admin/categories")
 public class AdminCategoryController {
-    private final AdminService adminService;
+    private final AdminCategoryService adminService;
 
 
     @PostMapping

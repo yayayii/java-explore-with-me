@@ -11,7 +11,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import ru.practicum.explorewithme.dto.category.CategoryResponseDto;
-import ru.practicum.explorewithme.service.PublicService;
+import ru.practicum.explorewithme.service.public_.PublicCategoryService;
+import ru.practicum.explorewithme.service.public_.PublicEventService;
 
 import java.util.List;
 
@@ -25,7 +26,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith(MockitoExtension.class)
 public class PublicCategoryControllerTest {
     @Mock
-    private PublicService mockPublicService;
+    private PublicCategoryService mockPublicService;
     @InjectMocks
     private PublicCategoryController publicController;
     private MockMvc mockMvc;

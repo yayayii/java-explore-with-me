@@ -15,13 +15,12 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import ru.practicum.explorewithme.StatClient;
 import ru.practicum.explorewithme.dto.StatResponseDto;
 import ru.practicum.explorewithme.dto.category.CategoryResponseDto;
-import ru.practicum.explorewithme.dto.compilation.CompilationResponseDto;
 import ru.practicum.explorewithme.dto.event.EventResponseDto;
 import ru.practicum.explorewithme.dto.event.EventShortResponseDto;
 import ru.practicum.explorewithme.dto.event.LocationDto;
 import ru.practicum.explorewithme.dto.user.UserResponseDto;
 import ru.practicum.explorewithme.model.event.enum_.EventState;
-import ru.practicum.explorewithme.service.PublicService;
+import ru.practicum.explorewithme.service.public_.PublicEventService;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -35,7 +34,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith(MockitoExtension.class)
 public class PublicControllerTest {
     @Mock
-    private PublicService mockPublicService;
+    private PublicEventService mockPublicService;
     @Mock
     private StatClient mockStatClient;
     @InjectMocks
@@ -51,7 +50,9 @@ public class PublicControllerTest {
     @BeforeAll
     public static void beforeAll() {
         CategoryResponseDto testCategoryResponseDto = new CategoryResponseDto(1L, "name1");
+
         UserResponseDto testUserResponseDto = new UserResponseDto(1L, "email1@email.ru", "name1");
+
         LocalDateTime testLocalDateTime = LocalDateTime.of(2024, 1, 1, 1, 1);
         testEventShortResponseDto = new EventShortResponseDto(
                 1L, "title1", "annotation1", false, testCategoryResponseDto, 1,
