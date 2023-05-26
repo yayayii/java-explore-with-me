@@ -14,6 +14,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import ru.practicum.explorewithme.dto.StatRequestDto;
 import ru.practicum.explorewithme.dto.StatResponseDto;
 
+import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -28,22 +29,24 @@ public class StatClient {
 
     @Autowired
     public StatClient(@Value("http://stats-server:9090") String serverUrl, RestTemplateBuilder builder) {
+        this.serverUrl = serverUrl;
         rest = builder.uriTemplateHandler(new DefaultUriBuilderFactory(serverUrl))
                 .requestFactory(HttpComponentsClientHttpRequestFactory::new).build();
-        this.serverUrl = serverUrl;
     }
 
 
-    public ResponseEntity<Void> saveEndpointRequest(StatRequestDto requestDto) {
-        log.info("stats - stats-service - StatClient - saveEndpointRequest - requestDto: {}", requestDto);
-        HttpEntity<StatRequestDto> request = new HttpEntity<>(requestDto);
-        return rest.exchange(serverUrl + "/hit", HttpMethod.POST, request, Void.class);
+    public ResponseEntity<Void> saveEndpointRequest(HttpServletRequest request) {
+        log.info("stats - stats-client - StatClient - saveEndpointRequest - request: {}" , request);
+        StatRequestDto requestDto = new StatRequestDto(
+                "main-service", request.getRequestURI(), request.getRemoteAddr(), LocalDateTime.now()
+        );
+        return rest.exchange(serverUrl + "/hit", HttpMethod.POST, new HttpEntity<>(requestDto), Void.class);
     }
 
     public ResponseEntity<List<StatResponseDto>> getStats(
             LocalDateTime start, LocalDateTime end, List<String> uris, boolean unique
     ) {
-        log.info("stats - stats-service - StatClient - getStats - start: {} / end: {} / uris: {} / unique: {}",
+        log.info("stats - stats-client - StatClient - getStats - start: {} / end: {} / uris: {} / unique: {}",
                 start, end, uris, unique);
         String urlTemplate = UriComponentsBuilder.fromHttpUrl(serverUrl + "/stats")
                 .queryParam("start", "{start}")

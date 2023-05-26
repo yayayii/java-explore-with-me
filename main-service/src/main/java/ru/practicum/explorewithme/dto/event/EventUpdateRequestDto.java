@@ -10,6 +10,7 @@ import ru.practicum.explorewithme.dto.event.enum_.util.EventAdminUpdateStatePatt
 import ru.practicum.explorewithme.dto.event.enum_.util.EventPrivateUpdateStatePattern;
 import ru.practicum.explorewithme.util.Private;
 
+import javax.validation.Valid;
 import javax.validation.constraints.Future;
 import javax.validation.constraints.PositiveOrZero;
 import javax.validation.constraints.Size;
@@ -32,6 +33,7 @@ public class EventUpdateRequestDto {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @Future(groups = {Admin.class, Private.class})
     private LocalDateTime eventDate;
+    @Valid
     private LocationDto location;
     private Long category;
     @EventAdminUpdateStatePattern(regexp = "PUBLISH_EVENT|REJECT_EVENT", groups = {Admin.class})

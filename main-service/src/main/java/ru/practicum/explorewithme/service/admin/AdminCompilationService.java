@@ -8,13 +8,12 @@ import ru.practicum.explorewithme.dao.CompilationDao;
 import ru.practicum.explorewithme.dao.EventDao;
 import ru.practicum.explorewithme.dto.compilation.CompilationRequestDto;
 import ru.practicum.explorewithme.dto.compilation.CompilationResponseDto;
+import ru.practicum.explorewithme.dto.compilation.CompilationUpdateRequestDto;
 import ru.practicum.explorewithme.mapper.CompilationMapper;
 import ru.practicum.explorewithme.model.Compilation;
 import ru.practicum.explorewithme.model.event.Event;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.*;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -44,7 +43,7 @@ public class AdminCompilationService {
     }
 
     @Transactional
-    public CompilationResponseDto updateCompilation(Long compilationId, CompilationRequestDto requestDto) {
+    public CompilationResponseDto updateCompilation(Long compilationId, CompilationUpdateRequestDto requestDto) {
         log.info("main-service - AdminService - addCompilation - updateCompilation: {}", requestDto);
 
         Compilation compilation = compilationDao.findById(compilationId)

@@ -8,19 +8,16 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import ru.practicum.explorewithme.StatClient;
-import ru.practicum.explorewithme.dto.StatResponseDto;
 import ru.practicum.explorewithme.dto.category.CategoryResponseDto;
 import ru.practicum.explorewithme.dto.compilation.CompilationRequestDto;
 import ru.practicum.explorewithme.dto.compilation.CompilationResponseDto;
 import ru.practicum.explorewithme.dto.event.EventShortResponseDto;
 import ru.practicum.explorewithme.dto.user.UserResponseDto;
 import ru.practicum.explorewithme.model.event.enum_.EventState;
+import ru.practicum.explorewithme.service.StatGateway;
 import ru.practicum.explorewithme.service.admin.AdminCompilationService;
 
 import java.time.LocalDateTime;
@@ -38,16 +35,16 @@ public class AdminCompilationControllerTest {
     @Mock
     private AdminCompilationService mockAdminService;
     @Mock
-    private StatClient mockStatClient;
+    private StatGateway mockStatService;
     @InjectMocks
     private AdminCompilationController adminController;
     private static ObjectMapper objectMapper;
     private MockMvc mockMvc;
 
     private static final String API_PREFIX = "/admin/compilations";
+    private static EventShortResponseDto[] testEventShortResponseDtos;
     private static CompilationRequestDto testCompilationRequestDto;
     private static CompilationResponseDto testCompilationResponseDto;
-    private static StatResponseDto testStatResponseDto;
 
 
     @BeforeAll
@@ -55,19 +52,33 @@ public class AdminCompilationControllerTest {
         objectMapper = new ObjectMapper();
 
         LocalDateTime testLocalDateTime = LocalDateTime.of(2024, 1, 1, 1, 1);
-        EventShortResponseDto testEventShortResponseDto = new EventShortResponseDto(
-                1L, "title1", "annotation1", false,
-                new CategoryResponseDto(1L, "name1"), 1,
-                testLocalDateTime, 1, new UserResponseDto(1L, "email1@email.ru", "name1"),
-                EventState.PUBLISHED, testLocalDateTime
-        );
+        UserResponseDto[] testUserResponseDtos = new UserResponseDto[]{
+                new UserResponseDto(1L, "email1@email.ru", "name1"),
+                new UserResponseDto(2L, "email2@email.ru", "name2")
+        };
+        CategoryResponseDto[] testCategoryResponseDtos = new CategoryResponseDto[]{
+                new CategoryResponseDto(1L, "name1"),
+                new CategoryResponseDto(2L, "name2")
+        };
+        testEventShortResponseDtos = new EventShortResponseDto[]{
+                new EventShortResponseDto(
+                        1L, "title1", "annotation1", false,
+                        testCategoryResponseDtos[0], 1,
+                        testLocalDateTime, 1, testUserResponseDtos[0],
+                        EventState.PUBLISHED, testLocalDateTime
+                ),
+                new EventShortResponseDto(
+                        2L, "title2", "annotation2", false,
+                        testCategoryResponseDtos[1], 1,
+                        testLocalDateTime, 1, testUserResponseDtos[1],
+                        EventState.PUBLISHED, testLocalDateTime
+                ),
+        };
 
         testCompilationRequestDto = new CompilationRequestDto("title1", false, List.of(1L, 2L));
         testCompilationResponseDto = new CompilationResponseDto(
-                1L, "title1", false, List.of(testEventShortResponseDto, testEventShortResponseDto)
+                1L, "title1", false, List.of(testEventShortResponseDtos[0], testEventShortResponseDtos[1])
         );
-
-        testStatResponseDto = new StatResponseDto("app1", "uri1", 1L);
     }
 
     @BeforeEach
@@ -85,8 +96,8 @@ public class AdminCompilationControllerTest {
                 .andExpect(status().isBadRequest());
         testCompilationRequestDto.setTitle("title1");
 
-        when(mockStatClient.getStats(any(), any(), any(), anyBoolean()))
-                .thenReturn(new ResponseEntity<>(List.of(testStatResponseDto), HttpStatus.OK));
+        when(mockStatService.getShortEventsWithViews(any()))
+                .thenReturn(List.of(testEventShortResponseDtos[0], testEventShortResponseDtos[1]));
         when(mockAdminService.addCompilation(any()))
                 .thenReturn(testCompilationResponseDto);
         mockMvc.perform(post(API_PREFIX)
@@ -98,8 +109,8 @@ public class AdminCompilationControllerTest {
 
     @Test
     public void testUpdateCompilation() throws Exception {
-        when(mockStatClient.getStats(any(), any(), any(), anyBoolean()))
-                .thenReturn(new ResponseEntity<>(List.of(testStatResponseDto), HttpStatus.OK));
+        when(mockStatService.getShortEventsWithViews(any()))
+                .thenReturn(List.of(testEventShortResponseDtos[0], testEventShortResponseDtos[1]));
         when(mockAdminService.updateCompilation(anyLong(), any()))
                 .thenReturn(testCompilationResponseDto);
         mockMvc.perform(patch(API_PREFIX + "/1")

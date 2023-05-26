@@ -7,18 +7,15 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import ru.practicum.explorewithme.StatClient;
-import ru.practicum.explorewithme.dto.StatResponseDto;
 import ru.practicum.explorewithme.dto.category.CategoryResponseDto;
 import ru.practicum.explorewithme.dto.compilation.CompilationResponseDto;
 import ru.practicum.explorewithme.dto.event.EventShortResponseDto;
 import ru.practicum.explorewithme.dto.user.UserResponseDto;
 import ru.practicum.explorewithme.model.event.enum_.EventState;
+import ru.practicum.explorewithme.service.StatGateway;
 import ru.practicum.explorewithme.service.public_.PublicCompilationService;
 
 import java.time.LocalDateTime;
@@ -36,31 +33,45 @@ public class PublicCompilationControllerTest {
     @Mock
     private PublicCompilationService mockPublicService;
     @Mock
-    private StatClient mockStatClient;
+    private StatGateway mockStatService;
     @InjectMocks
     private PublicCompilationController publicController;
     private MockMvc mockMvc;
 
     private static final String API_PREFIX = "/compilations";
     private static CompilationResponseDto testCompilationResponseDto;
-    private static StatResponseDto testStatResponseDto;
+    private static EventShortResponseDto[] testEventShortResponseDtos;
 
 
     @BeforeAll
     public static void beforeAll() {
         LocalDateTime testLocalDateTime = LocalDateTime.of(2024, 1, 1, 1, 1);
-        EventShortResponseDto testEventShortResponseDto = new EventShortResponseDto(
-                1L, "title1", "annotation1", false,
-                new CategoryResponseDto(1L, "name1"), 1,
-                testLocalDateTime, 1, new UserResponseDto(1L, "email1@email.ru", "name1"),
-                EventState.PUBLISHED, testLocalDateTime
-        );
+        UserResponseDto[] testUserResponseDtos = new UserResponseDto[]{
+                new UserResponseDto(1L, "email1@email.ru", "name1"),
+                new UserResponseDto(2L, "email2@email.ru", "name2")
+        };
+        CategoryResponseDto[] testCategoryResponseDtos = new CategoryResponseDto[]{
+                new CategoryResponseDto(1L, "name1"),
+                new CategoryResponseDto(2L, "name2")
+        };
+        testEventShortResponseDtos = new EventShortResponseDto[]{
+                new EventShortResponseDto(
+                        1L, "title1", "annotation1", false,
+                        testCategoryResponseDtos[0], 1,
+                        testLocalDateTime, 1, testUserResponseDtos[0],
+                        EventState.PUBLISHED, testLocalDateTime
+                ),
+                new EventShortResponseDto(
+                        2L, "title2", "annotation2", false,
+                        testCategoryResponseDtos[1], 1,
+                        testLocalDateTime, 1, testUserResponseDtos[1],
+                        EventState.PUBLISHED, testLocalDateTime
+                ),
+        };
 
         testCompilationResponseDto = new CompilationResponseDto(
-                1L, "title1", false, List.of(testEventShortResponseDto, testEventShortResponseDto)
+                1L, "title1", false, List.of(testEventShortResponseDtos[0], testEventShortResponseDtos[1])
         );
-
-        testStatResponseDto = new StatResponseDto("app1", "uri1", 1L);
     }
 
     @BeforeEach
@@ -71,10 +82,10 @@ public class PublicCompilationControllerTest {
 
     @Test
     public void testGetCompilationById() throws Exception {
-        when(mockStatClient.getStats(any(), any(), any(), anyBoolean()))
-                .thenReturn(new ResponseEntity<>(List.of(testStatResponseDto), HttpStatus.OK));
         when(mockPublicService.getCompilationById(anyLong()))
                 .thenReturn(testCompilationResponseDto);
+        when(mockStatService.getShortEventsWithViews(any()))
+                .thenReturn(List.of(testEventShortResponseDtos[0], testEventShortResponseDtos[1]));
         mockMvc.perform(get(API_PREFIX + "/1"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON));
@@ -82,10 +93,10 @@ public class PublicCompilationControllerTest {
 
     @Test
     public void testGetCompilations() throws Exception {
-        when(mockStatClient.getStats(any(), any(), any(), anyBoolean()))
-                .thenReturn(new ResponseEntity<>(List.of(testStatResponseDto), HttpStatus.OK));
         when(mockPublicService.getCompilations(any(), anyInt(), anyInt()))
                 .thenReturn(List.of(testCompilationResponseDto, testCompilationResponseDto));
+        when(mockStatService.getShortEventsWithViews(any()))
+                .thenReturn(List.of(testEventShortResponseDtos[0], testEventShortResponseDtos[1]));
         mockMvc.perform(get(API_PREFIX))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))

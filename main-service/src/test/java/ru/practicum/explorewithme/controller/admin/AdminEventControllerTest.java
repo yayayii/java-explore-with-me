@@ -9,13 +9,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import ru.practicum.explorewithme.StatClient;
-import ru.practicum.explorewithme.dto.StatResponseDto;
 import ru.practicum.explorewithme.dto.category.CategoryResponseDto;
 import ru.practicum.explorewithme.dto.event.EventResponseDto;
 import ru.practicum.explorewithme.dto.event.EventUpdateRequestDto;
@@ -23,6 +19,7 @@ import ru.practicum.explorewithme.dto.event.LocationDto;
 import ru.practicum.explorewithme.dto.event.enum_.EventUpdateState;
 import ru.practicum.explorewithme.dto.user.UserResponseDto;
 import ru.practicum.explorewithme.model.event.enum_.EventState;
+import ru.practicum.explorewithme.service.StatGateway;
 import ru.practicum.explorewithme.service.admin.AdminEventService;
 
 import java.time.LocalDateTime;
@@ -40,7 +37,7 @@ public class AdminEventControllerTest {
     @Mock
     private AdminEventService mockAdminService;
     @Mock
-    private StatClient mockStatClient;
+    private StatGateway mockStatService;
     @InjectMocks
     private AdminEventController adminController;
     private static ObjectMapper objectMapper;
@@ -49,7 +46,6 @@ public class AdminEventControllerTest {
     private static final String API_PREFIX = "/admin/events";
     private static EventUpdateRequestDto testEventUpdateRequestDto;
     private static EventResponseDto testEventResponseDto;
-    private static StatResponseDto testStatResponseDto;
 
 
     @BeforeAll
@@ -69,8 +65,6 @@ public class AdminEventControllerTest {
                 testLocalDateTime, testLocalDateTime, testLocalDateTime, new LocationDto(1.1, 1.1), 1,
                 new UserResponseDto(1L, "email1@email.ru", "name1"), EventState.PUBLISHED
         );
-
-        testStatResponseDto = new StatResponseDto("app1", "uri1", 1L);
     }
 
     @BeforeEach
@@ -83,8 +77,8 @@ public class AdminEventControllerTest {
     public void testSearchEvents() throws Exception {
         when(mockAdminService.searchEvents(any(), any(), any(), any(), any(), anyInt(), anyInt()))
                 .thenReturn(List.of(testEventResponseDto, testEventResponseDto));
-        when(mockStatClient.getStats(any(), any(), any(), anyBoolean()))
-                .thenReturn(new ResponseEntity<>(List.of(testStatResponseDto), HttpStatus.OK));
+        when(mockStatService.getEventsWithViews(any()))
+                .thenReturn(List.of(testEventResponseDto, testEventResponseDto));
         mockMvc.perform(get(API_PREFIX + "?users=1,2&states=PUBLISHED,PENDING&categories=1,2&rangeStart=2023-01-01 12:12:12&rangeEnd=2023-01-01 12:12:12&from=1&size=1"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))

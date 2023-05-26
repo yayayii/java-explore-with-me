@@ -9,12 +9,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import ru.practicum.explorewithme.StatClient;
-import ru.practicum.explorewithme.dto.StatRequestDto;
 import ru.practicum.explorewithme.dto.event.EventResponseDto;
 import ru.practicum.explorewithme.dto.event.EventShortResponseDto;
 import ru.practicum.explorewithme.model.event.enum_.EventState;
 import ru.practicum.explorewithme.dto.event.enum_.SortValue;
+import ru.practicum.explorewithme.service.StatGateway;
 import ru.practicum.explorewithme.service.public_.PublicEventService;
 
 import javax.servlet.http.HttpServletRequest;
@@ -31,30 +30,17 @@ import java.util.stream.Collectors;
 @RequestMapping(path = "/events")
 public class PublicEventController {
     private final PublicEventService publicService;
-    private final StatClient statClient;
+    private final StatGateway statGateway;
 
 
     @GetMapping("/{eventId}")
     public ResponseEntity<EventResponseDto> getEventById(@PathVariable Long eventId, HttpServletRequest request) {
-        log.info("main-service - PublicController - getEventById - eventId: {}", eventId);
+        log.info("main-service - PublicEventController - getEventById - eventId: {}", eventId);
 
         EventResponseDto event = publicService.getEventById(eventId);
-        statClient.saveEndpointRequest(new StatRequestDto(
-                "main-service", request.getRequestURI(), request.getRemoteAddr(), LocalDateTime.now()
-        ));
+        statGateway.saveEndpointRequest(request);
         if (event.getState() == EventState.PUBLISHED) {
-            long views;
-            try {
-                views = statClient.getStats(
-                        event.getPublishedOn(),
-                        LocalDateTime.now(),
-                        List.of("/events/" + event.getId()),
-                        true
-                ).getBody().get(0).getHits();
-            } catch (IndexOutOfBoundsException e) {
-                views = 0;
-            }
-            event.setViews(views);
+            event.setViews(statGateway.getViewsForEvent(event.getPublishedOn(), event.getId()));
         }
 
         return ResponseEntity.ok(event);
@@ -73,7 +59,7 @@ public class PublicEventController {
             @RequestParam(defaultValue = "10") @Positive int size,
             HttpServletRequest request
     ) {
-        log.info("main-service - PublicController - getEvents - " +
+        log.info("main-service - PublicEventController - getEvents - " +
                         "text: {} / categories: {} / paid: {} / rangeStart: {} / rangeEnd: {} / onlyAvailable: {} / " +
                         "sort: {}, from: {} / size: {}",
                 text, categories, paid, rangeStart, rangeEnd, onlyAvailable, sort, from, size);
@@ -81,30 +67,8 @@ public class PublicEventController {
         List<EventShortResponseDto> events = publicService.getEvents(
                 text, categories, paid, rangeStart, rangeEnd, onlyAvailable, from, size
         );
-        statClient.saveEndpointRequest(new StatRequestDto(
-                "main-service", "/events", request.getRemoteAddr(), LocalDateTime.now()
-        ));
-        for (EventShortResponseDto event : events) {
-            statClient.saveEndpointRequest(new StatRequestDto(
-                    "main-service", "/events/" + event.getId(), request.getRemoteAddr(), LocalDateTime.now()
-            ));
-        }
-        for (EventShortResponseDto event : events) {
-            if (event.getState() == EventState.PUBLISHED) {
-                long views;
-                try {
-                    views = statClient.getStats(
-                            event.getPublishedOn(),
-                            LocalDateTime.now(),
-                            List.of("/events/" + event.getId()),
-                            true
-                    ).getBody().get(0).getHits();
-                } catch (IndexOutOfBoundsException e) {
-                    views = 0;
-                }
-                event.setViews(views);
-            }
-        }
+        statGateway.saveEndpointRequest(request);
+        events = statGateway.getShortEventsWithViews(events);
         if (sort == SortValue.VIEWS) {
             events = events.stream().sorted(
                     Comparator.comparing(EventShortResponseDto::getViews)

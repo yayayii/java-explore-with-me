@@ -4,18 +4,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
-import ru.practicum.explorewithme.dao.CategoryDao;
-import ru.practicum.explorewithme.dao.CompilationDao;
 import ru.practicum.explorewithme.dao.EventDao;
-import ru.practicum.explorewithme.dto.category.CategoryResponseDto;
-import ru.practicum.explorewithme.dto.compilation.CompilationResponseDto;
 import ru.practicum.explorewithme.dto.event.EventResponseDto;
 import ru.practicum.explorewithme.dto.event.EventShortResponseDto;
-import ru.practicum.explorewithme.mapper.CategoryMapper;
-import ru.practicum.explorewithme.mapper.CompilationMapper;
 import ru.practicum.explorewithme.mapper.EventMapper;
-import ru.practicum.explorewithme.model.Category;
-import ru.practicum.explorewithme.model.Compilation;
 import ru.practicum.explorewithme.model.event.Event;
 import ru.practicum.explorewithme.model.event.enum_.EventState;
 

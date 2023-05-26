@@ -14,34 +14,29 @@ import java.time.LocalDateTime;
 public class ErrorHandler {
     @ExceptionHandler
     public ResponseEntity<ErrorResponse> handleIllegalArgumentException(final IllegalArgumentException e) {
-        ErrorResponse errorResponse = new ErrorResponse(
-                HttpStatus.BAD_REQUEST.getReasonPhrase(),
-                "Incorrectly made request",
-                e.getMessage(),
-                LocalDateTime.now());
+        ErrorResponse errorResponse = createErrorResponse(HttpStatus.BAD_REQUEST, "Incorrectly made request", e);
         log.warn(errorResponse.toString());
         return ResponseEntity.badRequest().body(errorResponse);
     }
 
     @ExceptionHandler
     public ResponseEntity<ErrorResponse> handleMissingServletRequestParameterException(final MissingServletRequestParameterException e) {
-        ErrorResponse errorResponse = new ErrorResponse(
-                HttpStatus.BAD_REQUEST.getReasonPhrase(),
-                "Incorrectly made request",
-                e.getMessage(),
-                LocalDateTime.now());
+        ErrorResponse errorResponse = createErrorResponse(HttpStatus.BAD_REQUEST, "Incorrectly made request", e);
         log.warn(errorResponse.toString());
         return ResponseEntity.badRequest().body(errorResponse);
     }
 
     @ExceptionHandler
     public ResponseEntity<ErrorResponse> handleException(final Exception e) {
-        ErrorResponse errorResponse = new ErrorResponse(
-                HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
-                "Unknown error: " + e.getClass().getName(),
-                e.getMessage(),
-                LocalDateTime.now());
+        ErrorResponse errorResponse = createErrorResponse(
+                HttpStatus.INTERNAL_SERVER_ERROR, "Unknown error: " + e.getClass().getName(), e
+        );
         log.warn(errorResponse.toString());
         return ResponseEntity.internalServerError().body(errorResponse);
+    }
+
+
+    private ErrorResponse createErrorResponse(HttpStatus statusCode, String reason, Exception e) {
+        return new ErrorResponse(statusCode.getReasonPhrase(), reason, e.getMessage(), LocalDateTime.now());
     }
 }

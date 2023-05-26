@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.validation.Valid;
 import javax.validation.constraints.*;
 import java.time.LocalDateTime;
 
@@ -25,7 +26,7 @@ public class EventRequestDto {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @NotNull @Future
     private LocalDateTime eventDate;
-    @NotNull
+    @NotNull @Valid
     private LocationDto location;
     @NotNull
     private Long category;

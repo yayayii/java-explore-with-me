@@ -12,7 +12,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import ru.practicum.explorewithme.dto.category.CategoryResponseDto;
 import ru.practicum.explorewithme.service.public_.PublicCategoryService;
-import ru.practicum.explorewithme.service.public_.PublicEventService;
 
 import java.util.List;
 

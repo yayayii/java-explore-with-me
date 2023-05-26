@@ -7,19 +7,18 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.explorewithme.StatClient;
 import ru.practicum.explorewithme.dto.event.EventRequestDto;
 import ru.practicum.explorewithme.dto.event.EventResponseDto;
 import ru.practicum.explorewithme.dto.event.EventShortResponseDto;
 import ru.practicum.explorewithme.dto.event.EventUpdateRequestDto;
 import ru.practicum.explorewithme.model.event.enum_.EventState;
+import ru.practicum.explorewithme.service.StatGateway;
 import ru.practicum.explorewithme.service.private_.PrivateEventSerivce;
 import ru.practicum.explorewithme.util.Private;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -29,7 +28,7 @@ import java.util.List;
 @RequestMapping(path = "/users/{userId}/events")
 public class PrivateEventController {
     private final PrivateEventSerivce privateService;
-    private final StatClient statClient;
+    private final StatGateway statGateway;
 
 
     @PostMapping
@@ -50,22 +49,7 @@ public class PrivateEventController {
                 userId, from, size);
 
         List<EventShortResponseDto> events = privateService.getEventsByInitiatorId(userId, from, size);
-        for (EventShortResponseDto event : events) {
-            if (event.getState() == EventState.PUBLISHED) {
-                long views;
-                try {
-                    views = statClient.getStats(
-                            event.getPublishedOn(),
-                            LocalDateTime.now(),
-                            List.of("/events/" + event.getId()),
-                            true
-                    ).getBody().get(0).getHits();
-                } catch (IndexOutOfBoundsException e) {
-                    views = 0;
-                }
-                event.setViews(views);
-            }
-        }
+        events = statGateway.getShortEventsWithViews(events);
 
         return ResponseEntity.ok(events);
     }
@@ -77,18 +61,7 @@ public class PrivateEventController {
 
         EventResponseDto event = privateService.getEventById(userId, eventId);
         if (event.getState() == EventState.PUBLISHED) {
-            long views;
-            try {
-                views = statClient.getStats(
-                        event.getPublishedOn(),
-                        LocalDateTime.now(),
-                        List.of("/events/" + event.getId()),
-                        true
-                ).getBody().get(0).getHits();
-            } catch (IndexOutOfBoundsException e) {
-                views = 0;
-            }
-            event.setViews(views);
+            event.setViews(statGateway.getViewsForEvent(event.getPublishedOn(), event.getId()));
         }
 
         return ResponseEntity.ok(event);

@@ -2,16 +2,15 @@ package ru.practicum.explorewithme.service.admin;
 
 import lombok.AllArgsConstructor;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.test.annotation.DirtiesContext;
 import ru.practicum.explorewithme.dto.category.CategoryRequestDto;
 import ru.practicum.explorewithme.dto.category.CategoryResponseDto;
 
-import javax.persistence.EntityManager;
+import javax.transaction.Transactional;
 import java.util.NoSuchElementException;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -26,9 +25,9 @@ import static org.junit.jupiter.api.Assertions.*;
         "spring.datasource.password=test",
         "server.port=8081"
 })
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class AdminCategoryServiceTest {
     private final AdminCategoryService adminService;
-    private final EntityManager entityManager;
 
     private static CategoryRequestDto[] testCategoryRequestDtos;
     private static CategoryResponseDto testCategoryResponseDto;
@@ -41,33 +40,6 @@ public class AdminCategoryServiceTest {
                 new CategoryRequestDto("name2")
         };
         testCategoryResponseDto = new CategoryResponseDto(1L, "name1");
-    }
-
-    @BeforeEach
-    public void beforeEach() {
-        entityManager.createNativeQuery(
-            "delete from event_compilation; " +
-            "delete from compilation; " +
-            "alter table compilation " +
-            "   alter column id " +
-            "       restart with 1; " +
-            "delete from event_request; " +
-            "alter table event_request " +
-            "   alter column id " +
-            "       restart with 1; " +
-            "delete from event; " +
-            "alter table event " +
-            "   alter column id " +
-            "       restart with 1; " +
-            "delete from category; " +
-            "alter table category " +
-            "   alter column id " +
-            "       restart with 1; " +
-            "delete from user_account; " +
-            "alter table user_account " +
-            "   alter column id " +
-            "       restart with 1; "
-        ).executeUpdate();
     }
 
 

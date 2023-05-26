@@ -2,28 +2,24 @@ package ru.practicum.explorewithme.service.private_;
 
 import lombok.AllArgsConstructor;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.explorewithme.dto.category.CategoryRequestDto;
-import ru.practicum.explorewithme.dto.category.CategoryResponseDto;
 import ru.practicum.explorewithme.dto.event.*;
 import ru.practicum.explorewithme.dto.request.EventRequestResponseDto;
 import ru.practicum.explorewithme.dto.request.EventRequestUpdateRequestDto;
 import ru.practicum.explorewithme.dto.request.EventRequestUpdateResponseDto;
 import ru.practicum.explorewithme.dto.user.UserRequestDto;
-import ru.practicum.explorewithme.dto.user.UserResponseDto;
-import ru.practicum.explorewithme.model.event.enum_.EventState;
 import ru.practicum.explorewithme.dto.event.enum_.EventUpdateState;
 import ru.practicum.explorewithme.model.request.enum_.EventRequestStatus;
 import ru.practicum.explorewithme.service.admin.AdminCategoryService;
 import ru.practicum.explorewithme.service.admin.AdminEventService;
 import ru.practicum.explorewithme.service.admin.AdminUserService;
 
-import javax.persistence.EntityManager;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
@@ -42,13 +38,13 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
         "spring.datasource.password=test",
         "server.port=8081"
 })
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class PrivateRequestServiceTest {
     private final AdminCategoryService adminCategoryService;
     private final AdminEventService adminEventService;
     private final AdminUserService adminUserService;
     private final PrivateEventSerivce privateEventSerivce;
     private final PrivateRequestService privateRequestService;
-    private final EntityManager entityManager;
 
     private static CategoryRequestDto[] testCategoryRequestDtos;
     private static UserRequestDto[] testUserRequestDtos;
@@ -128,33 +124,6 @@ public class PrivateRequestServiceTest {
         testEventRequestUpdateResponseDto = new EventRequestUpdateResponseDto(
                 List.of(testEventRequestResponseDtos[5], testEventRequestResponseDtos[6]), Collections.emptyList()
         );
-    }
-
-    @BeforeEach
-    public void beforeEach() {
-        entityManager.createNativeQuery(
-            "delete from event_compilation; " +
-            "delete from compilation; " +
-            "alter table compilation " +
-            "   alter column id " +
-            "       restart with 1; " +
-            "delete from event_request; " +
-            "alter table event_request " +
-            "   alter column id " +
-            "       restart with 1; " +
-            "delete from event; " +
-            "alter table event " +
-            "   alter column id " +
-            "       restart with 1; " +
-            "delete from category; " +
-            "alter table category " +
-            "   alter column id " +
-            "       restart with 1; " +
-            "delete from user_account; " +
-            "alter table user_account " +
-            "   alter column id " +
-            "       restart with 1; "
-        ).executeUpdate();
     }
 
 

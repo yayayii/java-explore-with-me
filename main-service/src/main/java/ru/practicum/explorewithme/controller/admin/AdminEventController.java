@@ -7,10 +7,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.explorewithme.StatClient;
 import ru.practicum.explorewithme.dto.event.EventResponseDto;
 import ru.practicum.explorewithme.dto.event.EventUpdateRequestDto;
 import ru.practicum.explorewithme.model.event.enum_.EventState;
+import ru.practicum.explorewithme.service.StatGateway;
 import ru.practicum.explorewithme.service.admin.AdminEventService;
 import ru.practicum.explorewithme.util.Admin;
 
@@ -26,7 +26,7 @@ import java.util.List;
 @RequestMapping(path = "/admin/events")
 public class AdminEventController {
     private final AdminEventService adminService;
-    private final StatClient statClient;
+    private final StatGateway statGateway;
 
 
     @GetMapping
@@ -46,22 +46,7 @@ public class AdminEventController {
         List<EventResponseDto> events = adminService.searchEvents(
                 users, states, categories, rangeStart, rangeEnd, from, size
         );
-        for (EventResponseDto event : events) {
-            if (event.getState() == EventState.PUBLISHED) {
-                long views;
-                try {
-                    views = statClient.getStats(
-                            event.getPublishedOn(),
-                            LocalDateTime.now(),
-                            List.of("/events/" + event.getId()),
-                            true
-                    ).getBody().get(0).getHits();
-                } catch (IndexOutOfBoundsException e) {
-                    views = 0;
-                }
-                event.setViews(views);
-            }
-        }
+        events = statGateway.getEventsWithViews(events);
 
         return ResponseEntity.ok(events);
     }

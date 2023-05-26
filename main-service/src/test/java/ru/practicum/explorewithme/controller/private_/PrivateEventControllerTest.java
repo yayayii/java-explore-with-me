@@ -9,18 +9,15 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import ru.practicum.explorewithme.StatClient;
-import ru.practicum.explorewithme.dto.StatResponseDto;
 import ru.practicum.explorewithme.dto.category.CategoryResponseDto;
 import ru.practicum.explorewithme.dto.event.*;
 import ru.practicum.explorewithme.dto.event.enum_.EventUpdateState;
 import ru.practicum.explorewithme.dto.user.UserResponseDto;
 import ru.practicum.explorewithme.model.event.enum_.EventState;
+import ru.practicum.explorewithme.service.StatGateway;
 import ru.practicum.explorewithme.service.private_.PrivateEventSerivce;
 
 import java.time.LocalDateTime;
@@ -38,7 +35,7 @@ public class PrivateEventControllerTest {
     @Mock
     private PrivateEventSerivce mockPrivateService;
     @Mock
-    private StatClient mockStatClient;
+    private StatGateway mockStatService;
     @InjectMocks
     private PrivateEventController privateController;
     private static ObjectMapper objectMapper;
@@ -50,7 +47,6 @@ public class PrivateEventControllerTest {
     private static EventUpdateRequestDto testEventUpdateRequestDto;
     private static EventShortResponseDto testEventShortResponseDto;
     private static EventResponseDto testEventResponseDto;
-    private static StatResponseDto testStatResponseDto;
 
 
     @BeforeAll
@@ -80,8 +76,6 @@ public class PrivateEventControllerTest {
                 testLocalDateTime, testLocalDateTime, testLocalDateTime, new LocationDto(1.1, 1.1), 1,
                 new UserResponseDto(1L, "email1@yandex.ru", "name1"), EventState.PUBLISHED
         );
-
-        testStatResponseDto = new StatResponseDto("app1", "uri1", 1L);
     }
 
     @BeforeEach
@@ -164,26 +158,26 @@ public class PrivateEventControllerTest {
     }
 
     @Test
-    public void testGetEventById() throws Exception {
-        when(mockPrivateService.getEventById(anyLong(), anyLong()))
-                .thenReturn(testEventResponseDto);
-        when(mockStatClient.getStats(any(), any(), any(), anyBoolean()))
-                .thenReturn(new ResponseEntity<>(List.of(testStatResponseDto), HttpStatus.OK));
-        mockMvc.perform(get(API_PREFIX + "/1"))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON));
-    }
-
-    @Test
     public void testGetEventsByInitiatorId() throws Exception {
         when(mockPrivateService.getEventsByInitiatorId(anyLong(), anyInt(), anyInt()))
                 .thenReturn(List.of(testEventShortResponseDto, testEventShortResponseDto));
-        when(mockStatClient.getStats(any(), any(), any(), anyBoolean()))
-                .thenReturn(new ResponseEntity<>(List.of(testStatResponseDto), HttpStatus.OK));
+        when(mockStatService.getShortEventsWithViews(any()))
+                .thenReturn(List.of(testEventShortResponseDto, testEventShortResponseDto));
         mockMvc.perform(get(API_PREFIX + "?from=1&size=1"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$", hasSize(2)));
+    }
+
+    @Test
+    public void testGetEventById() throws Exception {
+        when(mockPrivateService.getEventById(anyLong(), anyLong()))
+                .thenReturn(testEventResponseDto);
+        when(mockStatService.getViewsForEvent(any(), anyLong()))
+                .thenReturn(0L);
+        mockMvc.perform(get(API_PREFIX + "/1"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON));
     }
 
     @Test

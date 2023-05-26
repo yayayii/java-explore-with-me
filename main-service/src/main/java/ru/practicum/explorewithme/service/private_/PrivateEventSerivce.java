@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.explorewithme.dao.CategoryDao;
 import ru.practicum.explorewithme.dao.EventDao;
-import ru.practicum.explorewithme.dao.EventRequestDao;
 import ru.practicum.explorewithme.dao.UserDao;
 import ru.practicum.explorewithme.dto.event.EventRequestDto;
 import ru.practicum.explorewithme.dto.event.EventResponseDto;

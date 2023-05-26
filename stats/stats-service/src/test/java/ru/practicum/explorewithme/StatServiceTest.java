@@ -6,6 +6,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.explorewithme.dto.StatRequestDto;
 import ru.practicum.explorewithme.dto.StatResponseDto;
@@ -29,6 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
         "spring.datasource.password=test",
         "server.port=9091"
 })
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class StatServiceTest {
     private final EntityManager entityManager;
     private final StatService statService;
@@ -51,16 +53,6 @@ public class StatServiceTest {
                 new StatResponseDto("app2", "uri2", 1L),
                 new StatResponseDto("app2", "uri2", 2L)
         };
-    }
-
-    @AfterEach
-    void afterEach() {
-        entityManager.createNativeQuery(
-                "delete from stat_model; " +
-                "alter table stat_model " +
-                "   alter column id " +
-                "       restart with 1;"
-        ).executeUpdate();
     }
 
 
