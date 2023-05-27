@@ -13,7 +13,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import ru.practicum.explorewithme.controller.StatController;
-import ru.practicum.explorewithme.dto.StatFullResponseDto;
 import ru.practicum.explorewithme.dto.StatRequestDto;
 import ru.practicum.explorewithme.dto.StatResponseDto;
 import ru.practicum.explorewithme.service.StatService;
@@ -37,10 +36,8 @@ public class StatControllerTest {
     private static ObjectMapper objectMapper;
     private MockMvc mockMvc;
 
-
     private static StatRequestDto testStatRequestDto;
     private static StatResponseDto testStatResponseDto;
-    private static StatFullResponseDto testStatFullResponseDto;
 
 
     @BeforeAll
@@ -50,7 +47,6 @@ public class StatControllerTest {
 
         testStatRequestDto = new StatRequestDto("app1", "uri1", "ip1", LocalDateTime.now());
         testStatResponseDto = new StatResponseDto("app1", "uri1", 1L);
-        testStatFullResponseDto = new StatFullResponseDto(1L, "app1", "uri1", "ip1", LocalDateTime.now());
     }
 
     @BeforeEach
@@ -66,15 +62,6 @@ public class StatControllerTest {
                 .content(objectMapper.writeValueAsString(testStatRequestDto))
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isCreated());
-    }
-
-    @Test
-    public void testGetStatsById() throws Exception {
-        when(mockStatService.getStatById(anyLong()))
-                .thenReturn(testStatFullResponseDto);
-        mockMvc.perform(get("/stats/1"))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON));
     }
 
     @Test

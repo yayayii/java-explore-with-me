@@ -7,7 +7,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.explorewithme.dto.StatFullResponseDto;
 import ru.practicum.explorewithme.dto.StatRequestDto;
 import ru.practicum.explorewithme.dto.StatResponseDto;
 import ru.practicum.explorewithme.service.StatService;
@@ -23,26 +22,21 @@ public class StatController {
 
 
     @PostMapping("/hit")
-    public ResponseEntity<Void> saveEndpointRequest(@RequestBody StatRequestDto statsRequestDto) {
-        log.info("stats - stats-service - StatController - saveEndpointRequest");
-        statService.saveEndpointRequest(statsRequestDto);
+    public ResponseEntity<Void> saveEndpointRequest(@RequestBody StatRequestDto requestDto) {
+        log.info("stats - stats-service - StatController - saveEndpointRequest - requestDto: {}", requestDto);
+        statService.saveEndpointRequest(requestDto);
         return new ResponseEntity<>(HttpStatus.CREATED);
-    }
-
-    @GetMapping("/stats/{id}")
-    public ResponseEntity<StatFullResponseDto> getStatById(@PathVariable Long id) {
-        log.info("stats - stats-service - StatController - getStatById");
-        return ResponseEntity.ok(statService.getStatById(id));
     }
 
     @GetMapping("/stats")
     public ResponseEntity<List<StatResponseDto>> getStats(
             @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime start,
             @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime end,
-            @RequestParam(required = false) String[] uris,
+            @RequestParam(required = false) List<String> uris,
             @RequestParam(required = false) boolean unique
     ) {
-        log.info("stats - stats-service - StatController - getStats");
+        log.info("stats - stats-service - StatController - getStats - start: {} / end: {} / uris: {} / unique: {}",
+                start, end, uris, unique);
         return ResponseEntity.ok(statService.getStats(start, end, uris, unique));
     }
 }
