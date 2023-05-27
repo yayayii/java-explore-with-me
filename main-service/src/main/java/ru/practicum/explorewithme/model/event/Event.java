@@ -1,6 +1,7 @@
 package ru.practicum.explorewithme.model.event;
 
 import lombok.*;
+import org.hibernate.annotations.Formula;
 import ru.practicum.explorewithme.model.Category;
 import ru.practicum.explorewithme.model.User;
 import ru.practicum.explorewithme.model.event.enum_.EventState;
@@ -29,6 +30,7 @@ public class Event {
     private double locationLat;
     private double locationLon;
     private int participantLimit;
+    @Formula(" (select count(*) from event_request er where er.event_id = id and er.status like 'CONFIRMED') ")
     private int confirmedRequests;
     private LocalDateTime createdOn;
     private LocalDateTime eventDate;

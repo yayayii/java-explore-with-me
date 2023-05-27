@@ -19,7 +19,6 @@ import ru.practicum.explorewithme.model.request.EventRequest;
 import ru.practicum.explorewithme.model.request.enum_.EventRequestStatus;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
@@ -59,7 +58,6 @@ public class PrivateRequestService {
         EventRequest eventRequest = new EventRequest(event, requester, LocalDateTime.now());
         if (!event.isRequestModeration() || event.getParticipantLimit() == 0) {
             eventRequest.setStatus(EventRequestStatus.CONFIRMED);
-            event.setConfirmedRequests(event.getConfirmedRequests() + 1);
         } else {
             eventRequest.setStatus(EventRequestStatus.PENDING);
         }
@@ -109,31 +107,30 @@ public class PrivateRequestService {
         if (!event.getInitiator().getId().equals(userId)) {
             throw new DataIntegrityViolationException("You are not the initiator of the event");
         }
-        List<EventRequest> eventRequests = new ArrayList<>();
-        for (Long requestId : requestDto.getRequestIds()) {
-            EventRequest request = eventRequestDao.findById(requestId).orElseThrow(
-                    () -> new NoSuchElementException("Request id = " + requestId + " doesn't exist")
-            );
+
+        List<EventRequest> eventRequests = eventRequestDao.findAllById(requestDto.getRequestIds());
+        if (eventRequests.size() != requestDto.getRequestIds().size()) {
+            throw new NoSuchElementException("Trying to moderate non existing event requests");
+        }
+        for (EventRequest request : eventRequests) {
             if (!request.getEvent().getId().equals(eventId)) {
                 throw new DataIntegrityViolationException(
-                        "Request id = " + requestId + " is for event id = " + eventId
+                        "Request id = " + request.getId() + " is for event id = " + eventId
                 );
             }
             if (request.getStatus() != EventRequestStatus.PENDING) {
-                throw new DataIntegrityViolationException("Request id = " + requestId + " is already updated");
+                throw new DataIntegrityViolationException("Request id = " + request.getId() + " is already updated");
             }
 
             if (requestDto.getStatus() == EventRequestStatus.CONFIRMED) {
                 if (event.getParticipantLimit() != 0 && event.getParticipantLimit() == event.getConfirmedRequests()) {
                     throw new DataIntegrityViolationException("The event request list is full");
                 }
-                event.setConfirmedRequests(event.getConfirmedRequests() + 1);
                 request.setStatus(EventRequestStatus.CONFIRMED);
             }
             if (requestDto.getStatus() == EventRequestStatus.REJECTED) {
                 request.setStatus(EventRequestStatus.REJECTED);
             }
-            eventRequests.add(request);
         }
 
         EventRequestUpdateResponseDto responseDto = new EventRequestUpdateResponseDto();
@@ -169,8 +166,6 @@ public class PrivateRequestService {
             request.setStatus(EventRequestStatus.CANCELED);
         }
         if (request.getStatus() == EventRequestStatus.CONFIRMED) {
-            Event event = eventDao.findById(request.getEvent().getId()).get();
-            event.setConfirmedRequests(event.getConfirmedRequests() - 1);
             request.setStatus(EventRequestStatus.CANCELED);
         }
 

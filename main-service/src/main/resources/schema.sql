@@ -20,7 +20,6 @@ create table if not exists event (
     location_lat float,
     location_lon float,
     participant_limit int,
-    confirmed_requests int,
     created_on timestamp,
     event_date timestamp,
     published_on timestamp,

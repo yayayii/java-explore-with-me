@@ -11,4 +11,6 @@ public interface EventRequestDao extends JpaRepository<EventRequest, Long> {
     List<EventRequest> findAllByRequester_Id(Long requesterId);
 
     List<EventRequest> findAllByEvent_Id(Long eventId);
+
+    List<EventRequest> findAllByIdIn(List<Long> requestIds);
 }

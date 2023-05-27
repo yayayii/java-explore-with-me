@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.explorewithme.dto.request.EventRequestResponseDto;
 import ru.practicum.explorewithme.dto.request.EventRequestUpdateRequestDto;
@@ -18,7 +17,6 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 @Controller
-@Validated
 @RequestMapping(path = "/users/{userId}")
 public class PrivateRequestController {
     private final PrivateRequestService privateService;

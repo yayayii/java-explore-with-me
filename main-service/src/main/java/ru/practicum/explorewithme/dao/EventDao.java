@@ -46,4 +46,6 @@ public interface EventDao extends JpaRepository<Event, Long> {
     List<Event> findAllByInitiator_Id(Long userId, Pageable pageable);
 
     Optional<Event> findByIdAndState(Long eventId, EventState state);
+
+    List<Event> findAllByIdIn(List<Long> eventIds);
 }

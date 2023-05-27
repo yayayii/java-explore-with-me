@@ -30,13 +30,11 @@ public class AdminCompilationService {
 
         Compilation compilation = CompilationMapper.toModel(requestDto);
         if (requestDto.getEvents() != null) {
-            List<Event> events = new ArrayList<>();
-            for (Long eventId : requestDto.getEvents()) {
-                Event event = eventDao.findById(eventId)
-                        .orElseThrow(() -> new NoSuchElementException("Event id = " + eventId + " doesn't exist"));
-                events.add(event);
+            List<Event> events = eventDao.findAllByIdIn(requestDto.getEvents());
+            if (events.size() != requestDto.getEvents().size()) {
+                throw new NoSuchElementException("Compilation contains non existing events");
             }
-            compilation.setEvents(events);
+            compilation.setEvents(eventDao.findAllByIdIn(requestDto.getEvents()));
         }
 
         return CompilationMapper.toResponseDto(compilationDao.save(compilation));
@@ -55,13 +53,11 @@ public class AdminCompilationService {
             compilation.setPinned(requestDto.getPinned());
         }
         if (requestDto.getEvents() != null) {
-            List<Event> events = new ArrayList<>();
-            for (Long eventId : requestDto.getEvents()) {
-                Event event = eventDao.findById(eventId)
-                        .orElseThrow(() -> new NoSuchElementException("Event id = " + eventId + " doesn't exist"));
-                events.add(event);
+            List<Event> events = eventDao.findAllByIdIn(requestDto.getEvents());
+            if (events.size() != requestDto.getEvents().size()) {
+                throw new NoSuchElementException("Compilation contains non existing events");
             }
-            compilation.setEvents(events);
+            compilation.setEvents(eventDao.findAllByIdIn(requestDto.getEvents()));
         }
 
         return CompilationMapper.toResponseDto(compilation);

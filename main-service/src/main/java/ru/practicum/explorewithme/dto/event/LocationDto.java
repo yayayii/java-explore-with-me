@@ -6,13 +6,14 @@ import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
 public class LocationDto {
-    @Min(-90) @Max(90)
+    @NotNull @Min(-90) @Max(90)
     private Double lat;
-    @Min(-180) @Max(180)
+    @NotNull @Min(-180) @Max(180)
     private Double lon;
 }
