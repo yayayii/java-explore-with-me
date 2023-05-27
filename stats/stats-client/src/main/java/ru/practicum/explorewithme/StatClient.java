@@ -25,11 +25,13 @@ import java.util.Map;
 public class StatClient {
     private final RestTemplate rest;
     private final String serverUrl;
+    private final String appName;
 
 
     @Autowired
-    public StatClient(@Value("http://stats-server:9090") String serverUrl, RestTemplateBuilder builder) {
+    public StatClient(@Value("${server.url}") String serverUrl, @Value("${app.name}") String appName, RestTemplateBuilder builder) {
         this.serverUrl = serverUrl;
+        this.appName = appName;
         rest = builder.uriTemplateHandler(new DefaultUriBuilderFactory(serverUrl))
                 .requestFactory(HttpComponentsClientHttpRequestFactory::new).build();
     }
@@ -38,7 +40,7 @@ public class StatClient {
     public ResponseEntity<Void> saveEndpointRequest(HttpServletRequest request) {
         log.info("stats - stats-client - StatClient - saveEndpointRequest - request: {}", request);
         StatRequestDto requestDto = new StatRequestDto(
-                "main-service", request.getRequestURI(), request.getRemoteAddr(), LocalDateTime.now()
+                appName, request.getRequestURI(), request.getRemoteAddr(), LocalDateTime.now()
         );
         return rest.exchange(serverUrl + "/hit", HttpMethod.POST, new HttpEntity<>(requestDto), Void.class);
     }
