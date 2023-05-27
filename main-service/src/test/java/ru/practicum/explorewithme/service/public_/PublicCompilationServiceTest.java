@@ -20,7 +20,7 @@ import ru.practicum.explorewithme.service.admin.AdminCategoryService;
 import ru.practicum.explorewithme.service.admin.AdminCompilationService;
 import ru.practicum.explorewithme.service.admin.AdminEventService;
 import ru.practicum.explorewithme.service.admin.AdminUserService;
-import ru.practicum.explorewithme.service.private_.PrivateEventSerivce;
+import ru.practicum.explorewithme.service.private_.PrivateEventService;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -45,7 +45,7 @@ public class PublicCompilationServiceTest {
     private final AdminCompilationService adminCompilationService;
     private final AdminEventService adminEventService;
     private final AdminUserService adminUserService;
-    private final PrivateEventSerivce privateService;
+    private final PrivateEventService privateService;
     private final PublicCompilationService publicService;
 
     private static CategoryRequestDto testCategoryRequestDto;

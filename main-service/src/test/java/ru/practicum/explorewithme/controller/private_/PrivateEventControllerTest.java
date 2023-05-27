@@ -18,7 +18,7 @@ import ru.practicum.explorewithme.dto.event.enum_.EventUpdateState;
 import ru.practicum.explorewithme.dto.user.UserResponseDto;
 import ru.practicum.explorewithme.model.event.enum_.EventState;
 import ru.practicum.explorewithme.service.StatGateway;
-import ru.practicum.explorewithme.service.private_.PrivateEventSerivce;
+import ru.practicum.explorewithme.service.private_.PrivateEventService;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -33,7 +33,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith(MockitoExtension.class)
 public class PrivateEventControllerTest {
     @Mock
-    private PrivateEventSerivce mockPrivateService;
+    private PrivateEventService mockPrivateService;
     @Mock
     private StatGateway mockStatService;
     @InjectMocks

@@ -3,10 +3,12 @@ package ru.practicum.explorewithme.dto.event;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 import ru.practicum.explorewithme.dto.category.CategoryResponseDto;
+import ru.practicum.explorewithme.dto.comment.CommentResponseDto;
 import ru.practicum.explorewithme.dto.user.UserResponseDto;
 import ru.practicum.explorewithme.model.event.enum_.EventState;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -34,4 +36,5 @@ public class EventResponseDto {
     private long views;
     private UserResponseDto initiator;
     private EventState state;
+    private List<CommentResponseDto> comments;
 }

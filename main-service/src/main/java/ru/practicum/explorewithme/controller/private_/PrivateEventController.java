@@ -13,7 +13,7 @@ import ru.practicum.explorewithme.dto.event.EventShortResponseDto;
 import ru.practicum.explorewithme.dto.event.EventUpdateRequestDto;
 import ru.practicum.explorewithme.model.event.enum_.EventState;
 import ru.practicum.explorewithme.service.StatGateway;
-import ru.practicum.explorewithme.service.private_.PrivateEventSerivce;
+import ru.practicum.explorewithme.service.private_.PrivateEventService;
 import ru.practicum.explorewithme.util.Private;
 
 import javax.validation.Valid;
@@ -27,7 +27,7 @@ import java.util.List;
 @Validated
 @RequestMapping(path = "/users/{userId}/events")
 public class PrivateEventController {
-    private final PrivateEventSerivce privateService;
+    private final PrivateEventService privateService;
     private final StatGateway statGateway;
 
 

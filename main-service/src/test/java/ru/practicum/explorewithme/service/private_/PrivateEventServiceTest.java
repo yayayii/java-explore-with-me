@@ -41,7 +41,7 @@ public class PrivateEventServiceTest {
     private final AdminCategoryService adminCategoryService;
     private final AdminEventService adminEventService;
     private final AdminUserService adminUserService;
-    private final PrivateEventSerivce privateService;
+    private final PrivateEventService privateService;
 
     private static CategoryRequestDto[] testCategoryRequestDtos;
     private static UserRequestDto[] testUserRequestDtos;

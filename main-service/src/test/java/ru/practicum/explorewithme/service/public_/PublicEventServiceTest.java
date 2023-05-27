@@ -17,7 +17,7 @@ import ru.practicum.explorewithme.dto.event.enum_.EventUpdateState;
 import ru.practicum.explorewithme.service.admin.AdminCategoryService;
 import ru.practicum.explorewithme.service.admin.AdminEventService;
 import ru.practicum.explorewithme.service.admin.AdminUserService;
-import ru.practicum.explorewithme.service.private_.PrivateEventSerivce;
+import ru.practicum.explorewithme.service.private_.PrivateEventService;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -43,7 +43,7 @@ public class PublicEventServiceTest {
     private final AdminEventService adminEventService;
     private final AdminUserService adminUserService;
     private final PublicEventService publicService;
-    private final PrivateEventSerivce privateService;
+    private final PrivateEventService privateService;
 
     private static CategoryRequestDto testCategoryRequestDto;
     private static UserRequestDto testUserRequestDto;
