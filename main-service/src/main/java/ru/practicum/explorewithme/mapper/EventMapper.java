@@ -7,6 +7,8 @@ import ru.practicum.explorewithme.dto.event.EventShortResponseDto;
 import ru.practicum.explorewithme.dto.event.LocationDto;
 import ru.practicum.explorewithme.model.event.Event;
 
+import java.util.Collections;
+
 @UtilityClass
 public class EventMapper {
     public Event toModel(EventRequestDto requestDto) {
@@ -40,6 +42,7 @@ public class EventMapper {
                 .location(new LocationDto(model.getLocationLat(), model.getLocationLon()))
                 .initiator(UserMapper.toResponseDto(model.getInitiator()))
                 .state(model.getState())
+                .comments(Collections.emptyList())
         .build();
     }
 

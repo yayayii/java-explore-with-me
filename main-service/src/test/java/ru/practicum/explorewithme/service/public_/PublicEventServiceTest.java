@@ -96,7 +96,7 @@ public class PublicEventServiceTest {
                 1L, "title1", "annotation1", "description1", false,
                 false, testCategoryResponseDto, 1, 0,
                 testLocalDateTime, testLocalDateTime, testLocalDateTime, new LocationDto(1.1, 1.1), 0,
-                testUserResponseDto, EventState.PUBLISHED
+                testUserResponseDto, EventState.PUBLISHED, Collections.emptyList()
         );
     }
 

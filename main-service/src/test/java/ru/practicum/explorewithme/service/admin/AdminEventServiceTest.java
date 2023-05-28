@@ -74,13 +74,13 @@ public class AdminEventServiceTest {
                         1L, "title1", "annotation1", "description1", false,
                         false, testCategoryResponseDto, 1, 0,
                         testLocalDateTime, testLocalDateTime, null, new LocationDto(1.1, 1.1),
-                        0, testUserResponseDto, EventState.PENDING
+                        0, testUserResponseDto, EventState.PENDING, Collections.emptyList()
                 ),
                 new EventResponseDto(
                         1L, "newTitle1", "newAnnotation1", "newDescription1", true,
                         true, testCategoryResponseDto, 2, 0,
                         testLocalDateTime, testLocalDateTime, null, new LocationDto(0.0, 0.0),
-                        0, testUserResponseDto, EventState.PUBLISHED
+                        0, testUserResponseDto, EventState.PUBLISHED, Collections.emptyList()
                 )
         };
     }

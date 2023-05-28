@@ -20,6 +20,7 @@ import ru.practicum.explorewithme.service.StatGateway;
 import ru.practicum.explorewithme.service.public_.PublicEventService;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 
 import static org.hamcrest.Matchers.hasSize;
@@ -58,7 +59,7 @@ public class PublicEventControllerTest {
                 1L, "title1", "annotation1", "description1", false,
                 false, testCategoryResponseDto, 1, 1,
                 testLocalDateTime, testLocalDateTime, testLocalDateTime, new LocationDto(1.1, 1.1), 1,
-                testUserResponseDto, EventState.PUBLISHED
+                testUserResponseDto, EventState.PUBLISHED, Collections.emptyList()
         );
     }
 

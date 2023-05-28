@@ -20,6 +20,7 @@ import ru.practicum.explorewithme.service.admin.AdminEventService;
 import ru.practicum.explorewithme.service.admin.AdminUserService;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -92,13 +93,16 @@ public class PrivateEventServiceTest {
                         false, new CategoryResponseDto(1L, "name1"), 1,
                         0, testLocalDateTime, testLocalDateTime, null,
                         new LocationDto(1.1, 1.1), 0,
-                        new UserResponseDto(1L, "email1@yandex.ru", "name1"), EventState.PENDING
+                        new UserResponseDto(1L, "email1@yandex.ru", "name1"), EventState.PENDING,
+                        Collections.emptyList()
                 ),
                 new EventResponseDto(
                         1L, "newTitle1", "newAnnotation1", "newDescription1", true,
-                        true, new CategoryResponseDto(2L, "name2"), 2, 0,
-                        testLocalDateTime, testLocalDateTime, null, new LocationDto(0.0, 0.0), 0,
-                        new UserResponseDto(1L, "email1@yandex.ru", "name1"), EventState.CANCELED
+                        true, new CategoryResponseDto(2L, "name2"), 2,
+                        0, testLocalDateTime, testLocalDateTime, null,
+                        new LocationDto(0.0, 0.0), 0,
+                        new UserResponseDto(1L, "email1@yandex.ru", "name1"), EventState.CANCELED,
+                        Collections.emptyList()
                 )
         };
     }
