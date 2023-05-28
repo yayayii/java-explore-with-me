@@ -68,14 +68,14 @@ public class PrivateEventControllerTest {
         testEventShortResponseDto = new EventShortResponseDto(
                 1L, "title1", "annotation1", false,
                 new CategoryResponseDto(1L, "name1"), 1,testLocalDateTime,
-                1, new UserResponseDto(1L, "email1@yandex.ru", "name1"),
+                1, new UserResponseDto(1L, "name1", "email1@yandex.ru"),
                 EventState.PUBLISHED, testLocalDateTime
         );
         testEventResponseDto = new EventResponseDto(
                 1L, "title1", "annotation1", "description1", false,
                 false, new CategoryResponseDto(1L, "name1"), 1, 1,
                 testLocalDateTime, testLocalDateTime, testLocalDateTime, new LocationDto(1.1, 1.1), 1,
-                new UserResponseDto(1L, "email1@yandex.ru", "name1"), EventState.PUBLISHED, Collections.emptyList()
+                new UserResponseDto(1L, "name1", "email1@yandex.ru"), EventState.PUBLISHED, Collections.emptyList()
         );
     }
 

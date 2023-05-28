@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.explorewithme.dao.CategoryDao;
@@ -46,7 +47,7 @@ public class AdminEventService {
             throw new IllegalArgumentException("Start date must be before end date");
         }
 
-        List<EventResponseDto> events = eventDao.searchAllByAdmin(userIds, states, categoryIds, rangeStart, rangeEnd, PageRequest.of(from, size))
+        List<EventResponseDto> events = eventDao.searchAllByAdmin(userIds, states, categoryIds, rangeStart, rangeEnd, PageRequest.of(from, size, Sort.by("id")))
                 .stream().map(EventMapper::toResponseDto).collect(Collectors.toList());
         setCommentsForEvents(events);
 
@@ -113,10 +114,6 @@ public class AdminEventService {
         if (requestDto.getStateAction() != null && requestDto.getStateAction() == EventUpdateState.REJECT_EVENT) {
             event.setState(EventState.CANCELED);
         }
-
-        EventResponseDto responseDto = EventMapper.toResponseDto(event);
-        responseDto.setComments(commentDao.findAllByEvent_Id(eventId).stream()
-                .map(CommentMapper::toResponseDto).collect(Collectors.toList()));
 
         return EventMapper.toResponseDto(event);
     }

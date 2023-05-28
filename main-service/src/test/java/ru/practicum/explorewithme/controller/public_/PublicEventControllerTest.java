@@ -48,7 +48,7 @@ public class PublicEventControllerTest {
     public static void beforeAll() {
         CategoryResponseDto testCategoryResponseDto = new CategoryResponseDto(1L, "name1");
 
-        UserResponseDto testUserResponseDto = new UserResponseDto(1L, "email1@email.ru", "name1");
+        UserResponseDto testUserResponseDto = new UserResponseDto(1L, "name1", "email1@email.ru");
 
         LocalDateTime testLocalDateTime = LocalDateTime.of(2024, 1, 1, 1, 1);
         testEventShortResponseDto = new EventShortResponseDto(

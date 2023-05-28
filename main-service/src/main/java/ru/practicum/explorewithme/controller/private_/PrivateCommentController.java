@@ -10,6 +10,8 @@ import ru.practicum.explorewithme.dto.comment.CommentRequestDto;
 import ru.practicum.explorewithme.dto.comment.CommentResponseDto;
 import ru.practicum.explorewithme.service.private_.PrivateCommentService;
 
+import javax.validation.Valid;
+
 @RequiredArgsConstructor
 @Slf4j
 @Controller
@@ -19,7 +21,7 @@ public class PrivateCommentController {
 
     @PostMapping
     public ResponseEntity<CommentResponseDto> addComment(
-            @PathVariable Long userId, @PathVariable Long eventId, @RequestBody CommentRequestDto requestDto
+            @PathVariable Long userId, @PathVariable Long eventId, @RequestBody @Valid CommentRequestDto requestDto
     ) {
         log.info("main-service - PrivateCommentController - addComment - userId: {} / eventId: {} / requestDto: {}",
                 userId, eventId, requestDto);
@@ -31,7 +33,7 @@ public class PrivateCommentController {
             @PathVariable Long userId,
             @PathVariable Long eventId,
             @PathVariable Long commentId,
-            @RequestBody CommentRequestDto requestDto
+            @RequestBody @Valid CommentRequestDto requestDto
     ) {
         log.info("main-service - PrivateCommentController - editComment - userId: {} / eventId: {} / commentId: {} / requestDto: {}",
                 userId, eventId, commentId, requestDto);

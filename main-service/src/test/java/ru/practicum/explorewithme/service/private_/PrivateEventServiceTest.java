@@ -62,8 +62,8 @@ public class PrivateEventServiceTest {
         };
 
         testUserRequestDtos = new UserRequestDto[]{
-                new UserRequestDto("email1@yandex.ru", "name1"),
-                new UserRequestDto("email2@yandex.ru", "name2")
+                new UserRequestDto("name1", "email1@yandex.ru"),
+                new UserRequestDto("name2", "email2@yandex.ru")
         };
 
         testLocalDateTime = LocalDateTime.of(2024, 1, 1, 1, 1);
@@ -84,7 +84,7 @@ public class PrivateEventServiceTest {
         testEventShortResponseDto = new EventShortResponseDto(
                 1L, "title1", "annotation1", false,
                 new CategoryResponseDto(1L, "name1"), 0, testLocalDateTime, 0,
-                new UserResponseDto(1L, "email1@yandex.ru", "name1"),
+                new UserResponseDto(1L, "name1", "email1@yandex.ru"),
                 EventState.PENDING, testLocalDateTime
         );
         testEventResponseDtos = new EventResponseDto[] {
@@ -93,7 +93,7 @@ public class PrivateEventServiceTest {
                         false, new CategoryResponseDto(1L, "name1"), 1,
                         0, testLocalDateTime, testLocalDateTime, null,
                         new LocationDto(1.1, 1.1), 0,
-                        new UserResponseDto(1L, "email1@yandex.ru", "name1"), EventState.PENDING,
+                        new UserResponseDto(1L, "name1", "email1@yandex.ru"), EventState.PENDING,
                         Collections.emptyList()
                 ),
                 new EventResponseDto(
@@ -101,7 +101,7 @@ public class PrivateEventServiceTest {
                         true, new CategoryResponseDto(2L, "name2"), 2,
                         0, testLocalDateTime, testLocalDateTime, null,
                         new LocationDto(0.0, 0.0), 0,
-                        new UserResponseDto(1L, "email1@yandex.ru", "name1"), EventState.CANCELED,
+                        new UserResponseDto(1L, "name1", "email1@yandex.ru"), EventState.CANCELED,
                         Collections.emptyList()
                 )
         };

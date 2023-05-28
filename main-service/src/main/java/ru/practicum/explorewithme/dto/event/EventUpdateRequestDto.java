@@ -12,6 +12,7 @@ import ru.practicum.explorewithme.util.Private;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Future;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PositiveOrZero;
 import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
@@ -36,6 +37,7 @@ public class EventUpdateRequestDto {
     @Valid
     private LocationDto location;
     private Long category;
+    @NotNull(groups = {Admin.class, Private.class})
     @EventAdminUpdateStatePattern(regexp = "PUBLISH_EVENT|REJECT_EVENT", groups = {Admin.class})
     @EventPrivateUpdateStatePattern(regexp = "SEND_TO_REVIEW|CANCEL_REVIEW", groups = {Private.class})
     private EventUpdateState stateAction;

@@ -51,7 +51,7 @@ public class PrivateCommentService {
     }
 
     @Transactional
-    public CommentResponseDto editComment(Long userId, Long commentId, Long eventId, CommentRequestDto requestDto) {
+    public CommentResponseDto editComment(Long userId, Long eventId, Long commentId, CommentRequestDto requestDto) {
         log.info("main-service - PrivateCommentService - editComment - userId: {} / eventId: {} / commentId: {} / requestDto: {}",
                 userId, eventId, commentId, requestDto);
 
@@ -74,8 +74,8 @@ public class PrivateCommentService {
 
     @Transactional
     public void deleteComment(Long userId, Long eventId, Long commentId) {
-        log.info("main-service - PrivateCommentService - deleteComment - userId: {} / commentId: {} / eventId: {}",
-                userId, commentId, eventId);
+        log.info("main-service - PrivateCommentService - deleteComment - userId: {} / eventId: {} / commentId: {}",
+                userId, eventId, commentId);
 
         if (!userDao.existsById(userId)) {
             throw new NoSuchElementException("User id = " + userId + " doesn't exist");
