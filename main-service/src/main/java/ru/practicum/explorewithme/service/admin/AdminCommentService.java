@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.explorewithme.dao.CommentDao;
-import ru.practicum.explorewithme.model.Comment;
 
 import java.util.NoSuchElementException;
 
@@ -19,10 +18,9 @@ public class AdminCommentService {
     @Transactional
     public void deleteComment(Long commentId) {
         log.info("main-service - AdminCommentService - deleteComment - commentId: {}", commentId);
-
-        Comment comment = commentDao.findById(commentId)
-                .orElseThrow(() -> new NoSuchElementException("Comment id = " + commentId + " doesn't exist"));
-
-        commentDao.delete(comment);
+        if (!commentDao.existsById(commentId)) {
+            throw new NoSuchElementException("Comment id = " + commentId + " doesn't exist");
+        }
+        commentDao.deleteById(commentId);
     }
 }

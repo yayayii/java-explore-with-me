@@ -5,23 +5,31 @@ import ru.practicum.explorewithme.dto.event.EventRequestDto;
 import ru.practicum.explorewithme.dto.event.EventResponseDto;
 import ru.practicum.explorewithme.dto.event.EventShortResponseDto;
 import ru.practicum.explorewithme.dto.event.LocationDto;
+import ru.practicum.explorewithme.model.Category;
+import ru.practicum.explorewithme.model.User;
 import ru.practicum.explorewithme.model.event.Event;
+import ru.practicum.explorewithme.model.event.enum_.EventState;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
 
 @UtilityClass
 public class EventMapper {
-    public Event toModel(EventRequestDto requestDto) {
+    public Event toModel(EventRequestDto requestDto, Category category, LocalDateTime createdOn, User initiator, EventState state) {
         return Event.builder()
                 .title(requestDto.getTitle())
                 .annotation(requestDto.getAnnotation())
                 .description(requestDto.getDescription())
                 .paid(requestDto.isPaid())
                 .requestModeration(requestDto.isRequestModeration())
-                .participantLimit(requestDto.getParticipantLimit())
-                .eventDate(requestDto.getEventDate())
+                .category(category)
                 .locationLat(requestDto.getLocation().getLat())
                 .locationLon(requestDto.getLocation().getLon())
+                .participantLimit(requestDto.getParticipantLimit())
+                .createdOn(createdOn)
+                .eventDate(requestDto.getEventDate())
+                .initiator(initiator)
+                .state(state)
         .build();
     }
 

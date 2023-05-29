@@ -42,10 +42,7 @@ public class PrivateCommentService {
             throw new DataIntegrityViolationException("The event isn't published");
         }
 
-        Comment comment = CommentMapper.toComment(requestDto);
-        comment.setAuthor(author);
-        comment.setEvent(event);
-        comment.setCreated(LocalDateTime.now());
+        Comment comment = CommentMapper.toComment(requestDto, event, author, LocalDateTime.now());
 
         return CommentMapper.toResponseDto(commentDao.save(comment));
     }
@@ -66,7 +63,6 @@ public class PrivateCommentService {
         if (!comment.getAuthor().getId().equals(userId)) {
             throw new DataIntegrityViolationException("You must be the author of the comment");
         }
-
         comment.setText(requestDto.getText());
 
         return CommentMapper.toResponseDto(comment);

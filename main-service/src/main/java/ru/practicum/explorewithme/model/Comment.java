@@ -26,7 +26,10 @@ public class Comment {
     private User author;
     private LocalDateTime created;
 
-    public Comment(String text) {
+    public Comment(String text, Event event, User author, LocalDateTime created) {
         this.text = text;
+        this.event = event;
+        this.author = author;
+        this.created = created;
     }
 }

@@ -53,11 +53,7 @@ public class PrivateEventService {
             throw new DataIntegrityViolationException("The event date must be at least 2 hours later");
         }
 
-        Event event = EventMapper.toModel(requestDto);
-        event.setInitiator(user);
-        event.setCategory(category);
-        event.setState(EventState.PENDING);
-        event.setCreatedOn(LocalDateTime.now());
+        Event event = EventMapper.toModel(requestDto, category, LocalDateTime.now(), user, EventState.PENDING);
 
         return EventMapper.toResponseDto(eventDao.save(event));
     }
