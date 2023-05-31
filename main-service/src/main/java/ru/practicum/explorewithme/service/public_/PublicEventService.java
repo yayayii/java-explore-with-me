@@ -4,9 +4,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import ru.practicum.explorewithme.dao.CommentDao;
 import ru.practicum.explorewithme.dao.EventDao;
 import ru.practicum.explorewithme.dto.event.EventResponseDto;
 import ru.practicum.explorewithme.dto.event.EventShortResponseDto;
+import ru.practicum.explorewithme.mapper.CommentMapper;
 import ru.practicum.explorewithme.mapper.EventMapper;
 import ru.practicum.explorewithme.model.event.Event;
 import ru.practicum.explorewithme.model.event.enum_.EventState;
@@ -20,6 +22,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 public class PublicEventService {
+    private final CommentDao commentDao;
     private final EventDao eventDao;
 
 
@@ -29,7 +32,10 @@ public class PublicEventService {
                 .orElseThrow(
                         () -> new NoSuchElementException("Event id = " + eventId + " doesn't exist or not published")
                 );
-        return EventMapper.toResponseDto(event);
+        EventResponseDto responseDto = EventMapper.toResponseDto(event);
+        responseDto.setComments(commentDao.findAllByEvent_Id(eventId).stream()
+                .map(CommentMapper::toResponseDto).collect(Collectors.toList()));
+        return responseDto;
     }
 
     public List<EventShortResponseDto> getEvents(

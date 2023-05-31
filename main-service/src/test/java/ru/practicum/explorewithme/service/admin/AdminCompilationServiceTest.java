@@ -17,7 +17,7 @@ import ru.practicum.explorewithme.dto.event.enum_.EventUpdateState;
 import ru.practicum.explorewithme.dto.user.UserRequestDto;
 import ru.practicum.explorewithme.dto.user.UserResponseDto;
 import ru.practicum.explorewithme.model.event.enum_.EventState;
-import ru.practicum.explorewithme.service.private_.PrivateEventSerivce;
+import ru.practicum.explorewithme.service.private_.PrivateEventService;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -41,7 +41,7 @@ public class AdminCompilationServiceTest {
     private final AdminCompilationService adminCompilationService;
     private final AdminEventService adminEventService;
     private final AdminUserService adminUserService;
-    private final PrivateEventSerivce privateService;
+    private final PrivateEventService privateService;
 
 
     private static CategoryRequestDto testCategoryRequestDto;
@@ -58,8 +58,8 @@ public class AdminCompilationServiceTest {
         testCategoryRequestDto = new CategoryRequestDto("name1");
         CategoryResponseDto testCategoryResponseDto = new CategoryResponseDto(1L, "name1");
 
-        testUserRequestDto = new UserRequestDto("email1@yandex.ru", "name1");
-        UserResponseDto testUserResponseDto = new UserResponseDto(1L, "email1@yandex.ru", "name1");
+        testUserRequestDto = new UserRequestDto("name1", "email1@yandex.ru");
+        UserResponseDto testUserResponseDto = new UserResponseDto(1L, "name1", "email1@yandex.ru");
 
         LocalDateTime testLocalDateTime = LocalDateTime.of(2024, 1, 1, 1, 1);
         testEventRequestDtos = new EventRequestDto[]{

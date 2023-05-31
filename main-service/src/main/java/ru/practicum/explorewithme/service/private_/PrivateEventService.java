@@ -7,6 +7,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.explorewithme.dao.CategoryDao;
+import ru.practicum.explorewithme.dao.CommentDao;
 import ru.practicum.explorewithme.dao.EventDao;
 import ru.practicum.explorewithme.dao.UserDao;
 import ru.practicum.explorewithme.dto.event.EventRequestDto;
@@ -14,6 +15,7 @@ import ru.practicum.explorewithme.dto.event.EventResponseDto;
 import ru.practicum.explorewithme.dto.event.EventShortResponseDto;
 import ru.practicum.explorewithme.dto.event.EventUpdateRequestDto;
 import ru.practicum.explorewithme.dto.event.enum_.EventUpdateState;
+import ru.practicum.explorewithme.mapper.CommentMapper;
 import ru.practicum.explorewithme.mapper.EventMapper;
 import ru.practicum.explorewithme.model.Category;
 import ru.practicum.explorewithme.model.User;
@@ -30,8 +32,9 @@ import java.util.stream.Collectors;
 @Slf4j
 @Transactional(readOnly = true)
 @Service
-public class PrivateEventSerivce {
+public class PrivateEventService {
     private final CategoryDao categoryDao;
+    private final CommentDao commentDao;
     private final EventDao eventDao;
     private final UserDao userDao;
 
@@ -50,11 +53,8 @@ public class PrivateEventSerivce {
             throw new DataIntegrityViolationException("The event date must be at least 2 hours later");
         }
 
-        Event event = EventMapper.toModel(requestDto);
-        event.setInitiator(user);
-        event.setCategory(category);
-        event.setState(EventState.PENDING);
-        event.setCreatedOn(LocalDateTime.now());
+        Event event = EventMapper.toModel(requestDto, category, LocalDateTime.now(), user, EventState.PENDING);
+
         return EventMapper.toResponseDto(eventDao.save(event));
     }
 
@@ -70,7 +70,11 @@ public class PrivateEventSerivce {
             throw new DataIntegrityViolationException("You must be the initiator of the event");
         }
 
-        return EventMapper.toResponseDto(event);
+        EventResponseDto responseDto = EventMapper.toResponseDto(event);
+        responseDto.setComments(commentDao.findAllByEvent_Id(eventId).stream()
+                .map(CommentMapper::toResponseDto).collect(Collectors.toList()));
+
+        return responseDto;
     }
 
     public List<EventShortResponseDto> getEventsByInitiatorId(Long userId, int from, int size) {
@@ -148,6 +152,10 @@ public class PrivateEventSerivce {
             event.setState(EventState.PENDING);
         }
 
-        return EventMapper.toResponseDto(event);
+        EventResponseDto responseDto = EventMapper.toResponseDto(event);
+        responseDto.setComments(commentDao.findAllByEvent_Id(eventId).stream()
+                .map(CommentMapper::toResponseDto).collect(Collectors.toList()));
+
+        return responseDto;
     }
 }

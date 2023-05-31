@@ -8,10 +8,10 @@ import ru.practicum.explorewithme.model.User;
 @UtilityClass
 public class UserMapper {
     public User toModel(UserRequestDto requestDto) {
-        return new User(requestDto.getEmail(), requestDto.getName());
+        return new User(requestDto.getName(), requestDto.getEmail());
     }
 
     public UserResponseDto toResponseDto(User model) {
-        return new UserResponseDto(model.getId(), model.getEmail(), model.getName());
+        return new UserResponseDto(model.getId(), model.getName(), model.getEmail());
     }
 }

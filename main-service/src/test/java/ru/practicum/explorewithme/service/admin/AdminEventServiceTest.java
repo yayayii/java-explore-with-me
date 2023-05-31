@@ -14,7 +14,7 @@ import ru.practicum.explorewithme.dto.event.enum_.EventUpdateState;
 import ru.practicum.explorewithme.dto.user.UserRequestDto;
 import ru.practicum.explorewithme.dto.user.UserResponseDto;
 import ru.practicum.explorewithme.model.event.enum_.EventState;
-import ru.practicum.explorewithme.service.private_.PrivateEventSerivce;
+import ru.practicum.explorewithme.service.private_.PrivateEventService;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -39,7 +39,7 @@ public class AdminEventServiceTest {
     private final AdminCategoryService adminCategoryService;
     private final AdminEventService adminEventService;
     private final AdminUserService adminUserService;
-    private final PrivateEventSerivce privateService;
+    private final PrivateEventService privateService;
 
 
     private static CategoryRequestDto testCategoryRequestDto;
@@ -55,8 +55,8 @@ public class AdminEventServiceTest {
         testCategoryRequestDto = new CategoryRequestDto("name1");
         CategoryResponseDto testCategoryResponseDto = new CategoryResponseDto(1L, "name1");
 
-        testUserRequestDto = new UserRequestDto("email1@yandex.ru", "name1");
-        UserResponseDto testUserResponseDto = new UserResponseDto(1L, "email1@yandex.ru", "name1");
+        testUserRequestDto = new UserRequestDto("name1", "email1@yandex.ru");
+        UserResponseDto testUserResponseDto = new UserResponseDto(1L, "name1", "email1@yandex.ru");
 
         testLocalDateTime = LocalDateTime.of(2024, 1, 1, 1, 1);
         testEventRequestDto = new EventRequestDto(
@@ -74,13 +74,13 @@ public class AdminEventServiceTest {
                         1L, "title1", "annotation1", "description1", false,
                         false, testCategoryResponseDto, 1, 0,
                         testLocalDateTime, testLocalDateTime, null, new LocationDto(1.1, 1.1),
-                        0, testUserResponseDto, EventState.PENDING
+                        0, testUserResponseDto, EventState.PENDING, Collections.emptyList()
                 ),
                 new EventResponseDto(
                         1L, "newTitle1", "newAnnotation1", "newDescription1", true,
                         true, testCategoryResponseDto, 2, 0,
                         testLocalDateTime, testLocalDateTime, null, new LocationDto(0.0, 0.0),
-                        0, testUserResponseDto, EventState.PUBLISHED
+                        0, testUserResponseDto, EventState.PUBLISHED, Collections.emptyList()
                 )
         };
     }

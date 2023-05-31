@@ -43,7 +43,7 @@ public class PrivateRequestServiceTest {
     private final AdminCategoryService adminCategoryService;
     private final AdminEventService adminEventService;
     private final AdminUserService adminUserService;
-    private final PrivateEventSerivce privateEventSerivce;
+    private final PrivateEventService privateEventSerivce;
     private final PrivateRequestService privateRequestService;
 
     private static CategoryRequestDto[] testCategoryRequestDtos;
@@ -62,10 +62,10 @@ public class PrivateRequestServiceTest {
         };
 
         testUserRequestDtos = new UserRequestDto[]{
-                new UserRequestDto("email1@yandex.ru", "name1"),
-                new UserRequestDto("email2@yandex.ru", "name2"),
-                new UserRequestDto("email3@yandex.ru", "name3"),
-                new UserRequestDto("email4@yandex.ru", "name4")
+                new UserRequestDto("name1", "email1@yandex.ru"),
+                new UserRequestDto("name2", "email2@yandex.ru"),
+                new UserRequestDto("name3", "email3@yandex.ru"),
+                new UserRequestDto("name4", "email4@yandex.ru")
         };
 
         LocalDateTime testLocalDateTime = LocalDateTime.of(2024, 1, 1, 1, 1);

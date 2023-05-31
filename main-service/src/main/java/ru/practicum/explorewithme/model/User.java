@@ -17,11 +17,11 @@ public class User {
     @EqualsAndHashCode.Exclude
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String email;
     private String name;
+    private String email;
 
-    public User(String email, String name) {
-        this.email = email;
+    public User(String name, String email) {
         this.name = name;
+        this.email = email;
     }
 }

@@ -42,8 +42,8 @@ public class AdminUserControllerTest {
     public static void beforeAll() {
         objectMapper = new ObjectMapper();
 
-        testUserRequestDto = new UserRequestDto("email1@email.ru", "name1");
-        testUserResponseDto = new UserResponseDto(1L, "email1@email.ru", "name1");
+        testUserRequestDto = new UserRequestDto("name1", "email1@email.ru");
+        testUserResponseDto = new UserResponseDto(1L, "name1", "email1@email.ru");
     }
 
     @BeforeEach

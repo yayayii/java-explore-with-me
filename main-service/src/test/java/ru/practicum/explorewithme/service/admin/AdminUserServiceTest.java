@@ -37,12 +37,12 @@ public class AdminUserServiceTest {
     @BeforeAll
     public static void beforeAll() {
         testUserRequestDtos = new UserRequestDto[]{
-                new UserRequestDto("email1@yandex.ru", "name1"),
-                new UserRequestDto("email2@yandex.ru", "name2")
+                new UserRequestDto("name1", "email1@yandex.ru"),
+                new UserRequestDto("name2", "email2@yandex.ru")
         };
         testUserResponseDtos = new UserResponseDto[]{
-                new UserResponseDto(1L, "email1@yandex.ru", "name1"),
-                new UserResponseDto(2L, "email2@yandex.ru", "name2")
+                new UserResponseDto(1L, "name1", "email1@yandex.ru"),
+                new UserResponseDto(2L, "name2", "email2@yandex.ru")
         };
     }
 

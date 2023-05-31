@@ -17,7 +17,7 @@ import ru.practicum.explorewithme.dto.event.enum_.EventUpdateState;
 import ru.practicum.explorewithme.service.admin.AdminCategoryService;
 import ru.practicum.explorewithme.service.admin.AdminEventService;
 import ru.practicum.explorewithme.service.admin.AdminUserService;
-import ru.practicum.explorewithme.service.private_.PrivateEventSerivce;
+import ru.practicum.explorewithme.service.private_.PrivateEventService;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -43,7 +43,7 @@ public class PublicEventServiceTest {
     private final AdminEventService adminEventService;
     private final AdminUserService adminUserService;
     private final PublicEventService publicService;
-    private final PrivateEventSerivce privateService;
+    private final PrivateEventService privateService;
 
     private static CategoryRequestDto testCategoryRequestDto;
     private static UserRequestDto testUserRequestDto;
@@ -59,8 +59,8 @@ public class PublicEventServiceTest {
         testCategoryRequestDto = new CategoryRequestDto("name1");
         CategoryResponseDto testCategoryResponseDto = new CategoryResponseDto(1L, "name1");
 
-        testUserRequestDto = new UserRequestDto("email1@yandex.ru", "name1");
-        UserResponseDto testUserResponseDto = new UserResponseDto(1L, "email1@yandex.ru", "name1");
+        testUserRequestDto = new UserRequestDto("name1", "email1@yandex.ru");
+        UserResponseDto testUserResponseDto = new UserResponseDto(1L, "name1", "email1@yandex.ru");
 
         testLocalDateTime = LocalDateTime.of(2024, 1, 1, 1, 1);
         testEventRequestDtos = new EventRequestDto[]{
@@ -96,7 +96,7 @@ public class PublicEventServiceTest {
                 1L, "title1", "annotation1", "description1", false,
                 false, testCategoryResponseDto, 1, 0,
                 testLocalDateTime, testLocalDateTime, testLocalDateTime, new LocationDto(1.1, 1.1), 0,
-                testUserResponseDto, EventState.PUBLISHED
+                testUserResponseDto, EventState.PUBLISHED, Collections.emptyList()
         );
     }
 
@@ -130,9 +130,12 @@ public class PublicEventServiceTest {
 
         adminEventService.updateEvent(1L, testEventUpdateRequestDtos[0]);
         adminEventService.updateEvent(2L, testEventUpdateRequestDtos[1]);
-        assertEquals(List.of(testEventShortResponseDto), publicService.getEvents(
-                "description", List.of(1L, 2L), false, testLocalDateTime.minusDays(1),
-                testLocalDateTime.plusDays(1), false, 1, 1)
+        assertEquals(
+                List.of(testEventShortResponseDto),
+                publicService.getEvents(
+                        "description", List.of(1L, 2L), false, testLocalDateTime.minusDays(1),
+                        testLocalDateTime.plusDays(1), false, 1, 1
+                )
         );
     }
 }

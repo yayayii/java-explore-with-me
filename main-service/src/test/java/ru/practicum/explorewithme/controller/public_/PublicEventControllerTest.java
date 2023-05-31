@@ -20,6 +20,7 @@ import ru.practicum.explorewithme.service.StatGateway;
 import ru.practicum.explorewithme.service.public_.PublicEventService;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 
 import static org.hamcrest.Matchers.hasSize;
@@ -47,7 +48,7 @@ public class PublicEventControllerTest {
     public static void beforeAll() {
         CategoryResponseDto testCategoryResponseDto = new CategoryResponseDto(1L, "name1");
 
-        UserResponseDto testUserResponseDto = new UserResponseDto(1L, "email1@email.ru", "name1");
+        UserResponseDto testUserResponseDto = new UserResponseDto(1L, "name1", "email1@email.ru");
 
         LocalDateTime testLocalDateTime = LocalDateTime.of(2024, 1, 1, 1, 1);
         testEventShortResponseDto = new EventShortResponseDto(
@@ -58,7 +59,7 @@ public class PublicEventControllerTest {
                 1L, "title1", "annotation1", "description1", false,
                 false, testCategoryResponseDto, 1, 1,
                 testLocalDateTime, testLocalDateTime, testLocalDateTime, new LocationDto(1.1, 1.1), 1,
-                testUserResponseDto, EventState.PUBLISHED
+                testUserResponseDto, EventState.PUBLISHED, Collections.emptyList()
         );
     }
 

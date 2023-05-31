@@ -47,8 +47,8 @@ public class PublicCompilationControllerTest {
     public static void beforeAll() {
         LocalDateTime testLocalDateTime = LocalDateTime.of(2024, 1, 1, 1, 1);
         UserResponseDto[] testUserResponseDtos = new UserResponseDto[]{
-                new UserResponseDto(1L, "email1@email.ru", "name1"),
-                new UserResponseDto(2L, "email2@email.ru", "name2")
+                new UserResponseDto(1L, "name1", "email1@email.ru"),
+                new UserResponseDto(2L, "name2", "email2@email.ru")
         };
         CategoryResponseDto[] testCategoryResponseDtos = new CategoryResponseDto[]{
                 new CategoryResponseDto(1L, "name1"),

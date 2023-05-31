@@ -4,22 +4,25 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.explorewithme.dao.CategoryDao;
+import ru.practicum.explorewithme.dao.CommentDao;
 import ru.practicum.explorewithme.dao.EventDao;
 import ru.practicum.explorewithme.dto.event.EventResponseDto;
 import ru.practicum.explorewithme.dto.event.EventUpdateRequestDto;
 import ru.practicum.explorewithme.dto.event.enum_.EventUpdateState;
+import ru.practicum.explorewithme.mapper.CommentMapper;
 import ru.practicum.explorewithme.mapper.EventMapper;
 import ru.practicum.explorewithme.model.Category;
+import ru.practicum.explorewithme.model.Comment;
 import ru.practicum.explorewithme.model.event.Event;
 import ru.practicum.explorewithme.model.event.enum_.EventState;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -28,6 +31,7 @@ import java.util.stream.Collectors;
 @Service
 public class AdminEventService {
     private final CategoryDao categoryDao;
+    private final CommentDao commentDao;
     private final EventDao eventDao;
 
 
@@ -43,8 +47,11 @@ public class AdminEventService {
             throw new IllegalArgumentException("Start date must be before end date");
         }
 
-        return eventDao.searchAllByAdmin(userIds, states, categoryIds, rangeStart, rangeEnd, PageRequest.of(from, size))
+        List<EventResponseDto> events = eventDao.searchAllByAdmin(userIds, states, categoryIds, rangeStart, rangeEnd, PageRequest.of(from, size, Sort.by("id")))
                 .stream().map(EventMapper::toResponseDto).collect(Collectors.toList());
+        setCommentsForEvents(events);
+
+        return events;
     }
 
     @Transactional
@@ -109,5 +116,28 @@ public class AdminEventService {
         }
 
         return EventMapper.toResponseDto(event);
+    }
+
+
+    private void setCommentsForEvents(List<EventResponseDto> events) {
+        List<EventResponseDto> publishedEvents = events.stream()
+                .filter((event) -> event.getState() == EventState.PUBLISHED).collect(Collectors.toList());
+        List<Long> eventIds = publishedEvents.stream().map(EventResponseDto::getId).collect(Collectors.toList());
+        List<Comment> comments = commentDao.findAllByEvent_IdIn(eventIds);
+        Map<Long, List<Comment>> eventCommentMap = comments.stream().collect(
+                Collectors.groupingBy(
+                        comment -> comment.getEvent().getId(),
+                        HashMap::new,
+                        Collectors.toCollection(ArrayList::new))
+        );
+
+        for (EventResponseDto event : events) {
+            if (eventCommentMap.containsKey(event.getId())) {
+                event.setComments(
+                        eventCommentMap.get(event.getId()).stream()
+                                .map(CommentMapper::toResponseDto).collect(Collectors.toList())
+                );
+            }
+        }
     }
 }
